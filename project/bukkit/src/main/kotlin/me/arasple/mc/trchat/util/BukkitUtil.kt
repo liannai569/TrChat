@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.ProxyCommandSender
+import taboolib.common.platform.function.console
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.platform.util.sendLang
 import java.util.*
@@ -19,6 +20,15 @@ import java.util.*
  * @author wlys
  * @since 2022/6/8 12:48
  */
+fun Throwable.print(title: String, printStackTrace: Boolean = true) {
+    console().sendMessage("§c[TrChat] §8$title")
+    console().sendMessage("         §8${localizedMessage}")
+    if (printStackTrace){
+        stackTrace.forEach {
+            console().sendMessage("         §8$it")
+        }
+    }
+}
 fun String.toCondition() = Condition(this)
 
 fun Condition?.pass(commandSender: CommandSender): Boolean {

@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("io.izzel.taboolib") version "1.40"
-    id("org.jetbrains.kotlin.jvm") version "1.6.10"
+    id("org.jetbrains.kotlin.jvm") version "1.6.21"
     id("org.tabooproject.shrinkingkt") version "1.0.6"
 }
 
@@ -39,7 +39,7 @@ taboolib {
         "expansion-javascript"
     )
     classifier = null
-    version = "6.0.8-3"
+    version = "6.0.8-9"
 }
 
 configure<org.tabooproject.shrinkingkt.ShrinkingExt> {
@@ -61,8 +61,8 @@ dependencies {
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
     compileOnly("net.kyori:adventure-platform-bungeecord:4.1.0")
 
-    compileOnly("ink.ptms.core:v11802:11802:mapped")
-    compileOnly("ink.ptms.core:v11802:11802:universal")
+    compileOnly("ink.ptms.core:v11900:11900:mapped")
+    compileOnly("ink.ptms.core:v11900:11900:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
 
     compileOnly("net.md-5:bungeecord-bootstrap:1.17-R0.1-SNAPSHOT")

@@ -10,8 +10,6 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common5.Baffle
-import taboolib.common5.util.parseMillis
-import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
@@ -37,23 +35,22 @@ object Functions {
     }
 
     @ConfigNode("General.Command-Controller.List", "function.yml")
-    val commandController = ConfigNodeTransfer<List<*>, Map<Regex, Pair<Condition?, Baffle?>>> {
+    val commandController = ConfigNodeTransfer<List<*>, Map<String, Command>> {
         associate { string ->
             val (cmd, property) = Property.from(string!!.toString())
-            val baffle = property[Property.COOLDOWN]?.toFloat()?.let {
-                Baffle.of((it * 1000).toLong(), TimeUnit.MILLISECONDS)
-            }
-            val condition = property[Property.CONDITION]?.toCondition()
             val mCmd = Bukkit.getCommandAliases().entries.firstOrNull { (_, value) ->
                 value.any { it.equals(cmd.split(" ")[0], ignoreCase = true) }
             }
-            val key = if (mCmd != null) mCmd.key + cmd.removePrefix(mCmd.key) else cmd
-            val regex = if (property[Property.EXACT].toBoolean()) {
-                Regex("(?i)$key\$")
-            } else {
-                Regex("(?i)$key.*")
+            val key = if (mCmd != null) mCmd.key + cmd.substringAfter(' ') else cmd
+            val exact = property[Property.EXACT].toBoolean()
+            val condition = property[Property.CONDITION]?.toCondition()
+            val baffle = property[Property.COOLDOWN]?.toFloat()?.let {
+                Baffle.of((it * 1000).toLong(), TimeUnit.MILLISECONDS)
             }
-            regex to Pair(condition, baffle)
+            val relocate = property[Property.RELOCATE]?.split(';')
+            key to Command(exact, condition, baffle, relocate)
         }
     }
+
+    class Command(val exact: Boolean, val condition: Condition?, val baffle: Baffle?, val relocate: List<String>?)
 }

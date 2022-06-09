@@ -13,6 +13,8 @@ enum class Property(val regex: Regex, val group: Int) {
 
     EXACT("\\{exact[:=] ?(.+)}"),
 
+    RELOCATE("\\{relocate[:=] ?(.+)}"),
+
     COOLDOWN("\\{cooldown[:=] ?(.+)}");
 
     constructor(regex: String, group: Int = 1) : this("(?i)$regex".toRegex(), group)

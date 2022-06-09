@@ -28,6 +28,8 @@ class ActionChannel(val symbol: Symbol, val channel: String?): ScriptAction<Void
         return CompletableFuture.completedFuture(null)
     }
 
+    @Internal
+    @PlatformSide([Platform.BUKKIT])
     companion object {
 
         @KetherParser(["channel"], namespace = "trchat", shared = true)

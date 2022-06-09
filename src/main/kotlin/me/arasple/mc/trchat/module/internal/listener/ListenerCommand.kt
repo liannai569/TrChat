@@ -8,6 +8,8 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.util.replaceWithOrder
+import taboolib.common.util.subList
 import taboolib.platform.util.sendLang
 
 /**
@@ -31,21 +33,33 @@ object ListenerCommand {
         val mCmd = Bukkit.getCommandAliases().entries.firstOrNull { (_, value) ->
             value.any { it.equals(command[0], ignoreCase = true) }
         }
-        cmd = if (mCmd != null) mCmd.key + cmd.removePrefix(mCmd.key) else cmd
+        cmd = if (mCmd != null) mCmd.key + cmd.substringAfter(' ') else cmd
 
-        val controller = Functions.commandController.get().entries.firstOrNull { it.key.matches(cmd) }?.value
+        val controller = Functions.commandController.get().entries.firstOrNull {
+            (it.value.exact && cmd.equals(it.key, ignoreCase = true))
+                    || (!it.value.exact && cmd.substringBefore(' ').equals(it.key.substringBefore(' '), ignoreCase = true))
+        }?.value ?: return
 
-        val condition = controller?.first
+        val condition = controller.condition
         if (condition != null && !condition.eval(player)) {
             e.isCancelled =  true
             player.sendLang("Command-Controller-Deny")
             return
         }
 
-        val baffle = controller?.second
+        val baffle = controller.baffle
         if (baffle != null && !baffle.hasNext(player.name) && !player.hasPermission("trchat.bypass.cmdcooldown")) {
             e.isCancelled =  true
             player.sendLang("Command-Controller-Cooldown")
+            return
+        }
+
+        val relocate = controller.relocate?.map { it.replaceWithOrder(*subList(command, 1).toTypedArray()) }
+        if (relocate != null) {
+            e.isCancelled = true
+            relocate.forEach {
+                player.performCommand(it)
+            }
             return
         }
     }

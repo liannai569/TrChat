@@ -23,6 +23,8 @@ class ActionServer(val server: ParsedAction<*>): ScriptAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    @Internal
+    @PlatformSide([Platform.BUKKIT])
     companion object {
 
         @KetherParser(["server", "bungee", "connect"], shared = true)

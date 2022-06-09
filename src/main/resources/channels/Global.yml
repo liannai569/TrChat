@@ -1,5 +1,5 @@
 Options:
-  Speak-Condition: 'perm *trchat.global'
+  Speak-Condition: 'perm "trchat.global"'
   Proxy: true
   Force-Proxy: true
   Double-Transfer: true

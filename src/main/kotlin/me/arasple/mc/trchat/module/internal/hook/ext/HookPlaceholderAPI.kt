@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.hook.ext
 
-import me.arasple.mc.trchat.module.internal.script.js.JavaScriptAgent
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
 import org.bukkit.entity.Player
@@ -28,7 +27,7 @@ object HookPlaceholderAPI : PlaceholderExpansion {
             val session = player.getSession()
 
             return when (params[0].lowercase()) {
-                "js" -> if (params.size > 1) JavaScriptAgent.eval(player, args.substringAfter('_')).get() else ""
+//                "js" -> if (params.size > 1) JavaScriptAgent.eval(player, args.substringAfter('_')).get() else ""
                 "filter" -> session.isFilterEnabled
                 "channel" -> session.channel?.id
                 "toplayer" -> session.lastPrivateTo

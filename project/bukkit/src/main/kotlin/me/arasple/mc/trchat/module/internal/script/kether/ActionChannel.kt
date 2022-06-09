@@ -1,6 +1,8 @@
 package me.arasple.mc.trchat.module.internal.script.kether
 
 import me.arasple.mc.trchat.module.display.channel.Channel
+import taboolib.common.platform.Platform
+import taboolib.common.platform.PlatformSide
 import taboolib.library.kether.LocalizedException
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
@@ -28,6 +30,7 @@ class ActionChannel(val symbol: Symbol, val channel: String?): ScriptAction<Void
         return CompletableFuture.completedFuture(null)
     }
 
+    @PlatformSide([Platform.BUKKIT])
     companion object {
 
         @KetherParser(["channel"], namespace = "trchat", shared = true)

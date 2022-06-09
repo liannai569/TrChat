@@ -1,6 +1,8 @@
 package me.arasple.mc.trchat.module.internal.script.kether
 
 import me.arasple.mc.trchat.module.internal.proxy.bungee.Bungees
+import taboolib.common.platform.Platform
+import taboolib.common.platform.PlatformSide
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
@@ -23,6 +25,7 @@ class ActionServer(val server: ParsedAction<*>): ScriptAction<Void>() {
         return CompletableFuture.completedFuture(null)
     }
 
+    @PlatformSide([Platform.BUKKIT])
     companion object {
 
         @KetherParser(["server", "bungee", "connect"], shared = true)

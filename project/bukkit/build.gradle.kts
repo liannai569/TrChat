@@ -36,6 +36,7 @@ taboolib {
         "expansion-command-helper",
         "expansion-javascript"
     )
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
@@ -45,6 +46,7 @@ repositories {
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://jitpack.io")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
@@ -53,14 +55,15 @@ dependencies {
     compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
 
-    compileOnly("ink.ptms.core:v11802:11802:mapped")
-    compileOnly("ink.ptms.core:v11802:11802:universal")
+    compileOnly("ink.ptms.core:v11900:11900:mapped")
+    compileOnly("ink.ptms.core:v11900:11900:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
-
-    compileOnly("net.md-5:bungeecord-bootstrap:1.17-R0.1-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
 
     compileOnly("com.willfp:eco:6.6.3") { isTransitive = false }
     compileOnly("me.clip:placeholderapi:2.11.1") { isTransitive = false }
 
     compileOnly(fileTree("libs"))
 }
+
+tasks.tabooRelocateJar { onlyIf { false } }

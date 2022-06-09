@@ -14,6 +14,7 @@ dependencies {
 tasks {
     withType<ShadowJar> {
         archiveClassifier.set("")
+        relocate("taboolib", "${project.group}.taboolib")
     }
     build {
         dependsOn(shadowJar)

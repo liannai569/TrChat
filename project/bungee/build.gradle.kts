@@ -23,14 +23,15 @@ taboolib {
         "platform-bungee",
         "expansion-command-helper",
     )
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
 
 repositories {
-    mavenCentral()
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://jitpack.io")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
@@ -38,8 +39,9 @@ dependencies {
 
     compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-platform-bungeecord:4.1.0")
-
-    compileOnly("net.md-5:bungeecord-bootstrap:1.17-R0.1-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
 
     compileOnly(fileTree("libs"))
 }
+
+tasks.tabooRelocateJar { onlyIf { false } }

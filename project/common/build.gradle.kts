@@ -17,6 +17,7 @@ taboolib {
         "common",
         "common-5"
     )
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
@@ -26,6 +27,4 @@ dependencies {
     compileOnly("com.google.guava:guava:23.0")
 }
 
-tasks.tabooRelocateJar {
-    onlyIf { false }
-}
+tasks.tabooRelocateJar { onlyIf { false } }

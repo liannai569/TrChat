@@ -114,4 +114,8 @@ object TrChatAPI {
     val classChatSerializer by lazy {
         nmsClass("IChatBaseComponent\$ChatSerializer")
     }
+
+    val classClientboundChatPreviewPacket by lazy {
+        nmsClass("ClientboundChatPreviewPacket")
+    }
 }

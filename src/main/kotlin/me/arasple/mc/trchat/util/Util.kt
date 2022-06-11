@@ -4,7 +4,6 @@ import com.google.gson.JsonParser
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.internal.data.Database
-import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.script.Condition
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -87,12 +86,10 @@ fun CommandSender.sendProcessedMessage(sender: Player, component: Component) {
 }
 
 fun CommandSender.sendProcessedMessage(uuid: UUID, component: Component) {
-    if (!HookPlugin.getInteractiveChat().sendMessage(this, component)) {
-        if (TrChat.paperEnv) {
-            sendMessage(Identity.identity(uuid), component, MessageType.CHAT)
-        } else {
-            Util.adventure.sender(this).sendMessage(Identity.identity(uuid), component, MessageType.CHAT)
-        }
+    if (TrChat.paperEnv) {
+        sendMessage(Identity.identity(uuid), component, MessageType.CHAT)
+    } else {
+        Util.adventure.sender(this).sendMessage(Identity.identity(uuid), component, MessageType.CHAT)
     }
 }
 

@@ -6,9 +6,6 @@ import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.filter.ChatFilter
 import me.arasple.mc.trchat.module.display.format.Format
-import me.arasple.mc.trchat.module.internal.command.main.CommandReply
-import me.arasple.mc.trchat.module.internal.data.ChatLogs
-import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import me.arasple.mc.trchat.util.proxy.Proxy
 import me.arasple.mc.trchat.util.proxy.bukkit.Players
@@ -17,7 +14,6 @@ import me.arasple.mc.trchat.util.proxy.sendProxyLang
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.command
-import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
@@ -69,25 +65,25 @@ class PrivateChannel(
         }
     }
 
-    override fun execute(player: Player, message: String) {
+    override fun execute(player: Player, message: String, forward: Boolean): Pair<Component, Component?>? {
         if (!player.checkMute()) {
-            return
+            return null
         }
         if (!settings.speakCondition.pass(player)) {
             player.sendLang("Channel-No-Speak-Permission")
-            return
+            return null
         }
         if (settings.filterBeforeSending && ChatFilter.filter(message).sensitiveWords > 0) {
             player.sendLang("Channel-Filter-Before-Sending")
-            return
+            return null
         }
         val session = player.getSession()
         val event = TrChatEvent(this, session, message)
         if (!event.call()) {
-            return
+            return null
         }
-
         val msg = event.message
+
         val builderSender = Component.text()
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->
             format.prefix.forEach { prefix ->
@@ -95,7 +91,7 @@ class PrivateChannel(
             builderSender.append(format.msg.serialize(player, msg, settings.disabledFunctions))
             format.suffix.forEach { suffix ->
                 builderSender.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-        } ?: return
+        } ?: return null
         val send = builderSender.build()
 
         val builderReceiver = Component.text()
@@ -105,8 +101,12 @@ class PrivateChannel(
             builderReceiver.append(format.msg.serialize(player, msg, settings.disabledFunctions))
             format.suffix.forEach { suffix ->
                 builderReceiver.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-        } ?: return
+        } ?: return null
         val receive = builderReceiver.build()
+
+        if (!forward) {
+            return send to receive
+        }
 
         player.sendProcessedMessage(player, send)
 
@@ -125,14 +125,6 @@ class PrivateChannel(
             }
         }
 
-        ChatSession.SESSIONS.filterValues { it.isSpying }.entries.forEach { (_, v) ->
-            v.player.sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
-        }
-        console().sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
-
-        CommandReply.lastMessageFrom[session.lastPrivateTo] = player.name
-        player.getSession().lastMessage = message
-        ChatLogs.logPrivate(player.name, session.lastPrivateTo, message)
-        Metrics.increase(0)
+        return send to receive
     }
 }

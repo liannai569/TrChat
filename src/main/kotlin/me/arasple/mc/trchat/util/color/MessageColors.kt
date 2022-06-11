@@ -21,6 +21,7 @@ object MessageColors {
     private const val FORCE_CHAT_COLOR_PERMISSION_NODE = "trchat.color.force-defaultcolor."
 
     private val specialColors = arrayOf(
+        "minedown",
         "rainbow",
         "gradients",
         "hex",

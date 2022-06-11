@@ -39,7 +39,7 @@ taboolib {
         "expansion-javascript"
     )
     classifier = null
-    version = "6.0.8-9"
+    version = "6.0.9-3"
 }
 
 configure<org.tabooproject.shrinkingkt.ShrinkingExt> {
@@ -48,18 +48,20 @@ configure<org.tabooproject.shrinkingkt.ShrinkingExt> {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
     maven("https://nexus.velocitypowered.com/repository/maven-public/")
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://papermc.io/repo/repository/maven-public/")
-    maven("https://jitpack.io")
+    maven("https://repo.minebench.de/")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
 dependencies {
     compileOnly(kotlin("stdlib"))
-    compileOnly("net.kyori:adventure-api:4.10.1")
+    compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
     compileOnly("net.kyori:adventure-platform-bungeecord:4.1.0")
+    taboo("de.themoep:minedown-adventure:1.7.1-SNAPSHOT")
 
     compileOnly("ink.ptms.core:v11900:11900:mapped")
     compileOnly("ink.ptms.core:v11900:11900:universal")

@@ -3,17 +3,21 @@ package me.arasple.mc.trchat.api.nms
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.module.display.filter.ChatFilter.filter
+import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.gson
 import me.arasple.mc.trchat.util.print
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.minecraft.network.chat.IChatBaseComponent
+import net.minecraft.network.protocol.game.ClientboundChatPreviewPacket
 import net.minecraft.server.v1_16_R3.NBTBase
 import net.minecraft.server.v1_16_R3.NBTTagCompound
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.MinecraftVersion.isUniversal
+import taboolib.module.nms.sendPacket
 import taboolib.platform.util.isNotAir
 
 /**
@@ -75,6 +79,12 @@ class NMSImpl : NMS() {
         } catch (_: Throwable) {
         }
         return itemStack
+    }
+
+    override fun sendChatPreview(player: Player, queryId: Int, query: String) {
+        val component = player.getSession().channel?.execute(player, query, forward = false)?.first ?: return
+        val iChatBaseComponent = TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
+        player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
     }
 
     private fun filterComponent(component: Component): Component {

@@ -7,7 +7,7 @@ import taboolib.common.env.RuntimeDependency;
  * @since 2022/3/20 12:54
  */
 @RuntimeDependency(
-        value = "!net.kyori:adventure-api:4.10.0",
+        value = "!net.kyori:adventure-api:4.11.0",
         test = "!net.kyori.adventure.Adventure",
         initiative = true
 )

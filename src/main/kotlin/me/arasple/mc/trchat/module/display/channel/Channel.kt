@@ -102,21 +102,21 @@ open class Channel(
 
     val listeners = mutableSetOf<UUID>()
 
-    open fun execute(player: Player, message: String) {
+    open fun execute(player: Player, message: String, forward: Boolean = true): Pair<Component, Component?>? {
         if (!player.checkMute()) {
-            return
+            return null
         }
         if (!settings.speakCondition.pass(player)) {
             player.sendLang("Channel-No-Speak-Permission")
-            return
+            return null
         }
         if (settings.filterBeforeSending && ChatFilter.filter(message).sensitiveWords > 0) {
             player.sendLang("Channel-Filter-Before-Sending")
-            return
+            return null
         }
         val event = TrChatEvent(this, player.getSession(), message)
         if (!event.call()) {
-            return
+            return null
         }
         val msg = event.message
 
@@ -127,8 +127,12 @@ open class Channel(
             builder.append(format.msg.serialize(player, msg, settings.disabledFunctions))
             format.suffix.forEach { suffix ->
                 builder.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-        } ?: return
+        } ?: return null
         val component = builder.build()
+
+        if (!forward) {
+            return component to null
+        }
 
         if (settings.proxy && Proxy.isEnabled) {
             val gson = gson(component)
@@ -150,7 +154,7 @@ open class Channel(
                     settings.doubleTransfer.toString()
                 )
             }
-            return
+            return component to null
         }
         when (settings.target.range) {
             Target.Range.ALL -> {
@@ -179,6 +183,8 @@ open class Channel(
         player.getSession().lastMessage = message
         ChatLogs.log(player, message)
         Metrics.increase(0)
+
+        return component to null
     }
 
     open fun unregister() {

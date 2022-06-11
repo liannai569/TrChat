@@ -5,7 +5,6 @@ import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.info
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.PacketReceiveEvent
 
@@ -22,8 +21,8 @@ object ChatPreview {
     @SubscribeEvent
     fun onReceive(e: PacketReceiveEvent) {
         if (e.packet.name == "ServerboundChatPreviewPacket") {
-            val queryId = e.packet.source.invokeMethod<Int>("queryId")!!.also { info("queryId: $it") }
-            val query = e.packet.source.invokeMethod<String>("query")!!.also { info("query: $it") }
+            val queryId = e.packet.source.invokeMethod<Int>("queryId")!!
+            val query = e.packet.source.invokeMethod<String>("query")!!
 //            processingQueries[queryId] = e.player to query
             NMS.INSTANCE.sendChatPreview(e.player, queryId, query)
         }

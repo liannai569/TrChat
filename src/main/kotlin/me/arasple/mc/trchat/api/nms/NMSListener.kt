@@ -1,16 +1,17 @@
 package me.arasple.mc.trchat.api.nms
 
+import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.api.config.Filters
-import me.arasple.mc.trchat.module.display.filter.ChatFilter.filter
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
+import me.arasple.mc.trchat.util.gson
+import net.kyori.adventure.text.Component
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.module.nms.MinecraftVersion.majorLegacy
 import taboolib.module.nms.PacketSendEvent
 
@@ -27,30 +28,34 @@ object NMSListener {
         val session = e.player.getSession()
         // Chat Filter
         when (e.packet.name) {
+            "ClientboundPlayerChatPacket" -> {
+                // TODO: 1.19 聊天过滤
+                return
+            }
             "PacketPlayOutChat" -> {
-                session.addMessage(e.packet)
-                if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {
-                    return
-                }
                 val type = if (majorLegacy >= 11700) {
-                    e.packet.read<Any>("type")!!.invokeMethod<Byte>("a")
+                    e.packet.read<Any>("type")!!.getProperty<Byte>("index")
                 } else if (majorLegacy >= 11200) {
-                    e.packet.read<Any>("b")!!.invokeMethod<Byte>("a")
+                    e.packet.read<Any>("b")!!.getProperty<Byte>("d")
                 } else {
                     e.packet.read<Byte>("b")
                 }
                 if (type != 0.toByte()) {
                     return
                 }
-                if (majorLegacy >= 11700) {
-                    e.packet.write("message", NMS.INSTANCE.filterIChatComponent(e.packet.read<Any>("message")))
-                } else {
+                session.addMessage(e.packet)
+                if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {
+                    return
+                }
+                if (!TrChat.paperEnv) {
                     e.packet.write("a", NMS.INSTANCE.filterIChatComponent(e.packet.read<Any>("a")))
+                } else {
+                    e.packet.write("adventure\$message", filterComponentWithValidating(e.packet.read<Component>("adventure\$message")))
                 }
-                kotlin.runCatching {
-                    val components = e.packet.read<Array<BaseComponent>>("components") ?: return
-                    e.packet.write("components", components.map { filterComponent(it) }.toTypedArray())
-                }
+//                kotlin.runCatching {
+//                    val components = e.packet.read<Array<BaseComponent>>("components") ?: return
+//                    e.packet.write("components", components.map { filterComponent(it) }.toTypedArray())
+//                }
                 return
             }
             "PacketPlayOutWindowItems" -> {
@@ -93,13 +98,23 @@ object NMSListener {
 //        }
     }
 
-    private fun filterComponent(component: BaseComponent): BaseComponent {
-        if (component is TextComponent && component.text.isNotEmpty()) {
-            component.text = filter(component.text).filtered
+//    private fun filterComponent(component: BaseComponent): BaseComponent {
+//        if (component is TextComponent && component.text.isNotEmpty()) {
+//            component.text = filter(component.text).filtered
+//        }
+//        if (!component.extra.isNullOrEmpty()) {
+//            component.extra = component.extra.map { filterComponent(it) }
+//        }
+//        return component
+//    }
+
+    private fun filterComponentWithValidating(component: Component?): Component? {
+        return TrChatAPI.filterComponent(component)?.let {
+            if (gson(it).length >= 32000) {
+                Component.text("This chat packet is too big to send.")
+            } else {
+                it
+            }
         }
-        if (!component.extra.isNullOrEmpty()) {
-            component.extra = component.extra.map { filterComponent(it) }
-        }
-        return component
     }
 }

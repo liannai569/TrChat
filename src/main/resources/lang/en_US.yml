@@ -46,6 +46,7 @@ General-Too-Long: '&8[&3Tr&bChat&8] &7Message is too long. &8[&6{0}&8/&2{1}&8]'
 General-Too-Similar: '&8[&3Tr&bChat&8] &7Please do not repeat your message.'
 General-No-Permission: '&8[&3Tr&bChat&8] &7You do not have enough permission to do this.'
 General-Muted: '&8[&3Tr&bChat&8] &cYou have been muted until {0}!Reason: {1}'
+General-Cancel-Muted: '&8[&3Tr&bChat&8] &aYou can speak now.'
 General-Global-Muting: '&8[&3Tr&bChat&8] &cAll members are being muted.'
 
 Cooldowns-Chat:
@@ -65,6 +66,13 @@ Cooldowns-Item-Show:
 Cooldowns-Inventory-Show:
   - type: actionbar
     text: '&3&lYou need to wait after &a{0} secs &3&lbefore showing your inventory again.'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 0
+Cooldowns-EnderChest-Show:
+  - type: actionbar
+    text: '&3&lYou need to wait after &a{0} secs &3&lbefore showing your ender chest again.'
   - type: sound
     sound: 'ENTITY_ITEM_BREAK'
     volume: 1

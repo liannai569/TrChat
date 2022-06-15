@@ -49,6 +49,7 @@ General-Too-Long: '&8[&3Tr&bChat&8] &7你的聊天内容过长. &8[&6{0}&8/&2{1}
 General-Too-Similar: '&8[&3Tr&bChat&8] &7你的两次聊天内容过于相似, 请勿复读.'
 General-No-Permission: '&8[&3Tr&bChat&8] &7你没有足够的权限执行此操作.'
 General-Muted: '&8[&3Tr&bChat&8] &c你被禁言了!解除时间: {0} 原因: {1}'
+General-Cancel-Muted: '&8[&3Tr&bChat&8] &a你的禁言已被解除.'
 General-Global-Muting: '&8[&3Tr&bChat&8] &c全员禁言中.'
 
 Cooldowns-Chat:
@@ -68,6 +69,13 @@ Cooldowns-Item-Show:
 Cooldowns-Inventory-Show:
   - type: actionbar
     text: '&3&l您需要等待冷却 &a{0}s &3&l后才能再次展示背包.'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 0
+Cooldowns-EnderChest-Show:
+  - type: actionbar
+    text: '&3&l您需要等待冷却 &a{0}s &3&l后才能再次展示末影箱.'
   - type: sound
     sound: 'ENTITY_ITEM_BREAK'
     volume: 1

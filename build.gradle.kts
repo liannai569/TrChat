@@ -39,7 +39,7 @@ taboolib {
         "expansion-javascript"
     )
     classifier = null
-    version = "6.0.9-3"
+    version = "6.0.9-4"
 }
 
 configure<org.tabooproject.shrinkingkt.ShrinkingExt> {
@@ -61,10 +61,12 @@ dependencies {
     compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
     compileOnly("net.kyori:adventure-platform-bungeecord:4.1.0")
-    taboo("de.themoep:minedown-adventure:1.7.1-SNAPSHOT")
+//    taboo("de.themoep:minedown-adventure:1.7.1-SNAPSHOT")
 
     compileOnly("ink.ptms.core:v11900:11900:mapped")
     compileOnly("ink.ptms.core:v11900:11900:universal")
+    compileOnly("ink.ptms.core:v11802:11802-minimize:mapped")
+    compileOnly("ink.ptms.core:v11701:11701-minimize:mapped")
     compileOnly("ink.ptms:nms-all:1.0.0")
 
     compileOnly("net.md-5:bungeecord-bootstrap:1.17-R0.1-SNAPSHOT")

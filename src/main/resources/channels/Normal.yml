@@ -42,3 +42,6 @@ Formats:
           suggest: '/msg %player_name% '
       part-before-msg:
         text: '&7: '
+    suffix:
+      example:
+        text: ''

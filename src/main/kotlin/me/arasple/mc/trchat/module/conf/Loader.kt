@@ -178,11 +178,11 @@ object Loader {
             val condition = map.getString("condition")?.toCondition()
             val priority = map.getInt("priority", 100)
             val regex = map.getString("pattern")!!.toRegex()
-            val filterTextPattern = map.getString("text-filter")?.toPattern()
+            val filterTextRegex = map.getString("text-filter")?.toRegex()
             val displayJson = parseJSON(map.getConfigurationSection("display")!!.toMap())
             val action = map["action"]?.toString()
 
-            Function(id, condition, priority, regex, filterTextPattern, displayJson, action)
+            Function(id, condition, priority, regex, filterTextRegex, displayJson, action)
         }.sortedBy { it.priority }
 
         Function.functions.addAll(functions)

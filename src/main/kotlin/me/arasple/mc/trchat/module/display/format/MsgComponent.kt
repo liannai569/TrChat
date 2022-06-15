@@ -4,7 +4,6 @@ import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.*
 import me.arasple.mc.trchat.module.display.function.Function
-import me.arasple.mc.trchat.module.display.function.Function.Companion.replaceRegex
 import me.arasple.mc.trchat.util.color.DefaultColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.legacy
@@ -52,7 +51,7 @@ class MsgComponent(
             message = EnderChestShow.replaceMessage(message)
         }
         Function.functions.filter { it.condition.pass(sender) && !disabledFunctions.contains(it.id) }.forEach {
-            message = message.replaceRegex(it.regex, it.filterTextPattern, "{{${it.id}:{0}}}")
+            message = it.apply(message)
         }
 
         val defaultColor = MessageColors.catchDefaultMessageColor(sender, defaultColor)

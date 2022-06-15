@@ -2,12 +2,9 @@ package me.arasple.mc.trchat.api.nms
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.TrChatAPI
-import me.arasple.mc.trchat.module.display.filter.ChatFilter.filter
 import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.gson
 import me.arasple.mc.trchat.util.print
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.minecraft.network.chat.IChatBaseComponent
 import net.minecraft.network.protocol.game.ClientboundChatPreviewPacket
 import net.minecraft.server.v1_16_R3.NBTBase
@@ -30,7 +27,7 @@ class NMSImpl : NMS() {
         iChat ?: return null
         return try {
             val json = TrChatAPI.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
-            val component = filterComponent(gson(json))
+            val component = TrChatAPI.filterComponent(gson(json))!!
             TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component).let { if (it.length > 30000) "{\"text\":\"This chat packet is too big to send.\"}" else it }, fixed = true)!!
         } catch (t: Throwable) {
             if (!TrChat.reportedErrors.contains("filterIChatComponent")) {
@@ -85,24 +82,5 @@ class NMSImpl : NMS() {
         val component = player.getSession().channel?.execute(player, query, forward = false)?.first ?: return
         val iChatBaseComponent = TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
         player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
-    }
-
-    private fun filterComponent(component: Component): Component {
-        val newComponent = if (component is TextComponent && component.content().isNotEmpty()) {
-            component.content(filter(component.content()).filtered)
-        } else {
-            component
-        }
-        return if (newComponent.children().isNotEmpty()) {
-            Component.text { builder ->
-                newComponent.children().forEach { builder.append(filterComponent(it)) }
-                builder.style(newComponent.style())
-                if (newComponent is TextComponent) {
-                    builder.content(newComponent.content())
-                }
-            }
-        } else {
-            newComponent
-        }
     }
 }

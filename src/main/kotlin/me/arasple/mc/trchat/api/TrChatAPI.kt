@@ -5,6 +5,7 @@ import me.arasple.mc.trchat.module.display.filter.processer.FilteredObject
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.sendProcessedMessage
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
@@ -88,6 +89,33 @@ object TrChatAPI {
     @JvmStatic
     fun sendComponent(receiver: CommandSender, component: Component, sender: UUID = UUID.randomUUID()) {
         receiver.sendProcessedMessage(sender, component)
+    }
+
+    /**
+     * 过滤Component
+     *
+     * @param component 原内容
+     * @return 过滤后内容
+     */
+    @JvmStatic
+    fun filterComponent(component: Component?): Component? {
+        component ?: return null
+        val newComponent = if (component is TextComponent && component.content().isNotEmpty()) {
+            component.content(filter(component.content()).filtered)
+        } else {
+            component
+        }
+        return if (newComponent.children().isNotEmpty()) {
+            Component.text { builder ->
+                newComponent.children().forEach { builder.append(filterComponent(it)!!) }
+                builder.style(newComponent.style())
+                if (newComponent is TextComponent) {
+                    builder.content(newComponent.content())
+                }
+            }
+        } else {
+            newComponent
+        }
     }
 
     @JvmStatic

@@ -114,7 +114,7 @@ open class Channel(
             player.sendLang("Channel-Filter-Before-Sending")
             return null
         }
-        val event = TrChatEvent(this, player.getSession(), message)
+        val event = TrChatEvent(this, player.getSession(), message, !forward)
         if (!event.call()) {
             return null
         }

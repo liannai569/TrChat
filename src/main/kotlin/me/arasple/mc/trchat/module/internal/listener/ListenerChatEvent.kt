@@ -5,7 +5,6 @@ import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.EnderChestShow
 import me.arasple.mc.trchat.module.display.function.InventoryShow
 import me.arasple.mc.trchat.module.display.function.ItemShow
-import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.util.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -27,7 +26,6 @@ object ListenerChatEvent {
     fun onChat(e: AsyncPlayerChatEvent) {
         e.isCancelled = true
         val player = e.player
-        var message = e.message
         val session = player.getSession()
 
         session.recipients = e.recipients
@@ -36,9 +34,7 @@ object ListenerChatEvent {
             return
         }
 
-        message = HookPlugin.getItemsAdder().replaceFontImages(player, message)
-
-        if (!checkLimits(player, message)) {
+        if (!checkLimits(player, e.message)) {
             return
         }
 
@@ -58,14 +54,14 @@ object ListenerChatEvent {
 
         Channel.channels.forEach { channel ->
             channel.bindings.prefix?.forEach {
-                if (message.startsWith(it, ignoreCase = true)) {
-                    channel.execute(player, message.substring(it.length))
+                if (e.message.startsWith(it, ignoreCase = true)) {
+                    channel.execute(player, e.message.substring(it.length))
                     return
                 }
             }
         }
 
-        session.channel?.execute(player, message)
+        session.channel?.execute(player, e.message)
     }
 
     private fun checkLimits(player: Player, message: String): Boolean {

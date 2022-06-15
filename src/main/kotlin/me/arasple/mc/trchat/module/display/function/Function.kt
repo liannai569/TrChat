@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.display.function
 import me.arasple.mc.trchat.module.display.format.JsonComponent
 import me.arasple.mc.trchat.module.internal.script.Condition
 import taboolib.common.util.replaceWithOrder
-import java.util.regex.Pattern
 
 /**
  * @author wlys
@@ -14,26 +13,25 @@ class Function(
     val condition: Condition?,
     val priority: Int,
     val regex: Regex,
-    val filterTextPattern: Pattern?,
+    val filterTextRegex: Regex?,
     val displayJson: JsonComponent,
     val action: String?
 ) {
+
+    fun apply(string: String): String {
+        return string.replaceRegex(regex, filterTextRegex, "{{${id}:{0}}}")
+    }
 
     companion object {
 
         val functions = mutableListOf<Function>()
 
-        fun String.replaceRegex(regex: Regex, textPattern: Pattern?, replacement: String): String {
+        fun String.replaceRegex(regex: Regex, replaceRegex: Regex?, replacement: String): String {
             var string = this
             regex.findAll(string).forEach {
                 val str = it.value
-                val matcher = textPattern?.matcher(str)
-                val rep = replacement.replaceWithOrder(
-                    if (matcher != null && matcher.find()) {
-                        matcher.group()
-                    } else {
-                        str
-                    })
+                val result = replaceRegex?.find(str)?.value ?: str
+                val rep = replacement.replaceWithOrder(result)
                 string = string.replace(str, rep)
             }
             return string

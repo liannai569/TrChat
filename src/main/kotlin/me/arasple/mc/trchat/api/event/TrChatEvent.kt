@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.api.event
 
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.Channel
+import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
@@ -15,9 +16,11 @@ class TrChatEvent(
     val channel: Channel,
     val session: ChatSession,
     var message: String,
+    val preview: Boolean = false
 ) : BukkitProxyEvent() {
 
     init {
         message = message.replace("{{", "\\{{").replace("}}", "\\}}")
+        message = HookPlugin.getItemsAdder().replaceFontImages(session.player, message)
     }
 }

@@ -36,7 +36,7 @@ taboolib {
         "expansion-command-helper",
         "expansion-javascript"
     )
-    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
+    options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion
 }
@@ -53,7 +53,7 @@ dependencies {
     api(project(":project:common"))
 
     compileOnly("net.kyori:adventure-api:4.11.0")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.1.0")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.1.1")
 
     compileOnly("ink.ptms.core:v11900:11900:mapped")
     compileOnly("ink.ptms.core:v11900:11900:universal")
@@ -65,5 +65,3 @@ dependencies {
 
     compileOnly(fileTree("libs"))
 }
-
-tasks.tabooRelocateJar { onlyIf { false } }

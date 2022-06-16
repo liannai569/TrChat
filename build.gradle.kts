@@ -1,7 +1,7 @@
 plugins {
     id("org.gradle.java")
     id("org.gradle.maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "1.6.21" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.5.31" apply false
 }
 
 subprojects {
@@ -12,7 +12,9 @@ subprojects {
         mavenCentral()
     }
     dependencies {
-        "compileOnly"(kotlin("stdlib"))
+        compileOnly(kotlin("stdlib"))
+        compileOnly("com.google.code.gson:gson:2.8.5")
+        compileOnly("com.google.guava:guava:21.0")
     }
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
@@ -21,14 +23,11 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    tasks.jar {
-        exclude("taboolib")
-    }
 }
 
-tasks.jar {
-    onlyIf { false }
-}
+//gradle.buildFinished {
+//    buildDir.deleteRecursively()
+//}
 
 tasks.build {
     doLast {

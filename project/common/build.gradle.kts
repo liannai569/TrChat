@@ -5,26 +5,11 @@ plugins {
 }
 
 taboolib {
-    description {
-        name(rootProject.name)
-        desc("Advanced Minecraft Chat Control")
-        contributors {
-            name("Arasple")
-            name("ItsFlicker").description("Maintainer")
-        }
-    }
     install(
         "common",
         "common-5"
     )
-    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
+    options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion
 }
-
-dependencies {
-    compileOnly("com.google.code.gson:gson:2.9.0")
-    compileOnly("com.google.guava:guava:23.0")
-}
-
-tasks.tabooRelocateJar { onlyIf { false } }

@@ -6,15 +6,17 @@ plugins {
 
 dependencies {
     implementation(project(":project:common"))
-    implementation(project(":project:bukkit"))
-    implementation(project(":project:bungee"))
-    implementation(project(":project:velocity"))
+    implementation(project(":project:implementation-bukkit"))
+    implementation(project(":project:implementation-bungee"))
+    implementation(project(":project:implementation-velocity"))
 }
 
 tasks {
     withType<ShadowJar> {
         archiveClassifier.set("")
-        relocate("taboolib", "${project.group}.taboolib")
+        exclude("META-INF/maven/**")
+        exclude("META-INF/tf/**")
+        exclude("module-info.java")
     }
     build {
         dependsOn(shadowJar)

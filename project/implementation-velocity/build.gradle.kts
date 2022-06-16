@@ -20,28 +20,19 @@ taboolib {
         "module-configuration",
         "module-lang",
         "module-metrics",
-        "platform-bungee",
+        "platform-velocity",
         "expansion-command-helper",
     )
-    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
+    options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion
 }
 
 repositories {
-    maven("https://repo.codemc.io/repository/maven-public/")
-    maven("https://jitpack.io")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
     api(project(":project:common"))
-
-    compileOnly("net.kyori:adventure-api:4.11.0")
-    compileOnly("net.kyori:adventure-platform-bungeecord:4.1.0")
-    compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
-
-    compileOnly(fileTree("libs"))
+    compileOnly("com.velocitypowered:velocity-api:3.1.1")
 }
-
-tasks.tabooRelocateJar { onlyIf { false } }

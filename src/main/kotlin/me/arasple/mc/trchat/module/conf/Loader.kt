@@ -5,6 +5,7 @@ import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.channel.PrivateChannel
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
+import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.channel.obj.Target
 import me.arasple.mc.trchat.module.display.format.Format
@@ -13,8 +14,9 @@ import me.arasple.mc.trchat.module.display.format.MsgComponent
 import me.arasple.mc.trchat.module.display.format.part.Group
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.Function
+import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.*
-import me.arasple.mc.trchat.util.color.DefaultColor
+import me.arasple.mc.trchat.util.color.CustomColor
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import taboolib.common.io.newFile
@@ -24,6 +26,7 @@ import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.releaseResourceFile
+import taboolib.common.util.asList
 import taboolib.common.util.orNull
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
@@ -126,6 +129,12 @@ object Loader {
             ChannelBindings(prefix, command)
         } ?: ChannelBindings(null, null)
 
+        val events = conf.getConfigurationSection("Events")?.let {
+            val process = it["Process"]?.asList() ?: emptyList()
+            val send = it["Send"]?.asList() ?: emptyList()
+            ChannelEvents(Reaction(process), Reaction(send))
+        }
+
         if (private) {
             val sender = conf.getMapList("Sender").map { map ->
                 val condition = map["condition"]?.toString()?.toCondition()
@@ -144,7 +153,7 @@ object Loader {
                 Format(condition, priority, prefix, msg, suffix)
             }.sortedBy { it.priority }
 
-            return PrivateChannel(id, settings, bindings, sender, receiver)
+            return PrivateChannel(id, settings, bindings, events, sender, receiver)
         } else {
             val formats = conf.getMapList("Formats").map { map ->
                 val condition = map["condition"]?.toString()?.toCondition()
@@ -160,7 +169,7 @@ object Loader {
                 val suffix = parseGroups(map["suffix"] as? LinkedHashMap<*, *>)
                 Format(null, 100, prefix, msg, suffix)
             }
-            return Channel(id, settings, bindings, formats, console)
+            return Channel(id, settings, bindings, events, formats, console)
         }
     }
 
@@ -223,7 +232,7 @@ object Loader {
     }
 
     private fun parseMsg(content: Map<*, *>): MsgComponent {
-        val defaultColor = DefaultColor(content["default-color"]?.toString() ?: "&7")
+        val defaultColor = CustomColor(content["default-color"]?.toString() ?: "&7")
         val hover = content["hover"]?.serialize()?.associate { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Hover(it) }
         val suggest = content["suggest"]?.serialize()?.map { Suggest(it.first, it.second[Property.CONDITION]?.toCondition()) }
         val command = content["command"]?.serialize()?.map { Command(it.first, it.second[Property.CONDITION]?.toCondition()) }

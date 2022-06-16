@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.menu.MenuControlPanel
 import me.arasple.mc.trchat.module.display.menu.MenuFilterControl
+import me.arasple.mc.trchat.module.internal.command.sub.CommandColor
 import me.arasple.mc.trchat.module.internal.command.sub.CommandRemoveMessage
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
@@ -80,15 +81,18 @@ object CommandHandler {
         }
     }
 
-    @CommandBody(permission = "trchat.command.removemessage", optional = true)
-    val removeMessage = CommandRemoveMessage.command
-
     @CommandBody(permission = "trchat.command.vanish", optional = true)
     val vanish = subCommand {
         execute<Player> { sender, _, _ ->
             sender.getSession().switchVanish()
         }
     }
+
+    @CommandBody(permission = "trchat.command.removemessage", optional = true)
+    val removeMessage = CommandRemoveMessage.command
+
+    @CommandBody(permission = "trchat.command.color", optional = true)
+    val color = CommandColor.command
 
     @CommandBody
     val help = subCommand {

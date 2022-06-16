@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.module.display.channel
 import me.arasple.mc.trchat.api.event.TrChatEvent
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
+import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.filter.ChatFilter
 import me.arasple.mc.trchat.module.display.format.Format
@@ -27,9 +28,10 @@ class PrivateChannel(
     id: String,
     settings: ChannelSettings,
     bindings: ChannelBindings,
+    events: ChannelEvents?,
     val sender: List<Format>,
     val receiver: List<Format>
-) : Channel(id, settings, bindings, emptyList()) {
+) : Channel(id, settings, bindings, events, emptyList()) {
 
     init {
         if (!bindings.command.isNullOrEmpty()) {

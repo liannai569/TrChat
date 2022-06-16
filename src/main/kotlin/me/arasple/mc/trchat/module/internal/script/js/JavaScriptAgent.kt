@@ -50,7 +50,7 @@ object JavaScriptAgent {
         }
     }
 
-    fun eval(player: Player, script: String, cacheScript: Boolean = true): CompletableFuture<Any> {
+    fun eval(player: Player, script: String, vararg additions: Pair<String, Any>, cacheScript: Boolean = true): CompletableFuture<Any?> {
         return try {
             val session = player.getSession()
             val context = SimpleScriptContext()
@@ -59,6 +59,9 @@ object JavaScriptAgent {
                 it["session"] = session
                 it["player"] = player
                 it["sender"] = player
+                for (addition in additions) {
+                    it[addition.first] = addition.second
+                }
             }, ScriptContext.ENGINE_SCOPE)
 
             val compiledScript =
@@ -71,7 +74,7 @@ object JavaScriptAgent {
             e.localizedMessage.split("\n").forEach {
                 println("         §8$it")
             }
-            CompletableFuture.completedFuture(false)
+            CompletableFuture.completedFuture(null)
         }
     }
 }

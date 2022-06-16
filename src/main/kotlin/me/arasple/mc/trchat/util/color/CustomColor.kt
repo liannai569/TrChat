@@ -8,7 +8,7 @@ import taboolib.module.chat.colored
  * @since 2021/12/12 12:30
  */
 @Internal
-class DefaultColor(color: String) {
+class CustomColor(color: String) {
 
     val type: ColorType
 

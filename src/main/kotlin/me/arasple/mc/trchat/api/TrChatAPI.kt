@@ -120,6 +120,11 @@ object TrChatAPI {
 
     @JvmStatic
     fun eval(player: Player, script: String): CompletableFuture<Any?> {
+        return eval(player, listOf(script))
+    }
+
+    @JvmStatic
+    fun eval(player: Player, script: List<String>): CompletableFuture<Any?> {
         return mirrorNow("Handler:Script:Evaluation") {
             return@mirrorNow try {
                 KetherShell.eval(script, namespace = listOf("trchat", "trmenu", "trhologram")) {
@@ -130,7 +135,7 @@ object TrChatAPI {
                 e.localizedMessage.split("\n").forEach {
                     println("         §8$it")
                 }
-                CompletableFuture.completedFuture(false)
+                CompletableFuture.completedFuture(null)
             }
         }
     }
@@ -141,9 +146,5 @@ object TrChatAPI {
 
     val classChatSerializer by lazy {
         nmsClass("IChatBaseComponent\$ChatSerializer")
-    }
-
-    val classClientboundChatPreviewPacket by lazy {
-        nmsClass("ClientboundChatPreviewPacket")
     }
 }

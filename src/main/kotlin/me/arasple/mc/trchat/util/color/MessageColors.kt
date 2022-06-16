@@ -17,8 +17,8 @@ object MessageColors {
     private val COLOR_CODES = ChatColor.ALL_CODES.map { it.toString() }
 
     private const val COLOR_CHAR = ChatColor.COLOR_CHAR.toString()
-    private const val COLOR_PERMISSION_NODE = "trchat.color."
-    private const val FORCE_CHAT_COLOR_PERMISSION_NODE = "trchat.color.force-defaultcolor."
+    const val COLOR_PERMISSION_NODE = "trchat.color."
+    const val FORCE_CHAT_COLOR_PERMISSION_NODE = "trchat.color.force-defaultcolor."
 
     private val specialColors = arrayOf(
         "minedown",
@@ -50,14 +50,14 @@ object MessageColors {
         if (player.hasPermission("$COLOR_PERMISSION_NODE*")) {
             string = string.colored()
         } else {
-            for (code in COLOR_CODES) {
-                if (player.hasPermission(COLOR_PERMISSION_NODE + code)) {
-                    string = string.replace("&$code", COLOR_CHAR + code)
-                }
-            }
-//            getColorsFromPermissions(player, COLOR_PERMISSION_NODE).forEach {
-//                string.replace(it, DefaultColor(it).color)
+//            for (code in COLOR_CODES) {
+//                if (player.hasPermission(COLOR_PERMISSION_NODE + code)) {
+//                    string = string.replace("&$code", COLOR_CHAR + code)
+//                }
 //            }
+            getColorsFromPermissions(player, COLOR_PERMISSION_NODE).forEach {
+                string.replace(it, CustomColor(it).color)
+            }
         }
 
         string = if (player.hasPermission(COLOR_PERMISSION_NODE + "rainbow")) {
@@ -81,24 +81,20 @@ object MessageColors {
         return string
     }
 
-    fun defaultColored(color: DefaultColor, player: Player, msg: String): String {
+    fun defaultColored(color: CustomColor, player: Player, msg: String): String {
         var message = msg
 
         message = replaceWithPermission(player, message)
 
         message = when (color.type) {
-            DefaultColor.ColorType.NORMAL -> color.color + message
-            DefaultColor.ColorType.SPECIAL -> (color.color + message).parseRainbow().parseGradients()
+            CustomColor.ColorType.NORMAL -> color.color + message
+            CustomColor.ColorType.SPECIAL -> (color.color + message).parseRainbow().parseGradients()
         }
 
         return message
     }
 
-    fun catchDefaultMessageColor(player: Player, defaultColor: DefaultColor): DefaultColor {
-        return getColorsFromPermissions(player, FORCE_CHAT_COLOR_PERMISSION_NODE).firstOrNull()?.let { DefaultColor(it) } ?: defaultColor
-    }
-
-    private fun getColorsFromPermissions(player: Player, prefix: String): List<String> {
+    private fun getColorsFromPermissions(player: HumanEntity, prefix: String): List<String> {
         player.recalculatePermissions()
         return player.effectivePermissions.mapNotNull {
             val permission = it.permission
@@ -108,6 +104,14 @@ object MessageColors {
                 null
             }
         }.filterNot { it in specialColors }
+    }
+
+    fun getForceColors(player: HumanEntity): List<String> {
+        return getColorsFromPermissions(player, FORCE_CHAT_COLOR_PERMISSION_NODE)
+    }
+
+    fun getColors(player: HumanEntity): List<String> {
+        return getColorsFromPermissions(player, COLOR_PERMISSION_NODE)
     }
 
     enum class Type {

@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.display.channel
 
 import me.arasple.mc.trchat.api.event.TrChatEvent
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
+import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.channel.obj.Target
 import me.arasple.mc.trchat.module.display.filter.ChatFilter
@@ -35,6 +36,7 @@ open class Channel(
     val id: String,
     val settings: ChannelSettings,
     val bindings: ChannelBindings,
+    val events: ChannelEvents?,
     val formats: List<Format>,
     val console: Format? = null
 ) {

@@ -4,8 +4,9 @@ import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.*
 import me.arasple.mc.trchat.module.display.function.Function
-import me.arasple.mc.trchat.util.color.DefaultColor
+import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
+import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.pass
 import net.kyori.adventure.text.Component
@@ -20,7 +21,7 @@ import taboolib.common5.mirrorNow
  * @since 2021/12/12 13:46
  */
 class MsgComponent(
-    val defaultColor: DefaultColor,
+    val defaultColor: CustomColor,
     hover: Hover?,
     suggest: List<Suggest>?,
     command: List<Command>?,
@@ -54,7 +55,7 @@ class MsgComponent(
             message = it.apply(message)
         }
 
-        val defaultColor = MessageColors.catchDefaultMessageColor(sender, defaultColor)
+        val defaultColor = sender.getSession().getColor(defaultColor)
 
         for (part in parser.readToFlatten(message)) {
             if (part.isVariable) {

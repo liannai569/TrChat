@@ -19,7 +19,6 @@ taboolib {
         "module-chat",
         "module-configuration",
         "module-lang",
-        "module-metrics",
         "platform-velocity",
         "expansion-command-helper",
     )

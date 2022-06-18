@@ -61,7 +61,7 @@ object ListenerChatEvent {
             }
         }
 
-        session.channel?.execute(player, e.message)
+        session.getChannel()?.execute(player, e.message)
     }
 
     private fun checkLimits(player: Player, message: String): Boolean {

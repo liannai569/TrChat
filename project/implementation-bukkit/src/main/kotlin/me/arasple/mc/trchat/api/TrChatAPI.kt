@@ -1,9 +1,8 @@
 package me.arasple.mc.trchat.api
 
-import me.arasple.mc.trchat.module.display.filter.ChatFilter.filter
-import me.arasple.mc.trchat.module.display.filter.processer.FilteredObject
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.util.color.MessageColors
-import me.arasple.mc.trchat.util.sendProcessedMessage
+import me.arasple.mc.trchat.util.sendChatComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
@@ -30,20 +29,6 @@ import java.util.concurrent.CompletableFuture
 object TrChatAPI {
 
     /**
-     * 根据玩家的权限 (trchat.bypass.filter)，过滤字符串
-     *
-     * @param player 玩家
-     * @param string 字符串
-     * @param execute 是否真的过滤
-     * @return 过滤后的
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun filterString(player: HumanEntity, string: String, execute: Boolean = true): FilteredObject {
-        return if (execute) filter(string, !player.hasPermission("trchat.bypass.filter")) else FilteredObject(string, 0)
-    }
-
-    /**
      * 过滤物品的名字和Lore
      *
      * @param itemStack 物品
@@ -55,11 +40,11 @@ object TrChatAPI {
         }
         itemStack.modifyMeta<ItemMeta> {
             if (hasDisplayName()) {
-                setDisplayName(filter(displayName).filtered)
+                setDisplayName(TrChat.api().filter(displayName).filtered)
             }
             modifyLore {
                 if (isNotEmpty()) {
-                    replaceAll { filter(it).filtered }
+                    replaceAll { TrChat.api().filter(it).filtered }
                 }
             }
         }
@@ -88,7 +73,7 @@ object TrChatAPI {
     @JvmOverloads
     @JvmStatic
     fun sendComponent(receiver: CommandSender, component: Component, sender: UUID = UUID.randomUUID()) {
-        receiver.sendProcessedMessage(sender, component)
+        receiver.sendChatComponent(sender, component)
     }
 
     /**
@@ -101,7 +86,7 @@ object TrChatAPI {
     fun filterComponent(component: Component?): Component? {
         component ?: return null
         val newComponent = if (component is TextComponent && component.content().isNotEmpty()) {
-            component.content(filter(component.content()).filtered)
+            component.content(TrChat.api().filter(component.content()).filtered)
         } else {
             component
         }

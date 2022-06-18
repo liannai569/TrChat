@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.api.TrChatAPI
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.util.Internal
@@ -10,6 +10,7 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.adaptPlayer
 
 /**
  * @author Arasple, wlys
@@ -30,7 +31,7 @@ object ListenerSignChange {
                     line = MessageColors.replaceWithPermission(p, line ?: "", MessageColors.Type.SIGN)
                 }
                 if (Filters.CONF.getBoolean("Enable.Sign")) {
-                    TrChatAPI.filterString(p, line).filtered
+                    TrChat.api().filterString(adaptPlayer(p), line).filtered
                 } else {
                     line
                 }

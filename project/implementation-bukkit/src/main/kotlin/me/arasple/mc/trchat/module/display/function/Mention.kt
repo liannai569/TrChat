@@ -1,12 +1,8 @@
 package me.arasple.mc.trchat.module.display.function
 
-import me.arasple.mc.trchat.module.internal.proxy.bukkit.Players
-import me.arasple.mc.trchat.module.internal.proxy.sendProxyLang
-import me.arasple.mc.trchat.util.CooldownType
+import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
+import me.arasple.mc.trchat.util.*
 import me.arasple.mc.trchat.util.color.colorify
-import me.arasple.mc.trchat.util.isInCooldown
-import me.arasple.mc.trchat.util.legacy
-import me.arasple.mc.trchat.util.updateCooldown
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -49,7 +45,7 @@ object Mention {
             } else {
                 var result = message
                 var mentioned = false
-                Players.getRegex(player).forEach { regex ->
+                BukkitPlayers.getRegex(player).forEach { regex ->
                     if (result.contains(regex) && !player.isInCooldown(CooldownType.MENTION)) {
                         result = regex.replace(result, "{{MENTION:\$1}}")
                         mentioned = true

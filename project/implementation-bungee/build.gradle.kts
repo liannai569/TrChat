@@ -19,7 +19,6 @@ taboolib {
         "module-chat",
         "module-configuration",
         "module-lang",
-        "module-metrics",
         "platform-bungee"
     )
     options("skip-minimize", "keep-kotlin-module")
@@ -38,5 +37,6 @@ dependencies {
 
     compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-platform-bungeecord:4.1.1")
+
     compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
 }

@@ -1,15 +1,15 @@
 package me.arasple.mc.trchat.module.display.channel
 
+import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.api.event.TrChatEvent
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.channel.obj.Target
-import me.arasple.mc.trchat.module.display.filter.ChatFilter
 import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
-import me.arasple.mc.trchat.module.internal.proxy.Proxy
-import me.arasple.mc.trchat.module.internal.proxy.sendBukkitMessage
+import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.text.Component
@@ -26,7 +26,6 @@ import taboolib.module.lang.sendLang
 import taboolib.platform.util.sendLang
 import taboolib.platform.util.toProxyLocation
 import java.util.*
-import kotlin.properties.Delegates
 
 /**
  * @author wlys
@@ -45,7 +44,7 @@ open class Channel(
         if (!bindings.command.isNullOrEmpty()) {
             command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
                 execute<Player> { sender, _, _ ->
-                    if (sender.getSession().channel == this@Channel) {
+                    if (sender.getSession().channel == this@Channel.id) {
                         quit(sender)
                     } else {
                         join(sender, this@Channel)
@@ -66,10 +65,10 @@ open class Channel(
                             } ?: return@execute
                             val component = builder.build()
 
-                            if (settings.proxy && Proxy.isEnabled) {
+                            if (settings.proxy && BukkitProxyManager.processor != null) {
                                 val gson = gson(component)
                                 if (settings.ports != null) {
-                                    Bukkit.getServer().sendBukkitMessage(
+                                    Bukkit.getServer().sendTrChatMessage(
                                         "ForwardRaw",
                                         UUID.randomUUID().toString(),
                                         gson,
@@ -78,7 +77,7 @@ open class Channel(
                                         settings.doubleTransfer.toString()
                                     )
                                 } else {
-                                    Bukkit.getServer().sendBukkitMessage(
+                                    Bukkit.getServer().sendTrChatMessage(
                                         "BroadcastRaw",
                                         UUID.randomUUID().toString(),
                                         gson,
@@ -89,9 +88,9 @@ open class Channel(
                                 return@execute
                             }
                             listeners.forEach {
-                                getProxyPlayer(it)?.sendProcessedMessage(it, component)
+                                getProxyPlayer(it)?.sendChatComponent(it, component)
                             }
-                            sender.sendProcessedMessage(UUID.randomUUID(), component)
+                            sender.sendChatComponent(UUID.randomUUID(), component)
                         }
                     }
                 }
@@ -112,7 +111,7 @@ open class Channel(
             player.sendLang("Channel-No-Speak-Permission")
             return null
         }
-        if (settings.filterBeforeSending && ChatFilter.filter(message).sensitiveWords > 0) {
+        if (settings.filterBeforeSending && TrChat.api().filter(message).sensitiveWords > 0) {
             player.sendLang("Channel-Filter-Before-Sending")
             return null
         }
@@ -136,10 +135,10 @@ open class Channel(
             return component to null
         }
 
-        if (settings.proxy && Proxy.isEnabled) {
+        if (settings.proxy && BukkitProxyManager.processor != null) {
             val gson = gson(component)
             if (settings.ports != null) {
-                player.sendBukkitMessage(
+                player.sendTrChatMessage(
                     "ForwardRaw",
                     player.uniqueId.toString(),
                     gson,
@@ -148,7 +147,7 @@ open class Channel(
                     settings.doubleTransfer.toString()
                 )
             } else {
-                player.sendBukkitMessage(
+                player.sendTrChatMessage(
                     "BroadcastRaw",
                     player.uniqueId.toString(),
                     gson,
@@ -161,26 +160,26 @@ open class Channel(
         when (settings.target.range) {
             Target.Range.ALL -> {
                 listeners.forEach {
-                    getProxyPlayer(it)?.sendProcessedMessage(player, component)
+                    getProxyPlayer(it)?.sendChatComponent(player, component)
                 }
             }
             Target.Range.SINGLE_WORLD -> {
                 onlinePlayers().filter { listeners.contains(it.uniqueId) && it.world == player.world.name }.forEach {
-                    it.sendProcessedMessage(player, component)
+                    it.sendChatComponent(player, component)
                 }
             }
             Target.Range.DISTANCE -> {
                 onlinePlayers().filter { listeners.contains(it.uniqueId)
                         && it.world == player.world.name
                         && it.location.distance(player.location.toProxyLocation()) <= settings.target.distance }.forEach {
-                    it.sendProcessedMessage(player, component)
+                    it.sendChatComponent(player, component)
                 }
             }
             Target.Range.SELF -> {
-                player.sendProcessedMessage(player, component)
+                player.sendChatComponent(player, component)
             }
         }
-        console().cast<CommandSender>().sendProcessedMessage(player, component)
+        console().cast<CommandSender>().sendChatComponent(player, component)
 
         player.getSession().lastMessage = message
         ChatLogs.log(player, message)
@@ -198,17 +197,6 @@ open class Channel(
 
         val channels = mutableListOf<Channel>()
 
-        var defaultChannel: Channel? by Delegates.observable(null) { _, oldValue, newValue ->
-            if (newValue == null) {
-                return@observable
-            }
-            Bukkit.getOnlinePlayers().forEach {
-                if (it.getSession().channel == oldValue) {
-                    it.getSession().channel = newValue
-                }
-            }
-        }
-
         fun join(player: Player, channel: String, hint: Boolean = true) {
             channels.firstOrNull { it.id == channel }?.let {
                 join(player, it, hint)
@@ -220,7 +208,7 @@ open class Channel(
                 player.sendLang("General-No-Permission")
                 return
             }
-            player.getSession().channel = channel
+            player.getSession().channel = channel.id
             channel.listeners.add(player.uniqueId)
 
             if (hint) {
@@ -229,13 +217,13 @@ open class Channel(
         }
 
         fun quit(player: Player) {
-            player.getSession().channel?.let {
+            player.getSession().getChannel()?.let {
                 if (!it.settings.autoJoin) {
                     it.listeners.remove(player.uniqueId)
                 }
                 player.sendLang("Channel-Quit", it.id)
             }
-            player.getSession().channel = defaultChannel
+            player.getSession().channel = Settings.defaultChannel
         }
     }
 }

@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat
 
-import me.arasple.mc.trchat.util.buildMessage
+import me.arasple.mc.trchat.module.internal.service.Metrics
 import net.md_5.bungee.api.ProxyServer
 import taboolib.common.env.RuntimeEnv
 import taboolib.common.platform.*
@@ -9,9 +9,7 @@ import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
 import taboolib.common.platform.function.server
 import taboolib.module.lang.sendLang
-import taboolib.module.metrics.Metrics
 import taboolib.platform.BungeePlugin
-import java.io.IOException
 
 /**
  * @author Arasple
@@ -35,7 +33,7 @@ object TrChatBungee : Plugin() {
         console().sendLang("Plugin-Loading", server<ProxyServer>().version)
         console().sendLang("Plugin-Proxy-Supported", "Bungee")
 
-        Metrics(5803, pluginVersion, Platform.BUNGEE)
+        Metrics.init(5803)
     }
 
     override fun onEnable() {
@@ -47,14 +45,8 @@ object TrChatBungee : Plugin() {
                     listOf("on", "off")
                 }
                 execute<ProxyCommandSender> { _, _, argument ->
-                    try {
-                        server<ProxyServer>().servers.forEach { (_, v) ->
-                            for (bytes in buildMessage("GlobalMute", argument)) {
-                                v.sendData(TRCHAT_CHANNEL, bytes)
-                            }
-                        }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
+                    server<ProxyServer>().servers.forEach { (_, v) ->
+                        BungeeProxyManager.sendTrChatMessage(v, "GlobalMute", argument)
                     }
                 }
             }

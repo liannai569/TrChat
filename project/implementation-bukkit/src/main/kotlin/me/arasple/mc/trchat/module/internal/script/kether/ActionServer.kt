@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.internal.script.kether
 
+import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.proxy.bungee.Bungees
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.library.kether.ArgTypes
@@ -21,7 +21,7 @@ class ActionServer(val server: ParsedAction<*>): ScriptAction<Void>() {
             error("No sender selected.")
         }
         frame.newFrame(server).run<Any>().thenAccept { server ->
-            Bungees.sendBungeeData(s.sender!!.cast(), "Connect", server.toString())
+            BukkitProxyManager.sendCommonMessage(s.sender!!.cast(), "Connect", server.toString())
         }
         return CompletableFuture.completedFuture(null)
     }

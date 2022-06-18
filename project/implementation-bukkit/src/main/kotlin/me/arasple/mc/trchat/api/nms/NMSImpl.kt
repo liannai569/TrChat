@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.api.nms
 
-import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.TrChatBukkit
 import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.gson
@@ -30,9 +30,9 @@ class NMSImpl : NMS() {
             val component = TrChatAPI.filterComponent(gson(json))!!
             TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component).let { if (it.length > 30000) "{\"text\":\"This chat packet is too big to send.\"}" else it }, fixed = true)!!
         } catch (t: Throwable) {
-            if (!TrChat.reportedErrors.contains("filterIChatComponent")) {
+            if (!TrChatBukkit.reportedErrors.contains("filterIChatComponent")) {
                 t.print("Error occurred while filtering chat component.")
-                TrChat.reportedErrors.add("filterIChatComponent")
+                TrChatBukkit.reportedErrors.add("filterIChatComponent")
             }
             iChat
         }
@@ -79,7 +79,7 @@ class NMSImpl : NMS() {
     }
 
     override fun sendChatPreview(player: Player, queryId: Int, query: String) {
-        val component = player.getSession().channel?.execute(player, query, forward = false)?.first ?: return
+        val component = player.getSession().getChannel()?.execute(player, query, forward = false)?.first ?: return
         val iChatBaseComponent = TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
         player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
     }

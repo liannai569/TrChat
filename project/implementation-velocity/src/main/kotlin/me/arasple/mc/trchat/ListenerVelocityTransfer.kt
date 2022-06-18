@@ -3,7 +3,6 @@ package me.arasple.mc.trchat
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.proxy.Player
 import me.arasple.mc.trchat.TrChatVelocity.plugin
-import me.arasple.mc.trchat.util.buildMessage
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -29,7 +28,7 @@ object ListenerVelocityTransfer {
 
     @SubscribeEvent(ignoreCancelled = true)
     fun onTransfer(e: PluginMessageEvent) {
-        if (e.identifier == TrChatVelocity.incoming) {
+        if (e.identifier == VelocityProxyManager.incoming) {
             try {
                 val message = MessageReader.read(e.data)
                 if (message.isCompleted) {
@@ -61,9 +60,7 @@ object ListenerVelocityTransfer {
 
                 if (doubleTransfer) {
                     plugin.server.allServers.forEach {
-                        for (bytes in buildMessage("BroadcastRaw", uuid, raw, permission)) {
-                            it.sendPluginMessage(TrChatVelocity.outgoing, bytes)
-                        }
+                        VelocityProxyManager.sendTrChatMessage(it, "BroadcastRaw", uuid, raw, permission)
                     }
                 } else {
                     plugin.server.allServers.forEach { server ->
@@ -86,9 +83,7 @@ object ListenerVelocityTransfer {
                 if (doubleTransfer) {
                     plugin.server.allServers.forEach {
                         if (ports.contains(it.serverInfo.address.port)) {
-                            for (bytes in buildMessage("BroadcastRaw", uuid, raw, permission)) {
-                                it.sendPluginMessage(TrChatVelocity.outgoing, bytes)
-                            }
+                            VelocityProxyManager.sendTrChatMessage(it, "BroadcastRaw", uuid, raw, permission)
                         }
                     }
                 } else {

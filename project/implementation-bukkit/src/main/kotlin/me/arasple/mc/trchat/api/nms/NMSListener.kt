@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.api.nms
 
-import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.TrChatBukkit
 import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.util.Internal
@@ -47,7 +47,7 @@ object NMSListener {
                 if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {
                     return
                 }
-                if (!TrChat.paperEnv) {
+                if (!TrChatBukkit.paperEnv) {
                     e.packet.write("a", NMS.INSTANCE.filterIChatComponent(e.packet.read<Any>("a")))
                 } else {
                     e.packet.write("adventure\$message", filterComponentWithValidating(e.packet.read<Component>("adventure\$message")))

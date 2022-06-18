@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.conf
 
 import me.arasple.mc.trchat.api.config.Functions
-import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.channel.PrivateChannel
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
@@ -15,16 +14,17 @@ import me.arasple.mc.trchat.module.display.format.part.Group
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.*
+import me.arasple.mc.trchat.util.FileListener
+import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.CustomColor
+import me.arasple.mc.trchat.util.print
+import me.arasple.mc.trchat.util.toCondition
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Player
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.util.asList
 import taboolib.common.util.orNull
@@ -68,7 +68,6 @@ object Loader {
     }
 
     fun loadChannels(): Int {
-        init = false
         Channel.channels.forEach { it.unregister() }
         Channel.channels.clear()
 
@@ -83,16 +82,12 @@ object Loader {
                 FileListener.listen(it, runFirst = true) {
                     try {
                         Channel.channels.add(loadChannel(it))
-                        refreshChannels()
                     } catch (t: Throwable) {
                         t.print("Channel file ${it.name} loaded failed!")
                     }
                 }
             }
         }
-
-        init = true
-        refreshChannels()
 
         return Channel.channels.size
     }
@@ -241,16 +236,6 @@ object Loader {
         val copy = content["copy"]?.serialize()?.map { Copy(it.first, it.second[Property.CONDITION]?.toCondition()) }
         val font = content["font"]?.serialize()?.map { Font(it.first, it.second[Property.CONDITION]?.toCondition()) }
         return MsgComponent(defaultColor, hover, suggest, command, url, insertion, copy, font)
-    }
-
-    private fun refreshChannels() {
-        if (init) {
-            Settings.onReload()
-
-            onlinePlayers().map { it.cast<Player>() }.forEach {
-                it.getSession().channel?.id?.let { id -> Channel.join(it, id, hint = false) }
-            }
-        }
     }
 
     private fun filterChannelFiles(file: File): List<File> {

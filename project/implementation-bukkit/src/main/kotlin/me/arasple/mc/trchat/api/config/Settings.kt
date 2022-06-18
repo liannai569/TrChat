@@ -1,11 +1,7 @@
 package me.arasple.mc.trchat.api.config
 
-import me.arasple.mc.trchat.module.display.channel.Channel
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.function.severe
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigNode
@@ -23,19 +19,8 @@ object Settings {
     lateinit var CONF: Configuration
         private set
 
-    @Awake(LifeCycle.LOAD)
-    fun init() {
-        CONF.onReload {
-            onReload()
-        }
-    }
-
-    fun onReload() {
-        val id = CONF.getString("Channel.Default", "Normal")!!
-        Channel.defaultChannel = Channel.channels.firstOrNull { it.id.equals(id, ignoreCase = true) }.also {
-            if (it == null) severe("Default channel $id not found.")
-        }
-    }
+    @ConfigNode("Channel.Default", "settings.yml")
+    var defaultChannel = "Normal"
 
     @ConfigNode("Chat.Cooldown", "settings.yml")
     val chatCooldown = ConfigNodeTransfer<String, Long> { parseMillis() }

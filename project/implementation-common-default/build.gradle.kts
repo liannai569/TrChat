@@ -6,12 +6,11 @@ plugins {
 
 taboolib {
     install("common", "common-5")
-    install("module-lang", "module-metrics")
     options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-platform-api:4.1.1")
+    api(project(":project:common"))
 }

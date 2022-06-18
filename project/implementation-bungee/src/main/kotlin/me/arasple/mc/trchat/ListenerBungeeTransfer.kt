@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat
 
-import me.arasple.mc.trchat.util.BungeeAdventure
-import me.arasple.mc.trchat.util.buildMessage
+import me.arasple.mc.trchat.util.BungeeComponentManager
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -52,7 +51,7 @@ object ListenerBungeeTransfer {
                 val message = GsonComponentSerializer.gson().deserialize(raw)
 
                 if (player.isConnected) {
-                    BungeeAdventure.adventure.player(player).sendMessage(message)
+                    BungeeComponentManager.getAudienceProvider().player(player).sendMessage(message)
                 }
             }
             "BroadcastRaw" -> {
@@ -64,19 +63,17 @@ object ListenerBungeeTransfer {
 
                 if (doubleTransfer) {
                     server<ProxyServer>().servers.forEach { (_, v) ->
-                        for (bytes in buildMessage("BroadcastRaw", uuid, raw, permission)) {
-                            v.sendData(TrChatBungee.TRCHAT_CHANNEL, bytes)
-                        }
+                        BungeeProxyManager.sendTrChatMessage(v, "BroadcastRaw", uuid, raw, permission)
                     }
                 } else {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         v.players.filter { permission == "null" || it.hasPermission(permission) }.forEach {
-                            BungeeAdventure.adventure.player(it).sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
+                            BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
                         }
                     }
                 }
 
-                BungeeAdventure.adventure.console().sendMessage(message)
+                BungeeComponentManager.getAudienceProvider().console().sendMessage(message)
             }
             "ForwardRaw" -> {
                 val uuid = data[1]
@@ -89,22 +86,20 @@ object ListenerBungeeTransfer {
                 if (doubleTransfer) {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         if (ports.contains(v.address.port)) {
-                            for (bytes in buildMessage("BroadcastRaw", uuid, raw, permission)) {
-                                v.sendData(TrChatBungee.TRCHAT_CHANNEL, bytes)
-                            }
+                            BungeeProxyManager.sendTrChatMessage(v, "BroadcastRaw", uuid, raw, permission)
                         }
                     }
                 } else {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         if (ports.contains(v.address.port)) {
                             v.players.filter { permission == "null" || it.hasPermission(permission) }.forEach {
-                                BungeeAdventure.adventure.player(it).sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
+                                BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
                             }
                         }
                     }
                 }
 
-                BungeeAdventure.adventure.console().sendMessage(message)
+                BungeeComponentManager.getAudienceProvider().console().sendMessage(message)
             }
             "SendLang" -> {
                 val to = data[1]

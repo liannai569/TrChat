@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.api.TrChatAPI
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.util.Internal
@@ -12,6 +12,7 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.adaptPlayer
 import taboolib.platform.util.isAir
 import taboolib.platform.util.modifyMeta
 
@@ -36,7 +37,7 @@ object ListenerAnvilChange {
                 return@modifyMeta
             }
             if (Filters.CONF.getBoolean("Enable.Anvil")) {
-                setDisplayName(TrChatAPI.filterString(p, displayName).filtered)
+                setDisplayName(TrChat.api().filterString(adaptPlayer(p), displayName).filtered)
             }
             if (Settings.CONF.getBoolean("Color.Anvil")) {
                 setDisplayName(MessageColors.replaceWithPermission(p, displayName, MessageColors.Type.ANVIL))

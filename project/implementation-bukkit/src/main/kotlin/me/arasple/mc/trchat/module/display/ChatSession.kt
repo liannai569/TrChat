@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.display
 
 import me.arasple.mc.trchat.api.TrChatAPI
+import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
@@ -21,7 +22,7 @@ import java.util.*
  */
 class ChatSession(
     val player: Player,
-    var channel: Channel?,
+    var channel: String,
     var recipients: Set<Player>
 ) {
 
@@ -42,6 +43,10 @@ class ChatSession(
     val muteReason get() = player.getDataContainer().getString("mute_reason", "null")!!
 
     val isVanishing get() = player.getDataContainer().getBoolean("vanish", false)
+
+    fun getChannel(): Channel? {
+        return Channel.channels.firstOrNull { it.id == channel }
+    }
 
     fun selectColor(string: String) {
         player.getDataContainer()["color"] = string
@@ -112,7 +117,7 @@ class ChatSession(
 
         fun getSession(player: Player): ChatSession {
             return SESSIONS.computeIfAbsent(player.uniqueId) {
-                ChatSession(player, Channel.defaultChannel, onlinePlayers().map { it.cast<Player>() }.toSet()).also {
+                ChatSession(player, Settings.defaultChannel, onlinePlayers().map { it.cast<Player>() }.toSet()).also {
                     if (it.isVanishing) vanishing.add(player.name)
                 }
             }

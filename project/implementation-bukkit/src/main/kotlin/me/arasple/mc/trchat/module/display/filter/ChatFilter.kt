@@ -1,10 +1,8 @@
 package me.arasple.mc.trchat.module.display.filter
 
-import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.TrChatBukkit
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.module.display.filter.processer.Filter
-import me.arasple.mc.trchat.module.display.filter.processer.FilteredObject
-import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.parseJson
 import me.arasple.mc.trchat.util.print
 import taboolib.common.env.DependencyDownloader.readFully
@@ -14,7 +12,6 @@ import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.submit
-import taboolib.common5.mirrorNow
 import taboolib.module.lang.sendLang
 import java.io.BufferedInputStream
 import java.net.URL
@@ -117,26 +114,11 @@ object ChatFilter {
             notify.sendLang("Plugin-Loaded-Filter-Cloud", collected.size, url, cloud_last_update[url]!!)
             collected
         }.getOrElse {
-            if (!TrChat.reportedErrors.contains("catchCloudThesaurus")) {
+            if (!TrChatBukkit.reportedErrors.contains("catchCloudThesaurus")) {
                 it.print("Error occurred while catching cloud thesaurus.", printStackTrace = false)
-                TrChat.reportedErrors.add("catchCloudThesaurus")
+                TrChatBukkit.reportedErrors.add("catchCloudThesaurus")
             }
             emptyList()
-        }
-    }
-
-    /**
-     * 过滤一个字符串
-     *
-     * @param string  待过滤字符串
-     * @param execute 是否真的过滤
-     * @return 过滤后的字符串
-     */
-    fun filter(string: String, execute: Boolean = true): FilteredObject {
-        return mirrorNow("Handler:DoFilter") {
-            Filter.doFilter(string, execute).also {
-                Metrics.increase(1, it.sensitiveWords)
-            }
         }
     }
 }

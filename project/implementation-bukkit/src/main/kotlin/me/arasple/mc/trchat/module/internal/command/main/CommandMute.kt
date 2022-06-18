@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.command.main
 
-import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.muteDateFormat
@@ -71,8 +71,8 @@ object CommandMute {
         }
         command("muteall", listOf("globalmute"), "Mute all", permission = "trchat.command.muteall") {
             execute<CommandSender> { sender, _, _ ->
-                TrChat.isGlobalMuting = !TrChat.isGlobalMuting
-                if (TrChat.isGlobalMuting) {
+                TrChatBukkit.isGlobalMuting = !TrChatBukkit.isGlobalMuting
+                if (TrChatBukkit.isGlobalMuting) {
                     sender.sendLang("Mute-Muted-All")
                 } else {
                     sender.sendLang("Mute-Cancel-Muted-All")

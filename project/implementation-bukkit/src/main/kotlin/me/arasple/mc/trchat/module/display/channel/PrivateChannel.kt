@@ -1,17 +1,15 @@
 package me.arasple.mc.trchat.module.display.channel
 
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.event.TrChatEvent
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
-import me.arasple.mc.trchat.module.display.filter.ChatFilter
 import me.arasple.mc.trchat.module.display.format.Format
+import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
+import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.util.*
-import me.arasple.mc.trchat.util.proxy.Proxy
-import me.arasple.mc.trchat.util.proxy.bukkit.Players
-import me.arasple.mc.trchat.util.proxy.sendBukkitMessage
-import me.arasple.mc.trchat.util.proxy.sendProxyLang
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.command
@@ -37,7 +35,7 @@ class PrivateChannel(
         if (!bindings.command.isNullOrEmpty()) {
             command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
                 execute<Player> { sender, _, _ ->
-                    if (sender.getSession().channel == this@PrivateChannel) {
+                    if (sender.getSession().channel == this@PrivateChannel.id) {
                         quit(sender)
                     } else {
                         sender.sendLang("Private-Message-No-Player")
@@ -45,15 +43,15 @@ class PrivateChannel(
                 }
                 dynamic("player", optional = true) {
                     suggestion<Player> { _, _ ->
-                        Players.getPlayers().filter { !ChatSession.vanishing.contains(it) }
+                        BukkitPlayers.getPlayers().filter { !ChatSession.vanishing.contains(it) }
                     }
                     execute<Player> { sender, _, argument ->
-                        sender.getSession().lastPrivateTo = Players.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
+                        sender.getSession().lastPrivateTo = BukkitPlayers.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
                         join(sender, this@PrivateChannel)
                     }
                     dynamic("message", optional = true) {
                         execute<Player> { sender, context, argument ->
-                            Players.getPlayerFullName(context.argument(-1))?.let {
+                            BukkitPlayers.getPlayerFullName(context.argument(-1))?.let {
                                 sender.getSession().lastPrivateTo = it
                                 execute(sender, argument)
                             } ?: sender.sendLang("Command-Player-Not-Exist")
@@ -75,7 +73,7 @@ class PrivateChannel(
             player.sendLang("Channel-No-Speak-Permission")
             return null
         }
-        if (settings.filterBeforeSending && ChatFilter.filter(message).sensitiveWords > 0) {
+        if (settings.filterBeforeSending && TrChat.api().filter(message).sensitiveWords > 0) {
             player.sendLang("Channel-Filter-Before-Sending")
             return null
         }
@@ -110,10 +108,10 @@ class PrivateChannel(
             return send to receive
         }
 
-        player.sendProcessedMessage(player, send)
+        player.sendChatComponent(player, send)
 
-        if (settings.proxy && Proxy.isEnabled) {
-            player.sendBukkitMessage(
+        if (settings.proxy && BukkitProxyManager.processor != null) {
+            player.sendTrChatMessage(
                 "SendRaw",
                 session.lastPrivateTo,
                 gson(receive),
@@ -122,7 +120,7 @@ class PrivateChannel(
             player.sendProxyLang("Private-Message-Receive", player.name)
         } else {
             getProxyPlayer(player.getSession().lastPrivateTo)?.let {
-                it.sendProcessedMessage(player, receive)
+                it.sendChatComponent(player, receive)
                 it.sendLang("Private-Message-Receive", player.name)
             }
         }

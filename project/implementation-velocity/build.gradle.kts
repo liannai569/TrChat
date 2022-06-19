@@ -32,6 +32,7 @@ repositories {
 }
 
 dependencies {
-    api(project(":project:common"))
+    compileOnly(project(":project:common"))
+
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
 }

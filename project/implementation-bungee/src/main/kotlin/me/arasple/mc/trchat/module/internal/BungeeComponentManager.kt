@@ -2,6 +2,8 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.ComponentManager
 import me.arasple.mc.trchat.util.Internal
+import net.kyori.adventure.audience.MessageType
+import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences
 import net.kyori.adventure.text.Component
 import taboolib.common.platform.Platform
@@ -37,10 +39,10 @@ object BungeeComponentManager : ComponentManager {
     }
 
     override fun sendChatComponent(receiver: ProxyCommandSender, component: Component, sender: UUID) {
-        TODO("Not yet implemented")
+        adventure?.sender(receiver.cast())?.sendMessage(Identity.identity(sender), component, MessageType.CHAT)
     }
 
     override fun filterComponent(component: Component?, maxLength: Int): Component? {
-        TODO("Not yet implemented")
+        error("Not supported.")
     }
 }

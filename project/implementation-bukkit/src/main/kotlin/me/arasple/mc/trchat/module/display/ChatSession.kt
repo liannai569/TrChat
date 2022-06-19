@@ -7,11 +7,11 @@ import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.gson
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.flattener.ComponentFlattener
 import org.bukkit.entity.Player
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
-import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.Packet
 import taboolib.module.nms.sendPacket
 import java.util.*
@@ -129,13 +129,12 @@ class ChatSession(
 
         private fun Packet.toMessage(): String? {
             return kotlin.runCatching {
-                val iChat = if (MinecraftVersion.majorLegacy >= 11700) {
-                    read<Any>("message")!!
+                val component = if (!TrChatBukkit.paperEnv) {
+                    val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, fixed = true)!!
+                    gson(json)
                 } else {
-                    read<Any>("a")!!
+                    read<Component>("adventure\$message")!!
                 }
-                val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
-                val component = gson(json)
                 var string = ""
                 ComponentFlattener.textOnly().flatten(component) { string += it }
                 string

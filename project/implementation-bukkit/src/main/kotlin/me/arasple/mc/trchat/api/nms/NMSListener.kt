@@ -42,7 +42,7 @@ object NMSListener {
                 if (type != 0.toByte()) {
                     return
                 }
-//                session.addMessage(e.packet) FIXME: 2022/6/18
+                session.addMessage(e.packet)
                 if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {
                     return
                 }

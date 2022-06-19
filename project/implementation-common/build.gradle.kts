@@ -13,5 +13,5 @@ taboolib {
 }
 
 dependencies {
-    api(project(":project:common"))
+    compileOnly(project(":project:common"))
 }

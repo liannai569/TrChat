@@ -1,7 +1,8 @@
 package me.arasple.mc.trchat.util
 
-import me.arasple.mc.trchat.TrChatBukkit
 import me.arasple.mc.trchat.module.display.ChatSession
+import me.arasple.mc.trchat.module.internal.BukkitComponentManager
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.data.Database
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager

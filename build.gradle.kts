@@ -15,6 +15,7 @@ subprojects {
         compileOnly(kotlin("stdlib"))
         compileOnly("com.google.code.gson:gson:2.8.5")
         compileOnly("com.google.guava:guava:21.0")
+        compileOnly("net.kyori:adventure-api:4.11.0")
     }
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"

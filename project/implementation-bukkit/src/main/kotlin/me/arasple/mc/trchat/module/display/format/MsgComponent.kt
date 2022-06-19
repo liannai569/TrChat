@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.display.format
 
-import me.arasple.mc.trchat.api.TrChatAPI
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.*
 import me.arasple.mc.trchat.module.display.function.Function
@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.util.VariableReader
 import taboolib.common5.mirrorNow
 
@@ -81,7 +82,7 @@ class MsgComponent(
                         val function = Function.functions.firstOrNull { it.id == id }
                         if (function != null) {
                             component.append(function.displayJson.toTextComponent(sender, args[1]))
-                            function.action?.let { action -> TrChatAPI.eval(sender, action) }
+                            function.action?.let { action -> TrChat.api().eval(adaptPlayer(sender), action) }
                             continue
                         }
                     }

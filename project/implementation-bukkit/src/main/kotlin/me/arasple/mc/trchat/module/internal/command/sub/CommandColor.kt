@@ -19,10 +19,15 @@ object CommandColor {
     val command = subCommand {
         dynamic("color") {
             suggestion<Player> { sender, _ ->
-                MessageColors.getColors(sender)
+                MessageColors.getColors(sender) + listOf("reset")
             }
             execute<Player> { sender, _, argument ->
-                sender.getSession().selectColor(argument)
+                if (argument == "reset") {
+                    sender.getSession().selectColor(null)
+                } else {
+                    sender.getSession().selectColor(argument)
+                }
+
             }
         }
     }

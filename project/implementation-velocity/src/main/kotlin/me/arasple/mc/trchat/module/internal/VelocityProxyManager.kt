@@ -1,7 +1,8 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal
 
 import com.velocitypowered.api.proxy.messages.ChannelMessageSink
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
+import me.arasple.mc.trchat.ProxyManager
 import me.arasple.mc.trchat.util.buildMessage
 import me.arasple.mc.trchat.util.print
 import taboolib.common.platform.Platform

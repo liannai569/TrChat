@@ -1,13 +1,16 @@
 package me.arasple.mc.trchat.module.internal.proxy
 
 import com.google.common.io.ByteStreams
-import me.arasple.mc.trchat.TrChatBukkit
+import me.arasple.mc.trchat.module.conf.Loader
+import me.arasple.mc.trchat.module.display.channel.Channel
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.buildMessage
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import me.arasple.mc.trchat.util.sendChatComponent
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.bukkit.Bukkit
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageRecipient
@@ -49,6 +52,13 @@ interface BukkitProxyProcessor : PluginMessageListener {
                     onlinePlayers().filter { it.hasPermission(permission) }.forEach { it.sendChatComponent(uuid, message) }
                 }
                 console().sendChatComponent(uuid, message)
+            }
+            "SendProxyChannel" -> {
+                val id = data[1]
+                val channel = data[2]
+                Loader.loadChannel(id, YamlConfiguration().also { it.loadFromString(channel) }).let {
+                    Channel.channels[it.id] = it
+                }
             }
         }
     }

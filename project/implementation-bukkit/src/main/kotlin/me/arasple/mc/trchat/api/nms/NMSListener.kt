@@ -1,11 +1,10 @@
 package me.arasple.mc.trchat.api.nms
 
-import me.arasple.mc.trchat.TrChatBukkit
-import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.api.config.Filters
+import me.arasple.mc.trchat.module.internal.BukkitComponentManager
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
-import me.arasple.mc.trchat.util.gson
 import net.kyori.adventure.text.Component
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -43,14 +42,14 @@ object NMSListener {
                 if (type != 0.toByte()) {
                     return
                 }
-                session.addMessage(e.packet)
+//                session.addMessage(e.packet) FIXME: 2022/6/18
                 if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {
                     return
                 }
                 if (!TrChatBukkit.paperEnv) {
                     e.packet.write("a", NMS.INSTANCE.filterIChatComponent(e.packet.read<Any>("a")))
                 } else {
-                    e.packet.write("adventure\$message", filterComponentWithValidating(e.packet.read<Component>("adventure\$message")))
+                    e.packet.write("adventure\$message", BukkitComponentManager.filterComponent(e.packet.read<Component>("adventure\$message"), 32000))
                 }
 //                kotlin.runCatching {
 //                    val components = e.packet.read<Array<BaseComponent>>("components") ?: return
@@ -107,14 +106,4 @@ object NMSListener {
 //        }
 //        return component
 //    }
-
-    private fun filterComponentWithValidating(component: Component?): Component? {
-        return TrChatAPI.filterComponent(component)?.let {
-            if (gson(it).length >= 32000) {
-                Component.text("This chat packet is too big to send.")
-            } else {
-                it
-            }
-        }
-    }
 }

@@ -1,9 +1,9 @@
 package me.arasple.mc.trchat.module.internal.command
 
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.api.config.Functions
 import me.arasple.mc.trchat.api.config.Settings
-import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.menu.MenuControlPanel
 import me.arasple.mc.trchat.module.display.menu.MenuFilterControl
 import me.arasple.mc.trchat.module.internal.command.sub.CommandColor
@@ -42,7 +42,7 @@ object CommandHandler {
             Settings.CONF.reload()
             Functions.CONF.reload()
             Filters.CONF.reload()
-            Loader.loadChannels(sender)
+            TrChat.api().getChannelManager().loadChannels(sender)
         }
     }
 

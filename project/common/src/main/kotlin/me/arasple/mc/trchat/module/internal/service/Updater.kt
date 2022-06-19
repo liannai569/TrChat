@@ -4,8 +4,6 @@ import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.parseJson
 import taboolib.common.LifeCycle
 import taboolib.common.env.DependencyDownloader.readFully
-import taboolib.common.platform.Platform
-import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.SkipTo
 import taboolib.common.platform.function.console
@@ -22,11 +20,10 @@ import java.util.*
  * @date 2019/11/29 21:04
  */
 @Internal
-@PlatformSide([Platform.BUKKIT])
 @SkipTo(LifeCycle.LOAD)
 object Updater {
 
-    private const val api_url = "https://api.github.com/repos/FlickerProjects/TrChat/releases/latest"
+    private const val api_url = "https://api.github.com/repos/TrPlugins/TrChat/releases/latest"
     private var notify = false
     val notified = mutableListOf<UUID>()
     val current_version = Version(pluginVersion)

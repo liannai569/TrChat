@@ -1,7 +1,8 @@
 package me.arasple.mc.trchat.api.nms
 
-import me.arasple.mc.trchat.TrChatBukkit
-import me.arasple.mc.trchat.api.TrChatAPI
+import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.module.internal.BukkitComponentManager
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.gson
 import me.arasple.mc.trchat.util.print
@@ -11,11 +12,15 @@ import net.minecraft.server.v1_16_R3.NBTBase
 import net.minecraft.server.v1_16_R3.NBTTagCompound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.MinecraftVersion.isUniversal
 import taboolib.module.nms.sendPacket
+import taboolib.platform.util.isAir
 import taboolib.platform.util.isNotAir
+import taboolib.platform.util.modifyLore
+import taboolib.platform.util.modifyMeta
 
 /**
  * @author Arasple
@@ -26,9 +31,9 @@ class NMSImpl : NMS() {
     override fun filterIChatComponent(iChat: Any?): Any? {
         iChat ?: return null
         return try {
-            val json = TrChatAPI.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
-            val component = TrChatAPI.filterComponent(gson(json))!!
-            TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component).let { if (it.length > 30000) "{\"text\":\"This chat packet is too big to send.\"}" else it }, fixed = true)!!
+            val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
+            val component = BukkitComponentManager.filterComponent(gson(json), 32000)!!
+            TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)!!
         } catch (t: Throwable) {
             if (!TrChatBukkit.reportedErrors.contains("filterIChatComponent")) {
                 t.print("Error occurred while filtering chat component.")
@@ -41,8 +46,8 @@ class NMSImpl : NMS() {
     override fun filterItem(item: Any?) {
         item ?: return
         kotlin.runCatching {
-            val itemStack = TrChatAPI.classCraftItemStack.invokeMethod<ItemStack>("asCraftMirror", item, fixed = true)!!
-            TrChatAPI.filterItemStack(itemStack)
+            val itemStack = TrChatBukkit.classCraftItemStack.invokeMethod<ItemStack>("asCraftMirror", item, fixed = true)!!
+            filterItemStack(itemStack)
         }
     }
 
@@ -59,7 +64,7 @@ class NMSImpl : NMS() {
 
     override fun optimizeNBT(itemStack: ItemStack, nbtWhitelist: Array<String>): ItemStack {
         try {
-            val nmsItem = TrChatAPI.classCraftItemStack
+            val nmsItem = TrChatBukkit.classCraftItemStack
                 .invokeMethod<net.minecraft.server.v1_16_R3.ItemStack>("asNMSCopy", itemStack, fixed = true)!!
             if (itemStack.isNotAir() && nmsItem.hasTag()) {
                 val nbtTag = NBTTagCompound()
@@ -71,7 +76,7 @@ class NMSImpl : NMS() {
                     }
                 }
                 nmsItem.tag = nbtTag
-                return TrChatAPI.classCraftItemStack.invokeMethod<ItemStack>("asBukkitCopy", nmsItem, fixed = true)!!
+                return TrChatBukkit.classCraftItemStack.invokeMethod<ItemStack>("asBukkitCopy", nmsItem, fixed = true)!!
             }
         } catch (_: Throwable) {
         }
@@ -80,7 +85,23 @@ class NMSImpl : NMS() {
 
     override fun sendChatPreview(player: Player, queryId: Int, query: String) {
         val component = player.getSession().getChannel()?.execute(player, query, forward = false)?.first ?: return
-        val iChatBaseComponent = TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
+        val iChatBaseComponent = TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
         player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
+    }
+
+    private fun filterItemStack(itemStack: ItemStack) {
+        if (itemStack.isAir()) {
+            return
+        }
+        itemStack.modifyMeta<ItemMeta> {
+            if (hasDisplayName()) {
+                setDisplayName(TrChat.api().filter(displayName).filtered)
+            }
+            modifyLore {
+                if (isNotEmpty()) {
+                    replaceAll { TrChat.api().filter(it).filtered }
+                }
+            }
+        }
     }
 }

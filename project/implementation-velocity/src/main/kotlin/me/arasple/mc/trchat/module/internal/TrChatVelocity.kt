@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import taboolib.common.platform.Platform
@@ -26,12 +26,11 @@ object TrChatVelocity : Plugin() {
     override fun onLoad() {
         console().sendLang("Plugin-Loading", plugin.server.version.version)
         console().sendLang("Plugin-Proxy-Supported", "Velocity")
+
+        Metrics.init(12541)
     }
 
     override fun onEnable() {
-        console().sendLang("Plugin-Enabled", pluginVersion)
-        Metrics.init(12541)
-
         command("muteallservers", permission = "trchatv.muteallservers") {
             dynamic("state") {
                 suggestion<ProxyCommandSender> { _, _ ->
@@ -44,5 +43,7 @@ object TrChatVelocity : Plugin() {
                 }
             }
         }
+
+        console().sendLang("Plugin-Enabled", pluginVersion)
     }
 }

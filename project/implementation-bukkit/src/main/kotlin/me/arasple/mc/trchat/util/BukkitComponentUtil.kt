@@ -1,14 +1,11 @@
 package me.arasple.mc.trchat.util
 
 import io.papermc.paper.text.PaperComponents
-import me.arasple.mc.trchat.ComponentManager
-import me.arasple.mc.trchat.TrChatBukkit
-import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.api.nms.NMS
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.api.BinaryTagHolder
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -19,9 +16,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.inventory.meta.ItemMeta
-import taboolib.common.platform.Platform
-import taboolib.common.platform.PlatformFactory
-import taboolib.common.platform.PlatformSide
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.getI18nName
@@ -31,30 +25,8 @@ import taboolib.platform.util.modifyMeta
 
 /**
  * @author wlys
- * @since 2022/6/8 12:56
+ * @since 2022/6/19 10:16
  */
-@Internal
-@PlatformSide([Platform.BUKKIT])
-object BukkitComponentManager : ComponentManager {
-
-    init {
-        PlatformFactory.registerAPI<ComponentManager>(this)
-    }
-
-    private var adventure: BukkitAudiences? = null
-
-    override fun getAudienceProvider(): BukkitAudiences {
-        return adventure!!
-    }
-
-    override fun init() {
-        adventure = BukkitAudiences.create(TrChatBukkit.plugin)
-    }
-
-    override fun release() {
-        adventure?.close()
-    }
-}
 
 private val classNBTTagCompound by lazy {
     nmsClass("NBTTagCompound")
@@ -91,7 +63,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     if (TrChatBukkit.paperEnv) {
         return hoverEvent(newItem.asHoverEvent())
     }
-    val nmsItemStack = TrChatAPI.classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, fixed = true)!!
+    val nmsItemStack = TrChatBukkit.classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, fixed = true)!!
     val nmsNBTTabCompound = classNBTTagCompound.invokeConstructor()
     val itemJson = nmsItemStack.invokeMethod<Any>("save", nmsNBTTabCompound)!!
     val id = itemJson.invokeMethod<String>("getString", "id") ?: "minecraft:air"

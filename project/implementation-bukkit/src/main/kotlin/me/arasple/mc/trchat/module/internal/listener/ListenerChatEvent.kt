@@ -52,7 +52,7 @@ object ListenerChatEvent {
                 }
             }
 
-        Channel.channels.forEach { channel ->
+        Channel.channels.values.forEach { channel ->
             channel.bindings.prefix?.forEach {
                 if (e.message.startsWith(it, ignoreCase = true)) {
                     channel.execute(player, e.message.substring(it.length))

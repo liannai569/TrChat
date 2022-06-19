@@ -1,6 +1,9 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.util.BungeeComponentManager
+import me.arasple.mc.trchat.module.conf.BungeeChannelManager
+import me.arasple.mc.trchat.module.internal.BungeeComponentManager
+import me.arasple.mc.trchat.module.internal.BungeeProxyManager
+import me.arasple.mc.trchat.module.internal.TrChatBungee
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -110,6 +113,9 @@ object ListenerBungeeTransfer {
                     getProxyPlayer(to)?.sendLang(node, *args)
                 } catch (_: IllegalStateException) {
                 }
+            }
+            "FetchProxyChannels" -> {
+                BungeeChannelManager.sendAllProxyChannels()
             }
         }
     }

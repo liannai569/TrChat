@@ -25,7 +25,7 @@ object CommandChannel {
             literal("join") {
                 dynamic("channel") {
                     suggestion<Player> { _, _ ->
-                        Channel.channels.map { it.id }
+                        Channel.channels.keys.toList()
                     }
                     execute<Player> { sender, _, argument ->
                         Channel.join(sender, argument)

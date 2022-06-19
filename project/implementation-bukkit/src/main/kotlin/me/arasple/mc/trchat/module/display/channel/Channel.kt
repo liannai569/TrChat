@@ -195,10 +195,10 @@ open class Channel(
 
     companion object {
 
-        val channels = mutableListOf<Channel>()
+        val channels = mutableMapOf<String, Channel>()
 
         fun join(player: Player, channel: String, hint: Boolean = true) {
-            channels.firstOrNull { it.id == channel }?.let {
+            channels[channel]?.let {
                 join(player, it, hint)
             } ?: quit(player)
         }

@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.util.color
 
-import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -14,9 +13,6 @@ import taboolib.module.chat.colored
 @PlatformSide([Platform.BUKKIT])
 object MessageColors {
 
-    private val COLOR_CODES = ChatColor.ALL_CODES.map { it.toString() }
-
-    private const val COLOR_CHAR = ChatColor.COLOR_CHAR.toString()
     const val COLOR_PERMISSION_NODE = "trchat.color."
     const val FORCE_CHAT_COLOR_PERMISSION_NODE = "trchat.color.force-defaultcolor."
 
@@ -50,11 +46,6 @@ object MessageColors {
         if (player.hasPermission("$COLOR_PERMISSION_NODE*")) {
             string = string.colored()
         } else {
-//            for (code in COLOR_CODES) {
-//                if (player.hasPermission(COLOR_PERMISSION_NODE + code)) {
-//                    string = string.replace("&$code", COLOR_CHAR + code)
-//                }
-//            }
             getColorsFromPermissions(player, COLOR_PERMISSION_NODE).forEach {
                 string.replace(it, CustomColor(it).color)
             }

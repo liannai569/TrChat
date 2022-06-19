@@ -2,8 +2,6 @@ package me.arasple.mc.trchat.util
 
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
-import taboolib.common.platform.Platform
-import taboolib.common.platform.PlatformSide
 import taboolib.common5.FileWatcher
 import java.io.File
 
@@ -12,7 +10,6 @@ import java.io.File
  * @since 2022/4/4 13:50
  */
 @Internal
-@PlatformSide([Platform.BUKKIT])
 object FileListener {
 
     val watcher by lazy { FileWatcher() }

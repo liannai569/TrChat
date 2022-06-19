@@ -1,8 +1,8 @@
 package me.arasple.mc.trchat.module.display
 
-import me.arasple.mc.trchat.api.TrChatAPI
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.getDataContainer
@@ -45,11 +45,11 @@ class ChatSession(
     val isVanishing get() = player.getDataContainer().getBoolean("vanish", false)
 
     fun getChannel(): Channel? {
-        return Channel.channels.firstOrNull { it.id == channel }
+        return Channel.channels[channel]
     }
 
-    fun selectColor(string: String) {
-        player.getDataContainer()["color"] = string
+    fun selectColor(color: String?) {
+        player.getDataContainer()["color"] = color
     }
 
     fun getColor(default: CustomColor): CustomColor {
@@ -134,7 +134,7 @@ class ChatSession(
                 } else {
                     read<Any>("a")!!
                 }
-                val json = TrChatAPI.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
+                val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
                 val component = gson(json)
                 var string = ""
                 ComponentFlattener.textOnly().flatten(component) { string += it }

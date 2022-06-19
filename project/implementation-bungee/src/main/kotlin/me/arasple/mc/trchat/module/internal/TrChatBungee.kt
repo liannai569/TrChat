@@ -1,5 +1,7 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal
 
+import me.arasple.mc.trchat.BungeeEnv
+import me.arasple.mc.trchat.module.conf.BungeeChannelManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import net.md_5.bungee.api.ProxyServer
 import taboolib.common.env.RuntimeEnv
@@ -28,8 +30,6 @@ object TrChatBungee : Plugin() {
     }
 
     override fun onLoad() {
-        ProxyServer.getInstance().registerChannel(TRCHAT_CHANNEL)
-
         console().sendLang("Plugin-Loading", server<ProxyServer>().version)
         console().sendLang("Plugin-Proxy-Supported", "Bungee")
 
@@ -37,8 +37,6 @@ object TrChatBungee : Plugin() {
     }
 
     override fun onEnable() {
-        console().sendLang("Plugin-Enabled", pluginVersion)
-
         command("muteallservers", permission = "trchatb.muteallservers") {
             dynamic("state") {
                 suggestion<ProxyCommandSender> { _, _ ->
@@ -51,5 +49,14 @@ object TrChatBungee : Plugin() {
                 }
             }
         }
+
+        BungeeComponentManager.init()
+        BungeeChannelManager.loadChannels(console())
+
+        console().sendLang("Plugin-Enabled", pluginVersion)
+    }
+
+    override fun onDisable() {
+        BungeeComponentManager.release()
     }
 }

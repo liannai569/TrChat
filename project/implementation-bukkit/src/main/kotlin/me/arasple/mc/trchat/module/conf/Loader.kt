@@ -13,12 +13,14 @@ import me.arasple.mc.trchat.module.display.format.MsgComponent
 import me.arasple.mc.trchat.module.display.format.part.Group
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.Function
+import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.toCondition
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
@@ -43,8 +45,6 @@ import kotlin.system.measureTimeMillis
 @PlatformSide([Platform.BUKKIT])
 object Loader {
 
-    private var init = false
-
     private val folder by lazy {
         val folder = File(getDataFolder(), "channels")
 
@@ -68,20 +68,24 @@ object Loader {
     }
 
     fun loadChannels(): Int {
-        Channel.channels.forEach { it.unregister() }
+        Channel.channels.values.forEach { it.unregister() }
         Channel.channels.clear()
 
         filterChannelFiles(folder).forEach {
             if (FileListener.isListening(it)) {
                 try {
-                    Channel.channels.add(loadChannel(it))
+                    loadChannel(it.nameWithoutExtension, YamlConfiguration.loadConfiguration(it)).let { channel ->
+                        Channel.channels[channel.id] = channel
+                    }
                 } catch (t: Throwable) {
                     t.print("Channel file ${it.name} loaded failed!")
                 }
             } else {
                 FileListener.listen(it, runFirst = true) {
                     try {
-                        Channel.channels.add(loadChannel(it))
+                        loadChannel(it.nameWithoutExtension, YamlConfiguration.loadConfiguration(it)).let { channel ->
+                            Channel.channels[channel.id] = channel
+                        }
                     } catch (t: Throwable) {
                         t.print("Channel file ${it.name} loaded failed!")
                     }
@@ -89,16 +93,17 @@ object Loader {
             }
         }
 
+        if (Bukkit.getOnlinePlayers().isNotEmpty()) {
+            BukkitProxyManager.sendTrChatMessage(Bukkit.getOnlinePlayers().iterator().next(), "FetchProxyChannels")
+        }
+
         return Channel.channels.size
     }
 
-    fun loadChannel(file: File): Channel {
-        val conf = YamlConfiguration.loadConfiguration(file)
-        val id = file.nameWithoutExtension
-
-        Channel.channels.firstOrNull { it.id == id }?.let {
+    fun loadChannel(id: String, conf: YamlConfiguration): Channel {
+        Channel.channels[id]?.let {
             it.unregister()
-            Channel.channels.remove(it)
+            Channel.channels.remove(it.id)
         }
 
         val settings = conf.getConfigurationSection("Options")!!.let { section ->

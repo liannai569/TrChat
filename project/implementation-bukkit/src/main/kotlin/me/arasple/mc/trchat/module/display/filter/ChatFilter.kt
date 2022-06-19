@@ -1,8 +1,8 @@
 package me.arasple.mc.trchat.module.display.filter
 
-import me.arasple.mc.trchat.TrChatBukkit
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.module.display.filter.processer.Filter
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.parseJson
 import me.arasple.mc.trchat.util.print
 import taboolib.common.env.DependencyDownloader.readFully

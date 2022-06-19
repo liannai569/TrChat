@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.command.main
 
-import me.arasple.mc.trchat.TrChatBukkit
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.muteDateFormat

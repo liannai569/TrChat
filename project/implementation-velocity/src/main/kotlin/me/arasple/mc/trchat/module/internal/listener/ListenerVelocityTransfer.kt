@@ -1,8 +1,9 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal.listener
 
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.proxy.Player
-import me.arasple.mc.trchat.TrChatVelocity.plugin
+import me.arasple.mc.trchat.module.internal.TrChatVelocity.plugin
+import me.arasple.mc.trchat.module.internal.VelocityProxyManager
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity

@@ -1,12 +1,15 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal
 
+import me.arasple.mc.trchat.ProxyManager
 import me.arasple.mc.trchat.util.buildMessage
 import me.arasple.mc.trchat.util.print
+import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.config.ServerInfo
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.common.platform.function.server
 import taboolib.common.platform.function.submit
 import java.io.IOException
 
@@ -19,6 +22,7 @@ object BungeeProxyManager : ProxyManager {
 
     init {
         PlatformFactory.registerAPI<ProxyManager>(this)
+        server<ProxyServer>().registerChannel(TrChatBungee.TRCHAT_CHANNEL)
     }
 
     override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
@@ -44,6 +48,12 @@ object BungeeProxyManager : ProxyManager {
 
     override fun getPlayers(): List<String> {
         return onlinePlayers().map { it.name }
+    }
+
+    fun sendProxyChannel(id: String, channel: String) {
+        server<ProxyServer>().servers.forEach { (_, v) ->
+            sendTrChatMessage(v, "SendProxyChannel", id, channel)
+        }
     }
 
 }

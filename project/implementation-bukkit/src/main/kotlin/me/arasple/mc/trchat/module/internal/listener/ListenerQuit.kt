@@ -24,7 +24,7 @@ object ListenerQuit {
     fun e(e: PlayerQuitEvent) {
         val player = e.player
 
-        Channel.channels.forEach { it.listeners.remove(player.uniqueId) }
+        Channel.channels.values.forEach { it.listeners.remove(player.uniqueId) }
 
         ChatSession.removeSession(player)
 
@@ -38,7 +38,7 @@ object ListenerQuit {
     fun e(e: PlayerKickEvent) {
         val player = e.player
 
-        Channel.channels.forEach { it.listeners.remove(player.uniqueId) }
+        Channel.channels.values.forEach { it.listeners.remove(player.uniqueId) }
 
         ChatSession.removeSession(player)
 

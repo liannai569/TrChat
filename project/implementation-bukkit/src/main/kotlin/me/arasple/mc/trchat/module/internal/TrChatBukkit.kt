@@ -1,12 +1,14 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.module.internal
 
+import me.arasple.mc.trchat.BukkitEnv
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.filter.ChatFilter
 import me.arasple.mc.trchat.module.internal.data.Database
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
+import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
-import me.arasple.mc.trchat.util.BukkitComponentManager
 import org.bukkit.Bukkit
 import taboolib.common.env.RuntimeEnv
 import taboolib.common.platform.Awake
@@ -18,6 +20,8 @@ import taboolib.common.platform.function.pluginVersion
 import taboolib.module.kether.Kether
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion.majorLegacy
+import taboolib.module.nms.nmsClass
+import taboolib.module.nms.obcClass
 import taboolib.platform.BukkitPlugin
 
 /**
@@ -34,6 +38,14 @@ object TrChatBukkit : Plugin() {
     var isGlobalMuting = false
 
     val reportedErrors = mutableListOf<String>()
+
+    val classCraftItemStack by lazy {
+        obcClass("inventory.CraftItemStack")
+    }
+
+    val classChatSerializer by lazy {
+        nmsClass("IChatBaseComponent\$ChatSerializer")
+    }
 
     @Awake
     fun loadDependency() {
@@ -52,6 +64,8 @@ object TrChatBukkit : Plugin() {
 
     override fun onLoad() {
         console().sendLang("Plugin-Loading", Bukkit.getBukkitVersion())
+
+        Metrics.init(5802)
     }
 
     override fun onEnable() {
@@ -62,12 +76,12 @@ object TrChatBukkit : Plugin() {
 
         Database.init()
 
-        Loader.loadChannels(console())
+        TrChat.api().getChannelManager().loadChannels(console())
         Loader.loadFunctions(console())
         ChatFilter.loadFilter(true, console())
 
+        BukkitProxyManager.platform
         HookPlugin.printInfo()
-        Metrics.init(5802)
         console().sendLang("Plugin-Enabled", pluginVersion)
     }
 

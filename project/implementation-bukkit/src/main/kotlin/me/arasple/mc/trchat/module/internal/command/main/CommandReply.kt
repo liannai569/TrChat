@@ -39,7 +39,7 @@ object CommandReply {
                             val to = BukkitPlayers.getPlayerFullName(lastMessageFrom[sender.name]!!)
                                 ?: return@execute sender.sendLang("Command-Player-Not-Exist")
                             session.lastPrivateTo = to
-                            Channel.channels.firstOrNull { it is PrivateChannel
+                            Channel.channels.values.firstOrNull { it is PrivateChannel
                                     && (it.settings.joinPermission == null || sender.hasPermission(it.settings.joinPermission)) }
                                 ?.execute(sender, argument)
                         }

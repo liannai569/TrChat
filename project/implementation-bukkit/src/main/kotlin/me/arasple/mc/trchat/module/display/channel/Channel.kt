@@ -37,10 +37,22 @@ open class Channel(
     val bindings: ChannelBindings,
     val events: ChannelEvents?,
     val formats: List<Format>,
-    val console: Format? = null
+    val console: Format? = null,
+    val listeners: MutableSet<UUID> = mutableSetOf()
 ) {
 
     init {
+        if (settings.autoJoin) {
+            Bukkit.getOnlinePlayers().forEach {
+                if (settings.joinPermission == null || it.hasPermission(settings.joinPermission)) {
+                    listeners.add(it.uniqueId)
+                }
+            }
+        } else {
+            Bukkit.getOnlinePlayers().filter { it.getSession().channel == id }.forEach {
+                join(it, id, hint = false)
+            }
+        }
         if (!bindings.command.isNullOrEmpty()) {
             command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
                 execute<Player> { sender, _, _ ->
@@ -100,8 +112,6 @@ open class Channel(
             }
         }
     }
-
-    val listeners = mutableSetOf<UUID>()
 
     open fun execute(player: Player, message: String, forward: Boolean = true): Pair<Component, Component?>? {
         if (!player.checkMute()) {

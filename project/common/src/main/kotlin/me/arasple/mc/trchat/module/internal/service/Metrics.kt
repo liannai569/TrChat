@@ -31,7 +31,6 @@ object Metrics {
         }
     }
 
-    @JvmStatic
     fun increase(index: Int, value: Int = 1) {
         if (counts[index] < Int.MAX_VALUE) {
             counts[index] += value

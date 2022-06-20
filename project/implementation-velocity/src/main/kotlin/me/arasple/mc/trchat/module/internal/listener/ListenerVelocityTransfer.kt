@@ -2,8 +2,10 @@ package me.arasple.mc.trchat.module.internal.listener
 
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.proxy.Player
+import com.velocitypowered.api.proxy.ServerConnection
 import me.arasple.mc.trchat.module.internal.TrChatVelocity.plugin
 import me.arasple.mc.trchat.module.internal.VelocityProxyManager
+import me.arasple.mc.trchat.module.internal.conf.VelocityChannelManager
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -29,19 +31,19 @@ object ListenerVelocityTransfer {
 
     @SubscribeEvent(ignoreCancelled = true)
     fun onTransfer(e: PluginMessageEvent) {
-        if (e.identifier == VelocityProxyManager.incoming) {
+        if (e.identifier.id == VelocityProxyManager.incoming.id) {
             try {
                 val message = MessageReader.read(e.data)
                 if (message.isCompleted) {
                     val data = message.build()
-                    execute(data)
+                    execute(data, e.source as ServerConnection)
                 }
             } catch (_: IOException) {
             }
         }
     }
 
-    private fun execute(data: Array<String>) {
+    private fun execute(data: Array<String>, connection: ServerConnection) {
         when (data[0]) {
             "SendRaw" -> {
                 val to = data[1]
@@ -50,7 +52,6 @@ object ListenerVelocityTransfer {
                 val message = GsonComponentSerializer.gson().deserialize(raw)
 
                 player.sendMessage(message)
-
             }
             "BroadcastRaw" -> {
                 val uuid = data[1]
@@ -108,6 +109,13 @@ object ListenerVelocityTransfer {
                     getProxyPlayer(to)?.sendLang(node, *args)
                 } catch (_: IllegalStateException) {
                 }
+            }
+            "FetchProxyChannels" -> {
+                VelocityChannelManager.sendAllProxyChannels()
+            }
+            "LoadedProxyChannel" -> {
+                val id = data[1]
+                VelocityChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connection.serverInfo.address.port)
             }
         }
     }

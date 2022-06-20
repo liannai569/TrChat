@@ -19,17 +19,13 @@ import java.io.IOException
 @PlatformSide([Platform.VELOCITY])
 object VelocityProxyManager : ProxyManager {
 
-    var incoming: MinecraftChannelIdentifier
-    var outgoing: MinecraftChannelIdentifier
+    val incoming: MinecraftChannelIdentifier
+    val outgoing: MinecraftChannelIdentifier
 
     init {
         PlatformFactory.registerAPI<ProxyManager>(this)
-        incoming = MinecraftChannelIdentifier.create("trchat", "proxy").also {
-            TrChatVelocity.plugin.server.channelRegistrar.register(it)
-        }
-        outgoing = MinecraftChannelIdentifier.create("trchat", "server").also {
-            TrChatVelocity.plugin.server.channelRegistrar.register(it)
-        }
+        incoming = MinecraftChannelIdentifier.from("trchat:proxy")
+        outgoing = MinecraftChannelIdentifier.from("trchat:server")
         submit(period = 60, async = true) {
             TrChatVelocity.plugin.server.allServers.forEach { server ->
                 sendTrChatMessage(server, "PlayerList", onlinePlayers().joinToString(", ") { it.name })

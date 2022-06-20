@@ -197,6 +197,6 @@ interface BukkitProxyProcessor : PluginMessageListener {
             } catch (_: IOException) {
             }
         }
-
     }
+
 }

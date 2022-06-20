@@ -47,7 +47,7 @@ object ListenerBungeeTransfer {
     }
 
     @Suppress("Deprecation")
-    private fun execute(data: Array<String>, connent: Connection) {
+    private fun execute(data: Array<String>, connection: Connection) {
         when (data[0]) {
             "SendRaw" -> {
                 val to = data[1]
@@ -121,7 +121,7 @@ object ListenerBungeeTransfer {
             }
             "LoadedProxyChannel" -> {
                 val id = data[1]
-                BungeeChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connent.address.port)
+                BungeeChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connection.address.port)
             }
         }
     }

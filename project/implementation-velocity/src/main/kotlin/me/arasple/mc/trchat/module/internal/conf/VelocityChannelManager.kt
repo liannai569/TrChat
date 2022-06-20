@@ -1,10 +1,10 @@
-package me.arasple.mc.trchat.module.conf
+package me.arasple.mc.trchat.module.internal.conf
 
 import me.arasple.mc.trchat.ChannelManager
-import me.arasple.mc.trchat.module.internal.BungeeProxyManager
+import me.arasple.mc.trchat.module.internal.TrChatVelocity
+import me.arasple.mc.trchat.module.internal.VelocityProxyManager
 import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.print
-import net.md_5.bungee.api.ProxyServer
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
@@ -12,7 +12,6 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
-import taboolib.common.platform.function.server
 import taboolib.module.lang.sendLang
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -21,8 +20,8 @@ import kotlin.system.measureTimeMillis
  * @author wlys
  * @since 2022/6/19 20:26
  */
-@PlatformSide([Platform.BUNGEE])
-object BungeeChannelManager : ChannelManager {
+@PlatformSide([Platform.VELOCITY])
+object VelocityChannelManager : ChannelManager {
 
     init {
         PlatformFactory.registerAPI<ChannelManager>(this)
@@ -33,7 +32,7 @@ object BungeeChannelManager : ChannelManager {
 
         if (!folder.exists()) {
             arrayOf(
-                "Bungee.yml",
+                "Velocity.yml",
             ).forEach { releaseResourceFile("channels/$it", replace = true) }
             newFile(File(getDataFolder(), "data"), folder = true)
         }
@@ -84,10 +83,10 @@ object BungeeChannelManager : ChannelManager {
 
     @Suppress("Deprecation")
     fun sendProxyChannel(id: String, channel: String) {
-        server<ProxyServer>().servers.filterNot {
-            loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.value.address.port)
-        }.forEach { (_, v) ->
-            BungeeProxyManager.sendTrChatMessage(v, "SendProxyChannel", id, channel)
+        TrChatVelocity.plugin.server.allServers.filterNot {
+            loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
+        }.forEach {
+            VelocityProxyManager.sendTrChatMessage(it, "SendProxyChannel", id, channel)
         }
     }
 

@@ -17,6 +17,7 @@ import taboolib.common.platform.event.SubscribeEvent
 @PlatformSide([Platform.BUKKIT])
 object ListenerBookEdit {
 
+    @Suppress("Deprecation")
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onBookEdit(e: PlayerEditBookEvent) {
         val p = e.player

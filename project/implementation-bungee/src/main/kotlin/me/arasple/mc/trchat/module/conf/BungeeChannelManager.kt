@@ -5,7 +5,6 @@ import me.arasple.mc.trchat.module.internal.BungeeProxyManager
 import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.print
 import net.md_5.bungee.api.ProxyServer
-import net.md_5.bungee.api.config.ServerInfo
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
@@ -83,6 +82,7 @@ object BungeeChannelManager : ChannelManager {
         return channels[id]
     }
 
+    @Suppress("Deprecation")
     fun sendProxyChannel(id: String, channel: String) {
         server<ProxyServer>().servers.filterNot {
             loadedServers.computeIfAbsent(it.key) { ArrayList() }.contains(it.value.address.port)

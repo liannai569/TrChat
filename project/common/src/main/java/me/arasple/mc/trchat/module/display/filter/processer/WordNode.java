@@ -5,7 +5,7 @@ import java.util.List;
 
 public class WordNode {
 
-    private int value;
+    private final int value;
     private List<WordNode> subNodes;
     private boolean isLast;
 

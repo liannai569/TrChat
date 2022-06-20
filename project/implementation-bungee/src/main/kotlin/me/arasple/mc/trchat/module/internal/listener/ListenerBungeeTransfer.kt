@@ -21,7 +21,6 @@ import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * ListenerBungeeTransfer
@@ -47,6 +46,7 @@ object ListenerBungeeTransfer {
         }
     }
 
+    @Suppress("Deprecation")
     private fun execute(data: Array<String>, connent: Connection) {
         when (data[0]) {
             "SendRaw" -> {

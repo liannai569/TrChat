@@ -1,3 +1,5 @@
+@file:Suppress("Deprecation")
+
 package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.api.config.Settings

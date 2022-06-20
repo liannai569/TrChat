@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.module.conf.BukkitChannelManager
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Updater

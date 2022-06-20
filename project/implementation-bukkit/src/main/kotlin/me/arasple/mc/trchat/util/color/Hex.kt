@@ -23,22 +23,22 @@ object Hex {
     internal val RAINBOW_PATTERN =
         Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>")
     internal val GRADIENT_PATTERN =
-        Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(?<loop>l|L|loop))?>")
+        Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f\\d]{6}|[A-Fa-f\\d]{3})){2,})(:(?<loop>l|L|loop))?>")
     internal val HEX_PATTERNS = listOf(
-        Pattern.compile("<#([A-Fa-f0-9]){6}>"),  // <#FFFFFF>
-        Pattern.compile("\\{#([A-Fa-f0-9]){6}}"),  // {#FFFFFF}
-        Pattern.compile("&#([A-Fa-f0-9]){6}"),  // &#FFFFFF
-        Pattern.compile("#([A-Fa-f0-9]){6}"), // #FFFFFF
-        Pattern.compile("&\\{#([A-Fa-f0-9]){6}}") // &{#FFFFFF}
+        Pattern.compile("<#([A-Fa-f\\d]){6}>"),  // <#FFFFFF>
+        Pattern.compile("\\{#([A-Fa-f\\d]){6}}"),  // {#FFFFFF}
+        Pattern.compile("&#([A-Fa-f\\d]){6}"),  // &#FFFFFF
+        Pattern.compile("#([A-Fa-f\\d]){6}"), // #FFFFFF
+        Pattern.compile("&\\{#([A-Fa-f\\d]){6}}") // &{#FFFFFF}
     )
     private val STOP = Pattern.compile(
         "<(rainbow|r)(#(\\d+))?(:(\\d*\\.?\\d+))?(:(\\d*\\.?\\d+))?(:(l|L|loop))?>|" +
-                "<(gradient|g)(#(\\d+))?((:#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})){2,})(:(l|L|loop))?>|" +
-                "(&[a-f0-9r])|" +
-                "<#([A-Fa-f0-9]){6}>|" +
-                "\\{#([A-Fa-f0-9]){6}}|" +
-                "&#([A-Fa-f0-9]){6}|" +
-                "#([A-Fa-f0-9]){6}|" +
+                "<(gradient|g)(#(\\d+))?((:#([A-Fa-f\\d]{6}|[A-Fa-f\\d]{3})){2,})(:(l|L|loop))?>|" +
+                "(&[a-f\\dr])|" +
+                "<#([A-Fa-f\\d]){6}>|" +
+                "\\{#([A-Fa-f\\d]){6}}|" +
+                "&#([A-Fa-f\\d]){6}|" +
+                "#([A-Fa-f\\d]){6}|" +
                 org.bukkit.ChatColor.COLOR_CHAR
     )
 
@@ -311,7 +311,7 @@ object Hex {
     }
 
     /**
-     * Allows generation of a multi-part gradient with a defined number of steps
+     * Allows generation of a multipart gradient with a defined number of steps
      */
     open class Gradient(colors: List<Color>, steps: Int) :
         ColorGenerator {
@@ -359,7 +359,7 @@ object Hex {
             private fun calculateHexPiece(step: Int, channelStart: Int, channelEnd: Int): Int {
                 val range = upperRange - lowerRange
                 val interval = (channelEnd - channelStart) / range
-                return Math.round(interval * (step - lowerRange) + channelStart)
+                return (interval * (step - lowerRange) + channelStart).let { if (it.isNaN()) 0 else it.roundToInt() }
             }
         }
 
@@ -379,7 +379,7 @@ object Hex {
     }
 
     /**
-     * Allows generation of an animated multi-part gradient with a defined number of steps
+     * Allows generation of an animated multipart gradient with a defined number of steps
      */
     class AnimatedGradient(colors: List<Color>, steps: Int, speed: Int) :
         Gradient(colors, steps) {

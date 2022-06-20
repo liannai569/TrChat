@@ -32,7 +32,7 @@ object Database {
         }
     }
 
-    @Schedule(delay = 100, period = 20 * 60 * 5, async = true)
+    @Schedule(delay = 100, period = (20 * 60 * 5).toLong(), async = true)
     @Awake(LifeCycle.DISABLE)
     fun save() {
         onlinePlayers().forEach { database.push(it.cast()) }

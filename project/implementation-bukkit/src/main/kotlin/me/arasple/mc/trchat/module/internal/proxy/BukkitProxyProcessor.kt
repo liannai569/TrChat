@@ -68,21 +68,21 @@ interface BukkitProxyProcessor : PluginMessageListener {
 
     class BungeeSide : BukkitProxyProcessor {
 
-        private val TRCHAT_CHANNEL = "trchat:main"
-        private val BUNGEE_CHANNEL = "BungeeCord"
+        private val trChatChannel = "trchat:main"
+        private val bungeeChannel = "BungeeCord"
 
         override fun init() {
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, BUNGEE_CHANNEL)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, BUNGEE_CHANNEL)
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, bungeeChannel)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, bungeeChannel)
             }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, BUNGEE_CHANNEL)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, BUNGEE_CHANNEL, BungeeSide())
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, bungeeChannel)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, bungeeChannel, BungeeSide())
             }
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, TRCHAT_CHANNEL)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, TRCHAT_CHANNEL)
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, trChatChannel)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, trChatChannel)
             }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, TRCHAT_CHANNEL)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, TRCHAT_CHANNEL, BungeeSide())
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, trChatChannel)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, trChatChannel, BungeeSide())
             }
             submit(period = 60, async = true) {
                 if (Bukkit.getOnlinePlayers().isNotEmpty()) {
@@ -105,7 +105,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
                     success = false
                 }
 
-                recipient.sendPluginMessage(TrChatBukkit.plugin, BUNGEE_CHANNEL, out.toByteArray())
+                recipient.sendPluginMessage(TrChatBukkit.plugin, bungeeChannel, out.toByteArray())
             }
 
             return success
@@ -116,7 +116,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
             submit(async = async) {
                 try {
                     for (bytes in buildMessage(*args)) {
-                        recipient.sendPluginMessage(TrChatBukkit.plugin, TRCHAT_CHANNEL, bytes)
+                        recipient.sendPluginMessage(TrChatBukkit.plugin, trChatChannel, bytes)
                     }
                 } catch (e: IOException) {
                     e.print("Failed to send proxy trchat message!")
@@ -128,7 +128,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
         }
 
         override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-            if (channel == BUNGEE_CHANNEL) {
+            if (channel == bungeeChannel) {
                 try {
                     val data = ByteStreams.newDataInput(message)
                     val subChannel = data.readUTF()
@@ -139,7 +139,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 } catch (_: IOException) {
                 }
             }
-            if (channel == TRCHAT_CHANNEL) {
+            if (channel == trChatChannel) {
                 try {
                     val data = MessageReader.read(message)
                     if (data.isCompleted) {
@@ -153,15 +153,15 @@ interface BukkitProxyProcessor : PluginMessageListener {
 
     class VelocitySide : BukkitProxyProcessor {
 
-        private val INCOMING_CHANNEL = "trchat:server"
-        private val OUTGOING_CHANNEL = "trchat:proxy"
+        private val incoming = "trchat:server"
+        private val outgoing = "trchat:proxy"
 
         override fun init() {
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, OUTGOING_CHANNEL)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, OUTGOING_CHANNEL)
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, outgoing)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, outgoing)
             }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, INCOMING_CHANNEL)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, INCOMING_CHANNEL, VelocitySide())
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, incoming)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, incoming, VelocitySide())
             }
         }
 
@@ -174,7 +174,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
             submit(async = async) {
                 try {
                     for (bytes in buildMessage(*args)) {
-                        recipient.sendPluginMessage(TrChatBukkit.plugin, OUTGOING_CHANNEL, bytes)
+                        recipient.sendPluginMessage(TrChatBukkit.plugin, outgoing, bytes)
                     }
                 } catch (e: IOException) {
                     e.print("Failed to send proxy trchat message!")
@@ -186,7 +186,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
         }
 
         override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-            if (channel != INCOMING_CHANNEL) {
+            if (channel != incoming) {
                 return
             }
             try {
@@ -196,11 +196,6 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 }
             } catch (_: IOException) {
             }
-        }
-
-        companion object {
-
-
         }
 
     }

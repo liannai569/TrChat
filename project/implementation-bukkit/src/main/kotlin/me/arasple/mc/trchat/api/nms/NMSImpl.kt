@@ -26,6 +26,7 @@ import taboolib.platform.util.modifyMeta
  * @author Arasple
  * @date 2019/11/30 11:16
  */
+@Suppress("unused")
 class NMSImpl : NMS() {
 
     override fun filterIChatComponent(iChat: Any?): Any? {
@@ -89,6 +90,7 @@ class NMSImpl : NMS() {
         player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
     }
 
+    @Suppress("Deprecation")
     private fun filterItemStack(itemStack: ItemStack) {
         if (itemStack.isAir()) {
             return

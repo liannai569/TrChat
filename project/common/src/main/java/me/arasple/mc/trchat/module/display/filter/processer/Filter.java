@@ -96,12 +96,12 @@ public class Filter {
                 markNum = 0;
             }
             k = i;
-//            curry = curr;
+            curry = curr;
             while (++k < length) {
                 int temp = charConvert(chs[k]);
-//                if (temp == curry) {
-//                    continue;
-//                }
+                if (temp == curry) {
+                    continue;
+                }
                 if (PUNCTUATIONS_SET.contains(temp)) {
                     continue;
                 }
@@ -113,7 +113,7 @@ public class Filter {
                     couldMark = true;
                     markNum = k - i;
                 }
-//                curry = temp;
+                curry = temp;
             }
             if (couldMark) {
                 for (k = 0; k <= markNum; k++) {

@@ -71,6 +71,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     return hoverEvent(HoverEvent.showItem(Key.key(id), newItem.amount, BinaryTagHolder.binaryTagHolder(tag)))
 }
 
+@Suppress("Deprecation", "USELESS_ELVIS")
 private fun ItemStack.optimizeShulkerBox(): ItemStack {
     try {
         if (!type.name.endsWith("SHULKER_BOX")) {

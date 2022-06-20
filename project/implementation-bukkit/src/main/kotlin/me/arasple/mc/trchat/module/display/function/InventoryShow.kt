@@ -65,6 +65,7 @@ object InventoryShow {
         }
     }
 
+    @Suppress("Deprecation")
     fun createComponent(player: Player): Component {
         return mirrorNow("Function:InventoryShow:CreateComponent") {
             val menu = buildMenu<Linked<ItemStack>>("${player.name}'s Inventory") {

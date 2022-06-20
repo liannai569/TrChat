@@ -20,6 +20,7 @@ import taboolib.common.platform.function.adaptPlayer
 @PlatformSide([Platform.BUKKIT])
 object ListenerSignChange {
 
+    @Suppress("Deprecation", "USELESS_ELVIS")
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onSignChange(e: SignChangeEvent) {
         val p = e.player

@@ -24,6 +24,7 @@ import taboolib.platform.util.modifyMeta
 @PlatformSide([Platform.BUKKIT])
 object ListenerAnvilChange {
 
+    @Suppress("Deprecation")
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onAnvilCraft(e: PrepareAnvilEvent) {
         val p = e.view.player

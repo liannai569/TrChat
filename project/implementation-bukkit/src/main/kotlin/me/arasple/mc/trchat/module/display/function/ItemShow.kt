@@ -88,6 +88,7 @@ object ItemShow {
         }
     }
 
+    @Suppress("Deprecation")
     private fun ItemStack.getDisplayName(player: Player): String {
         if (isAir()) {
             return "空气"

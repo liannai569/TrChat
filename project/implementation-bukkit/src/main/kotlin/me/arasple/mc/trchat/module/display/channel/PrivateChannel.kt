@@ -74,7 +74,7 @@ class PrivateChannel(
             return null
         }
         if (settings.filterBeforeSending && TrChat.api().filter(message).sensitiveWords > 0) {
-            player.sendLang("Channel-Filter-Before-Sending")
+            player.sendLang("Channel-Bad-Language")
             return null
         }
         val session = player.getSession()

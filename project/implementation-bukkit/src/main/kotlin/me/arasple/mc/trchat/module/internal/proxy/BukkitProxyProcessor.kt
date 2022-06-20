@@ -59,6 +59,9 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 Loader.loadChannel(id, YamlConfiguration().also { it.loadFromString(channel) }).let {
                     Channel.channels[it.id] = it
                 }
+                if (Bukkit.getOnlinePlayers().isNotEmpty()) {
+                    BukkitProxyManager.sendTrChatMessage(Bukkit.getOnlinePlayers().iterator().next(), "LoadedProxyChannel", id)
+                }
             }
         }
     }

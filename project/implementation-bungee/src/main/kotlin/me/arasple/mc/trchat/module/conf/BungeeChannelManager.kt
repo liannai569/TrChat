@@ -4,6 +4,8 @@ import me.arasple.mc.trchat.ChannelManager
 import me.arasple.mc.trchat.module.internal.BungeeProxyManager
 import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.print
+import net.md_5.bungee.api.ProxyServer
+import net.md_5.bungee.api.config.ServerInfo
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
@@ -11,6 +13,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
+import taboolib.common.platform.function.server
 import taboolib.module.lang.sendLang
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -41,6 +44,8 @@ object BungeeChannelManager : ChannelManager {
 
     val channels = mutableMapOf<String, String>()
 
+    val loadedServers = mutableMapOf<String, ArrayList<Int>>()
+
     override fun loadChannels(sender: ProxyCommandSender) {
         measureTimeMillis {
             channels.clear()
@@ -51,7 +56,8 @@ object BungeeChannelManager : ChannelManager {
                     try {
                         val channel = it.readText()
                         channels[id] = channel
-                        BungeeProxyManager.sendProxyChannel(id, channel)
+                        loadedServers[id]?.clear()
+                        sendProxyChannel(id, channel)
                     } catch (t: Throwable) {
                         t.print("Channel file ${it.name} loaded failed!")
                     }
@@ -60,7 +66,8 @@ object BungeeChannelManager : ChannelManager {
                         try {
                             val channel = it.readText()
                             channels[id] = channel
-                            BungeeProxyManager.sendProxyChannel(id, channel)
+                            loadedServers[id]?.clear()
+                            sendProxyChannel(id, channel)
                         } catch (t: Throwable) {
                             t.print("Channel file ${it.name} loaded failed!")
                         }
@@ -76,9 +83,17 @@ object BungeeChannelManager : ChannelManager {
         return channels[id]
     }
 
+    fun sendProxyChannel(id: String, channel: String) {
+        server<ProxyServer>().servers.filterNot {
+            loadedServers.computeIfAbsent(it.key) { ArrayList() }.contains(it.value.address.port)
+        }.forEach { (_, v) ->
+            BungeeProxyManager.sendTrChatMessage(v, "SendProxyChannel", id, channel)
+        }
+    }
+
     fun sendAllProxyChannels() {
         channels.forEach {
-            BungeeProxyManager.sendProxyChannel(it.key, it.value)
+            sendProxyChannel(it.key, it.value)
         }
     }
 

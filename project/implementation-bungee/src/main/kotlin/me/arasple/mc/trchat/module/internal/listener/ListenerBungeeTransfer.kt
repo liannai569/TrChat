@@ -9,6 +9,7 @@ import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.md_5.bungee.api.ProxyServer
+import net.md_5.bungee.api.connection.Connection
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.PluginMessageEvent
 import taboolib.common.platform.Platform
@@ -20,6 +21,7 @@ import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * ListenerBungeeTransfer
@@ -38,14 +40,14 @@ object ListenerBungeeTransfer {
                 val message = MessageReader.read(e.data)
                 if (message.isCompleted) {
                     val data = message.build()
-                    execute(data)
+                    execute(data, e.sender)
                 }
             } catch (_: IOException) {
             }
         }
     }
 
-    private fun execute(data: Array<String>) {
+    private fun execute(data: Array<String>, connent: Connection) {
         when (data[0]) {
             "SendRaw" -> {
                 val to = data[1]
@@ -116,6 +118,10 @@ object ListenerBungeeTransfer {
             }
             "FetchProxyChannels" -> {
                 BungeeChannelManager.sendAllProxyChannels()
+            }
+            "LoadedProxyChannel" -> {
+                val id = data[1]
+                BungeeChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connent.address.port)
             }
         }
     }

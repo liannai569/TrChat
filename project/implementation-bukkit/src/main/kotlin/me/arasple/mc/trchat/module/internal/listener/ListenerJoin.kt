@@ -25,10 +25,7 @@ object ListenerJoin {
     fun e(e: PlayerJoinEvent) {
         val player = e.player
 
-        if (!BukkitChannelManager.loadedProxyChannels) {
-            BukkitProxyManager.sendTrChatMessage(player, "FetchProxyChannels")
-            BukkitChannelManager.loadedProxyChannels = true
-        }
+        BukkitProxyManager.sendTrChatMessage(player, "FetchProxyChannels")
 
         Channel.channels.values.filter { it.settings.autoJoin }.forEach {
             if (it.settings.joinPermission == null || player.hasPermission(it.settings.joinPermission)) {

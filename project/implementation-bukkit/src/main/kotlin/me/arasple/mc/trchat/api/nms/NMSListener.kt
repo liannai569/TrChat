@@ -1,11 +1,14 @@
 package me.arasple.mc.trchat.api.nms
 
+import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.getSession
 import net.kyori.adventure.text.Component
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TextComponent
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
@@ -32,12 +35,10 @@ object NMSListener {
                 return
             }
             "PacketPlayOutChat" -> {
-                val type = if (majorLegacy >= 11700) {
-                    e.packet.read<Any>("type")!!.getProperty<Byte>("index")
-                } else if (majorLegacy >= 11200) {
+                val type = if (TrChatBukkit.paperEnv) {
                     e.packet.read<Any>("b")!!.getProperty<Byte>("d")
                 } else {
-                    e.packet.read<Byte>("b")
+                    0 // adventure-platform-bukkit cannot send chat type properly
                 }
                 if (type != 0.toByte()) {
                     return
@@ -48,13 +49,11 @@ object NMSListener {
                 }
                 if (!TrChatBukkit.paperEnv) {
                     e.packet.write("a", NMS.INSTANCE.filterIChatComponent(e.packet.read<Any>("a")))
+//                    val components = e.packet.read<Array<BaseComponent>>("components") ?: return
+//                    e.packet.write("components", components.map { filterComponent(it) }.toTypedArray())
                 } else {
                     e.packet.write("adventure\$message", BukkitComponentManager.filterComponent(e.packet.read<Component>("adventure\$message"), 32000))
                 }
-//                kotlin.runCatching {
-//                    val components = e.packet.read<Array<BaseComponent>>("components") ?: return
-//                    e.packet.write("components", components.map { filterComponent(it) }.toTypedArray())
-//                }
                 return
             }
             "PacketPlayOutWindowItems" -> {
@@ -97,13 +96,13 @@ object NMSListener {
 //        }
     }
 
-//    private fun filterComponent(component: BaseComponent): BaseComponent {
-//        if (component is TextComponent && component.text.isNotEmpty()) {
-//            component.text = filter(component.text).filtered
-//        }
-//        if (!component.extra.isNullOrEmpty()) {
-//            component.extra = component.extra.map { filterComponent(it) }
-//        }
-//        return component
-//    }
+    private fun filterComponent(component: BaseComponent): BaseComponent {
+        if (component is TextComponent && component.text.isNotEmpty()) {
+            component.text = TrChat.api().filter(component.text).filtered
+        }
+        if (!component.extra.isNullOrEmpty()) {
+            component.extra = component.extra.map { filterComponent(it) }
+        }
+        return component
+    }
 }

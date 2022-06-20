@@ -7,6 +7,7 @@ import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.gson
+import me.arasple.mc.trchat.util.print
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.flattener.ComponentFlattener
 import org.bukkit.entity.Player

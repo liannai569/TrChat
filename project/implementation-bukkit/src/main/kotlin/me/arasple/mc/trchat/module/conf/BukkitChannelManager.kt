@@ -18,8 +18,6 @@ object BukkitChannelManager : ChannelManager {
         PlatformFactory.registerAPI<ChannelManager>(this)
     }
 
-    var loadedProxyChannels = false
-
     override fun loadChannels(sender: ProxyCommandSender) {
         Loader.loadChannels(sender)
     }

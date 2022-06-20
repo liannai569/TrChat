@@ -50,10 +50,4 @@ object BungeeProxyManager : ProxyManager {
         return onlinePlayers().map { it.name }
     }
 
-    fun sendProxyChannel(id: String, channel: String) {
-        server<ProxyServer>().servers.forEach { (_, v) ->
-            sendTrChatMessage(v, "SendProxyChannel", id, channel)
-        }
-    }
-
 }

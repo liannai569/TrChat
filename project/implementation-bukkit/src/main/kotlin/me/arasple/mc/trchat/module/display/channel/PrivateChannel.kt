@@ -108,7 +108,7 @@ class PrivateChannel(
             return send to receive
         }
 
-        player.sendChatComponent(player, send)
+        player.sendComponent(player, send)
 
         if (settings.proxy && BukkitProxyManager.processor != null) {
             player.sendTrChatMessage(
@@ -120,7 +120,7 @@ class PrivateChannel(
             player.sendProxyLang("Private-Message-Receive", player.name)
         } else {
             getProxyPlayer(player.getSession().lastPrivateTo)?.let {
-                it.sendChatComponent(player, receive)
+                it.sendComponent(player, receive)
                 it.sendLang("Private-Message-Receive", player.name)
             }
         }

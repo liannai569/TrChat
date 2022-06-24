@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.api.nms
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Filters
+import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
@@ -35,13 +36,15 @@ object NMSListener {
                 return
             }
             "PacketPlayOutChat" -> {
-                val type = if (TrChatBukkit.paperEnv) {
-                    e.packet.read<Any>("b")!!.getProperty<Byte>("d")
-                } else {
-                    0 // adventure-platform-bukkit cannot send chat type properly
-                }
-                if (type != 0.toByte()) {
-                    return
+                if (Settings.CONF.getString("Options.Send-Message-Method", "CHAT")?.uppercase() == "CHAT") {
+                    val type = if (TrChatBukkit.paperEnv) {
+                        e.packet.read<Any>("b")!!.getProperty<Byte>("d")
+                    } else {
+                        0 // adventure-platform-bukkit cannot send chat type properly
+                    }
+                    if (type != 0.toByte()) {
+                        return
+                    }
                 }
                 session.addMessage(e.packet)
                 if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {

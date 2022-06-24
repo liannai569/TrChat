@@ -2,8 +2,6 @@ package me.arasple.mc.trchat
 
 import net.kyori.adventure.platform.AudienceProvider
 import net.kyori.adventure.text.Component
-import taboolib.common.platform.ProxyCommandSender
-import java.util.*
 
 /**
  * @author wlys
@@ -18,13 +16,21 @@ interface ComponentManager {
     fun release()
 
     /**
+     * 发送系统Component
+     *
+     * @param receiver 接收者 (ProxyCommandSender / Platform CommandSender)
+     * @param component 内容
+     */
+    fun sendSystemComponent(receiver: Any, component: Component)
+
+    /**
      * 发送玩家聊天Component
      *
-     * @param receiver 接收者
+     * @param receiver 接收者 (ProxyCommandSender / Platform CommandSender)
      * @param component 内容
-     * @param sender 发送者UUID
+     * @param sender 发送者 (ProxyCommandSender / Platform CommandSender / UUID)
      */
-    fun sendChatComponent(receiver: ProxyCommandSender, component: Component, sender: UUID = UUID.randomUUID())
+    fun sendChatComponent(receiver: Any, component: Component, sender: Any? = null)
 
     /**
      * 过滤Component

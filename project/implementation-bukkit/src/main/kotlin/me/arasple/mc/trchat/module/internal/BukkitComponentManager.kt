@@ -2,17 +2,17 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.ComponentManager
 import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.gson
-import me.arasple.mc.trchat.util.sendChatComponent
+import net.kyori.adventure.audience.MessageType
+import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
-import taboolib.common.platform.Platform
-import taboolib.common.platform.PlatformFactory
-import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.ProxyCommandSender
-import java.util.*
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Entity
+import taboolib.common.platform.*
 
 /**
  * @author wlys
@@ -60,8 +60,43 @@ object BukkitComponentManager : ComponentManager {
         }, maxLength)
     }
 
-    override fun sendChatComponent(receiver: ProxyCommandSender, component: Component, sender: UUID) {
-        receiver.sendChatComponent(sender, component)
+    override fun sendSystemComponent(receiver: Any, component: Component) {
+        val commandSender = when (receiver) {
+            is ProxyCommandSender -> receiver.cast()
+            is CommandSender -> receiver
+            else -> error("Unsupported receiver type $receiver.")
+        }
+
+        if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
+            return
+        }
+        if (TrChatBukkit.paperEnv) {
+            commandSender.sendMessage(component, MessageType.SYSTEM)
+        } else {
+            getAudienceProvider().sender(commandSender).sendMessage(component, MessageType.SYSTEM)
+        }
+    }
+
+    override fun sendChatComponent(receiver: Any, component: Component, sender: Any?) {
+        val commandSender = when (receiver) {
+            is ProxyCommandSender -> receiver.cast()
+            is CommandSender -> receiver
+            else -> error("Unsupported receiver type $receiver.")
+        }
+        val identity = when (sender) {
+            is ProxyPlayer -> sender.uniqueId
+            is Entity -> sender.uniqueId
+            else -> null
+        }?.let { Identity.identity(it) } ?: Identity.nil()
+
+        if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
+            return
+        }
+        if (TrChatBukkit.paperEnv) {
+            commandSender.sendMessage(identity, component, MessageType.CHAT)
+        } else {
+            getAudienceProvider().sender(commandSender).sendMessage(identity, component, MessageType.CHAT)
+        }
     }
 
     private fun validateComponent(component: Component, maxLength: Int): Component {

@@ -7,7 +7,7 @@ import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.buildMessage
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
-import me.arasple.mc.trchat.util.sendChatComponent
+import me.arasple.mc.trchat.util.sendComponent
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -47,11 +47,11 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 val message = GsonComponentSerializer.gson().deserialize(raw)
 
                 if (permission == "null") {
-                    onlinePlayers().forEach { it.sendChatComponent(uuid, message) }
+                    onlinePlayers().forEach { it.sendComponent(uuid, message) }
                 } else {
-                    onlinePlayers().filter { it.hasPermission(permission) }.forEach { it.sendChatComponent(uuid, message) }
+                    onlinePlayers().filter { it.hasPermission(permission) }.forEach { it.sendComponent(uuid, message) }
                 }
-                console().sendChatComponent(uuid, message)
+                console().sendComponent(uuid, message)
             }
             "SendProxyChannel" -> {
                 val id = data[1]

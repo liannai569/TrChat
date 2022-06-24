@@ -5,6 +5,10 @@ Options:
   Prevent-Tab-Complete: false
   Kether-Allow-Tolerance-Parser: true
   ChatEvent-Hooks: ['PlayMoreSounds', 'ChatBubbles', 'QuestCreator']
+  # AUTO, NONE, BUNGEE, VELOCITY
+  Proxy: AUTO
+  # CHAT, SYSTEM
+  Send-Message-Method: CHAT
 
 Database:
   Method: SQLite
@@ -16,7 +20,7 @@ Database:
     port: 3306
     user: root
     password: root
-    database: root
+    database: trixey
     table: trchat_user_data
   Mongodb:
     client: 'mongodb://localhost:3307'

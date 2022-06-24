@@ -36,7 +36,6 @@ object HookPlaceholderAPI : PlaceholderExpansion {
                 else -> ""
             }.toString()
         }
-
         return "__"
     }
 }

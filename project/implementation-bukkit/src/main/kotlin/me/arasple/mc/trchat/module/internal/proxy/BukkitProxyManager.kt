@@ -26,7 +26,7 @@ object BukkitProxyManager : ProxyManager {
     var processor: BukkitProxyProcessor? = null
 
     val platform by lazy {
-        val force = Settings.CONF.getString("Options.Force-Proxy")?.uppercase()
+        val force = Settings.CONF.getString("Options.Proxy")?.uppercase()
         if (Bukkit.getServer().spigot().config.getBoolean("settings.bungeecord") || force == "BUNGEE") {
             processor = BukkitProxyProcessor.BungeeSide().also { it.init() }
             console().sendLang("Plugin-Proxy-Supported", "Bungee")

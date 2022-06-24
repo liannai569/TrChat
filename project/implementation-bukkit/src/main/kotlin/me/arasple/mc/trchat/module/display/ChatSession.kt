@@ -9,8 +9,8 @@ import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.gson
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.flattener.ComponentFlattener
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.Packet
 import taboolib.module.nms.sendPacket
@@ -117,7 +117,7 @@ class ChatSession(
 
         fun getSession(player: Player): ChatSession {
             return SESSIONS.computeIfAbsent(player.uniqueId) {
-                ChatSession(player, Settings.defaultChannel, onlinePlayers().map { it.cast<Player>() }.toSet()).also {
+                ChatSession(player, Settings.defaultChannel, Bukkit.getOnlinePlayers().toSet()).also {
                     if (it.isVanishing) vanishing.add(player.name)
                 }
             }

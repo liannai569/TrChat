@@ -1,22 +1,18 @@
 package me.arasple.mc.trchat.util
 
+import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.data.Database
-import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Condition
-import net.kyori.adventure.audience.MessageType
-import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageRecipient
-import taboolib.common.platform.ProxyCommandSender
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.platform.util.sendLang
-import java.util.*
 
 /**
  * @author wlys
@@ -51,26 +47,12 @@ fun Player.getDataContainer(): ConfigurationSection {
     return Database.database.pull(this)
 }
 
-fun CommandSender.sendChatComponent(sender: Player, component: Component) {
-    sendChatComponent(sender.uniqueId, component)
-}
-
-fun CommandSender.sendChatComponent(uuid: UUID, component: Component) {
-    if (!HookPlugin.getInteractiveChat().sendMessage(this, component)) {
-        if (TrChatBukkit.paperEnv) {
-            sendMessage(Identity.identity(uuid), component, MessageType.CHAT)
-        } else {
-            BukkitComponentManager.getAudienceProvider().sender(this).sendMessage(Identity.identity(uuid), component, MessageType.CHAT)
-        }
+fun Any.sendComponent(sender: Any, component: Component) {
+    when (val method = Settings.CONF.getString("Options.Send-Message-Method", "CHAT")!!.uppercase()) {
+        "CHAT" -> BukkitComponentManager.sendChatComponent(this, component, sender)
+        "SYSTEM" -> BukkitComponentManager.sendSystemComponent(this, component)
+        else -> error("Unsupported send message method $method.")
     }
-}
-
-fun ProxyCommandSender.sendChatComponent(sender: Player, component: Component) {
-    cast<CommandSender>().sendChatComponent(sender, component)
-}
-
-fun ProxyCommandSender.sendChatComponent(uuid: UUID, component: Component) {
-    cast<CommandSender>().sendChatComponent(uuid, component)
 }
 
 fun PluginMessageRecipient.sendTrChatMessage(vararg args: String) {

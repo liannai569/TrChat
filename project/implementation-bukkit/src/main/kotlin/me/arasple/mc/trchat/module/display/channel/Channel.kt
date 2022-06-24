@@ -100,9 +100,9 @@ open class Channel(
                                 return@execute
                             }
                             listeners.forEach {
-                                getProxyPlayer(it)?.sendChatComponent(it, component)
+                                getProxyPlayer(it)?.sendComponent(it, component)
                             }
-                            sender.sendChatComponent(UUID.randomUUID(), component)
+                            sender.sendComponent(UUID.randomUUID(), component)
                         }
                     }
                 }
@@ -170,26 +170,26 @@ open class Channel(
         when (settings.target.range) {
             Target.Range.ALL -> {
                 listeners.forEach {
-                    getProxyPlayer(it)?.sendChatComponent(player, component)
+                    getProxyPlayer(it)?.sendComponent(player, component)
                 }
             }
             Target.Range.SINGLE_WORLD -> {
                 onlinePlayers().filter { listeners.contains(it.uniqueId) && it.world == player.world.name }.forEach {
-                    it.sendChatComponent(player, component)
+                    it.sendComponent(player, component)
                 }
             }
             Target.Range.DISTANCE -> {
                 onlinePlayers().filter { listeners.contains(it.uniqueId)
                         && it.world == player.world.name
                         && it.location.distance(player.location.toProxyLocation()) <= settings.target.distance }.forEach {
-                    it.sendChatComponent(player, component)
+                    it.sendComponent(player, component)
                 }
             }
             Target.Range.SELF -> {
-                player.sendChatComponent(player, component)
+                player.sendComponent(player, component)
             }
         }
-        console().cast<CommandSender>().sendChatComponent(player, component)
+        console().cast<CommandSender>().sendComponent(player, component)
 
         player.getSession().lastMessage = message
         ChatLogs.log(player, message)

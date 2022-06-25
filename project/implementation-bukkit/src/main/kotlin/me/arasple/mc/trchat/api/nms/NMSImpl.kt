@@ -3,9 +3,9 @@ package me.arasple.mc.trchat.api.nms
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
-import me.arasple.mc.trchat.util.getSession
 import me.arasple.mc.trchat.util.gson
 import me.arasple.mc.trchat.util.print
+import me.arasple.mc.trchat.util.session
 import net.minecraft.network.chat.IChatBaseComponent
 import net.minecraft.network.protocol.game.ClientboundChatPreviewPacket
 import net.minecraft.server.v1_16_R3.NBTBase
@@ -85,7 +85,7 @@ class NMSImpl : NMS() {
     }
 
     override fun sendChatPreview(player: Player, queryId: Int, query: String) {
-        val component = player.getSession().getChannel()?.execute(player, query, forward = false)?.first ?: return
+        val component = player.session.getChannel()?.execute(player, query, forward = false)?.first ?: return
         val iChatBaseComponent = TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
         player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
     }

@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.internal.command.sub
 
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -22,11 +22,11 @@ object CommandRemoveMessage {
     val command = subCommand {
         dynamic("message") {
             suggestion<Player> { sender, _ ->
-                sender.getSession().receivedMessages.mapNotNull { it.message }
+                sender.session.receivedMessages.mapNotNull { it.message }
             }
             execute<Player> { _, _, argument ->
-                onlinePlayers().forEach { it.cast<Player>().getSession().removeMessage(argument) }
-                onlinePlayers().forEach { it.cast<Player>().getSession().releaseMessage() }
+                onlinePlayers().forEach { it.cast<Player>().session.removeMessage(argument) }
+                onlinePlayers().forEach { it.cast<Player>().session.releaseMessage() }
             }
         }
     }

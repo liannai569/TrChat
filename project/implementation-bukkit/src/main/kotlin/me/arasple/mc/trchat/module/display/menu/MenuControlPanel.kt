@@ -1,7 +1,8 @@
 package me.arasple.mc.trchat.module.display.menu
 
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
+import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -72,7 +73,7 @@ object MenuControlPanel {
                 name = "&e${target.name}"
                 lore += listOf(
                     "",
-                    "&aLast message: &7${target.getSession().lastMessage}",
+                    "&aLast message: &7${target.session.lastMessage}",
                     ""
                 )
                 colored()
@@ -92,7 +93,7 @@ object MenuControlPanel {
                         player.sendMessage("Type the time of muting, 0 = remove mute")
                         player.nextChat {
                             try {
-                                target.getSession().updateMuteTime(it.parseMillis())
+                                target.data.updateMuteTime(it.parseMillis())
                                 player.sendLang("Mute-Muted-Player", target.name, it)
                             } catch (_: Throwable) {
                                 player.sendLang("Plugin-Failed")
@@ -100,7 +101,7 @@ object MenuControlPanel {
                         }
                     }
 //                    'R' -> {
-//                        val session = target.getSession()
+//                        val session = target.session
 //                        Users.formattedMessages[target.uniqueId]?.removeLastOrNull()?.let {
 //                            if (it.isNotEmpty()) {
 //                                ChatMessage.removeMessage(it.replace("\\s".toRegex(), "").takeLast(32))

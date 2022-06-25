@@ -49,14 +49,14 @@ open class Channel(
                 }
             }
         } else {
-            Bukkit.getOnlinePlayers().filter { it.getSession().channel == id }.forEach {
+            Bukkit.getOnlinePlayers().filter { it.session.channel == id }.forEach {
                 join(it, id, hint = false)
             }
         }
         if (!bindings.command.isNullOrEmpty()) {
             command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
                 execute<Player> { sender, _, _ ->
-                    if (sender.getSession().channel == this@Channel.id) {
+                    if (sender.session.channel == this@Channel.id) {
                         quit(sender)
                     } else {
                         join(sender, this@Channel)
@@ -125,7 +125,7 @@ open class Channel(
             player.sendLang("Channel-Bad-Language")
             return null
         }
-        val event = TrChatEvent(this, player.getSession(), message, !forward)
+        val event = TrChatEvent(this, player.session, message, !forward)
         if (!event.call()) {
             return null
         }
@@ -191,7 +191,7 @@ open class Channel(
         }
         console().cast<CommandSender>().sendComponent(player, component)
 
-        player.getSession().lastMessage = message
+        player.session.lastMessage = message
         ChatLogs.log(player, message)
         Metrics.increase(0)
 
@@ -218,7 +218,7 @@ open class Channel(
                 player.sendLang("General-No-Permission")
                 return
             }
-            player.getSession().channel = channel.id
+            player.session.channel = channel.id
             channel.listeners.add(player.uniqueId)
 
             if (hint) {
@@ -227,13 +227,13 @@ open class Channel(
         }
 
         fun quit(player: Player) {
-            player.getSession().getChannel()?.let {
+            player.session.getChannel()?.let {
                 if (!it.settings.autoJoin) {
                     it.listeners.remove(player.uniqueId)
                 }
                 player.sendLang("Channel-Quit", it.id)
             }
-            player.getSession().channel = Settings.defaultChannel
+            player.session.channel = Settings.defaultChannel
         }
     }
 }

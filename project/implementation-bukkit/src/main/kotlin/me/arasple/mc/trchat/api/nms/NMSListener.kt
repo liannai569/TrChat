@@ -6,7 +6,8 @@ import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
+import me.arasple.mc.trchat.util.session
 import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
@@ -28,7 +29,8 @@ object NMSListener {
 
     @SubscribeEvent(EventPriority.LOWEST)
     fun e(e: PacketSendEvent) {
-        val session = e.player.getSession()
+        val session = e.player.session
+        val data = e.player.data
         // Chat Filter
         when (e.packet.name) {
             "ClientboundPlayerChatPacket" -> {
@@ -47,7 +49,7 @@ object NMSListener {
                     }
                 }
                 session.addMessage(e.packet)
-                if (!Filters.CONF.getBoolean("Enable.Chat") || !session.isFilterEnabled) {
+                if (!Filters.CONF.getBoolean("Enable.Chat") || !data.isFilterEnabled) {
                     return
                 }
                 if (!TrChatBukkit.paperEnv) {
@@ -60,7 +62,7 @@ object NMSListener {
                 return
             }
             "PacketPlayOutWindowItems" -> {
-                if (!Filters.CONF.getBoolean("Enable.Item") || !session.isFilterEnabled) {
+                if (!Filters.CONF.getBoolean("Enable.Item") || !data.isFilterEnabled) {
                     return
                 }
                 if (majorLegacy >= 11700) {
@@ -71,7 +73,7 @@ object NMSListener {
                 return
             }
             "PacketPlayOutSetSlot" -> {
-                if (!Filters.CONF.getBoolean("Enable.Item") || !session.isFilterEnabled) {
+                if (!Filters.CONF.getBoolean("Enable.Item") || !data.isFilterEnabled) {
                     return
                 }
                 if (majorLegacy >= 11700) {

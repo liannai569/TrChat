@@ -13,7 +13,7 @@ import taboolib.common.env.RuntimeDependency;
         initiative = true
 )
 @RuntimeDependency(
-        value = "!net.kyori:adventure-platform-bukkit:4.1.0",
+        value = "!net.kyori:adventure-platform-bukkit:4.1.1",
         test = "!net.kyori.adventure.platform.bukkit.BukkitAudiences",
 //        relocate = {"!net.kyori.adventure", "!net.kyori.adventure_4_11_0"},
         repository = "https://repo.maven.apache.org/maven2",

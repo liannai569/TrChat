@@ -2,7 +2,7 @@ package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.Channel
-import me.arasple.mc.trchat.module.internal.data.Database
+import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.util.Internal
 import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -29,8 +29,8 @@ object ListenerQuit {
         ChatSession.removeSession(player)
 
         submit(async = true) {
-            Database.database.push(player)
-            Database.database.release(player)
+            Databases.database.push(player)
+            Databases.database.release(player)
         }
     }
 
@@ -43,8 +43,8 @@ object ListenerQuit {
         ChatSession.removeSession(player)
 
         submit(async = true) {
-            Database.database.push(player)
-            Database.database.release(player)
+            Databases.database.push(player)
+            Databases.database.release(player)
         }
     }
 }

@@ -4,12 +4,14 @@ import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Updater
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
+import me.arasple.mc.trchat.util.session
 import org.bukkit.event.player.PlayerJoinEvent
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.submit
 import taboolib.platform.util.sendLang
 
 /**
@@ -31,13 +33,16 @@ object ListenerJoin {
                 it.listeners.add(player.uniqueId)
             }
         }
-        player.getSession()
+        player.session
+        player.data
 
-        if (player.hasPermission("trchat.admin") && Updater.latest_Version > Updater.current_version && !Updater.notified.contains(player.uniqueId)) {
-            player.sendLang("Plugin-Updater-Header", Updater.current_version, Updater.latest_Version)
-            player.sendMessage(Updater.information)
-            player.sendLang("Plugin-Updater-Footer")
-            Updater.notified.add(player.uniqueId)
+        submit(delay = 20) {
+            if (player.isOnline && player.hasPermission("trchat.admin") && Updater.latest_Version > Updater.current_version && !Updater.notified.contains(player.uniqueId)) {
+                player.sendLang("Plugin-Updater-Header", Updater.current_version, Updater.latest_Version)
+                player.sendMessage(Updater.information)
+                player.sendLang("Plugin-Updater-Footer")
+                Updater.notified.add(player.uniqueId)
+            }
         }
     }
 }

@@ -2,8 +2,7 @@ package me.arasple.mc.trchat.module.internal.database
 
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.util.Internal
-import org.bukkit.entity.Player
-import taboolib.common.platform.function.adaptPlayer
+import org.bukkit.OfflinePlayer
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.database.bridge.Index
 import taboolib.module.database.bridge.createBridgeCollection
@@ -22,19 +21,19 @@ class DatabaseMongodb : Database() {
         Index.UUID
     )
 
-    override fun pull(player: Player): ConfigurationSection {
-        return collection[adaptPlayer(player)].also {
+    override fun pull(player: OfflinePlayer): ConfigurationSection {
+        return collection[player.uniqueId.toString()].also {
             if (it.contains("username")) {
                 it["username"] = player.name
             }
         }
     }
 
-    override fun push(player: Player) {
+    override fun push(player: OfflinePlayer) {
         collection.update(player.uniqueId.toString())
     }
 
-    override fun release(player: Player) {
+    override fun release(player: OfflinePlayer) {
         collection.release(player.uniqueId.toString())
     }
 }

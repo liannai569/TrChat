@@ -4,10 +4,12 @@ import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
-import me.arasple.mc.trchat.module.internal.data.Database
+import me.arasple.mc.trchat.module.internal.data.Databases
+import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Condition
 import net.kyori.adventure.text.Component
+import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageRecipient
@@ -28,23 +30,25 @@ fun Condition?.pass(commandSender: CommandSender): Boolean {
     }
 }
 
-fun Player.getSession() = ChatSession.getSession(this)
+val Player.session get() = ChatSession.getSession(this)
+
+val OfflinePlayer.data get() = PlayerData.getData(this)
 
 fun Player.checkMute(): Boolean {
     if (TrChatBukkit.isGlobalMuting && !hasPermission("trchat.bypass.globalmute")) {
         sendLang("General-Global-Muting")
         return false
     }
-    val session = getSession()
-    if (session.isMuted) {
-        sendLang("General-Muted", muteDateFormat.format(session.muteTime), session.muteReason)
+    val data = data
+    if (data.isMuted) {
+        sendLang("General-Muted", muteDateFormat.format(data.muteTime), data.muteReason)
         return false
     }
     return true
 }
 
-fun Player.getDataContainer(): ConfigurationSection {
-    return Database.database.pull(this)
+fun OfflinePlayer.getDataContainer(): ConfigurationSection {
+    return Databases.database.pull(this)
 }
 
 fun Any.sendComponent(sender: Any, component: Component) {

@@ -5,7 +5,7 @@ import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.filter.ChatFilter
-import me.arasple.mc.trchat.module.internal.data.Database
+import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
@@ -74,7 +74,7 @@ object TrChatBukkit : Plugin() {
         }
         Kether.isAllowToleranceParser = Settings.CONF.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
 
-        Database.init()
+        Databases.init()
 
         TrChat.api().getChannelManager().loadChannels(console())
         Loader.loadFunctions(console())

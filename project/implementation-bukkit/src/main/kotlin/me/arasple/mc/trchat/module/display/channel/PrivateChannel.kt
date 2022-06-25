@@ -2,11 +2,11 @@ package me.arasple.mc.trchat.module.display.channel
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.event.TrChatEvent
-import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.format.Format
+import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.util.*
@@ -35,7 +35,7 @@ class PrivateChannel(
         if (!bindings.command.isNullOrEmpty()) {
             command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
                 execute<Player> { sender, _, _ ->
-                    if (sender.getSession().channel == this@PrivateChannel.id) {
+                    if (sender.session.channel == this@PrivateChannel.id) {
                         quit(sender)
                     } else {
                         sender.sendLang("Private-Message-No-Player")
@@ -43,16 +43,16 @@ class PrivateChannel(
                 }
                 dynamic("player", optional = true) {
                     suggestion<Player> { _, _ ->
-                        BukkitPlayers.getPlayers().filter { !ChatSession.vanishing.contains(it) }
+                        BukkitPlayers.getPlayers().filter { !PlayerData.vanishing.contains(it) }
                     }
                     execute<Player> { sender, _, argument ->
-                        sender.getSession().lastPrivateTo = BukkitPlayers.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
+                        sender.session.lastPrivateTo = BukkitPlayers.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
                         join(sender, this@PrivateChannel)
                     }
                     dynamic("message", optional = true) {
                         execute<Player> { sender, context, argument ->
                             BukkitPlayers.getPlayerFullName(context.argument(-1))?.let {
-                                sender.getSession().lastPrivateTo = it
+                                sender.session.lastPrivateTo = it
                                 execute(sender, argument)
                             } ?: sender.sendLang("Command-Player-Not-Exist")
                         }
@@ -77,7 +77,7 @@ class PrivateChannel(
             player.sendLang("Channel-Bad-Language")
             return null
         }
-        val session = player.getSession()
+        val session = player.session
         val event = TrChatEvent(this, session, message, !forward)
         if (!event.call()) {
             return null
@@ -119,7 +119,7 @@ class PrivateChannel(
             )
             player.sendProxyLang("Private-Message-Receive", player.name)
         } else {
-            getProxyPlayer(player.getSession().lastPrivateTo)?.let {
+            getProxyPlayer(player.session.lastPrivateTo)?.let {
                 it.sendComponent(player, receive)
                 it.sendLang("Private-Message-Receive", player.name)
             }

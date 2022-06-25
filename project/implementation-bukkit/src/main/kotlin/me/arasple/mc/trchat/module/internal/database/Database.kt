@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.internal.database
 
 import me.arasple.mc.trchat.util.Internal
-import org.bukkit.entity.Player
+import org.bukkit.OfflinePlayer
 import taboolib.library.configuration.ConfigurationSection
 
 /**
@@ -11,10 +11,10 @@ import taboolib.library.configuration.ConfigurationSection
 @Internal
 abstract class Database {
 
-    abstract fun pull(player: Player): ConfigurationSection
+    abstract fun pull(player: OfflinePlayer): ConfigurationSection
 
-    abstract fun push(player: Player)
+    abstract fun push(player: OfflinePlayer)
 
-    abstract fun release(player: Player)
+    abstract fun release(player: OfflinePlayer)
 
 }

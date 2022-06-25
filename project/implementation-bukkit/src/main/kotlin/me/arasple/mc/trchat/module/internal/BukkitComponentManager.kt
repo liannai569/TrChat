@@ -4,6 +4,7 @@ import me.arasple.mc.trchat.ComponentManager
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.util.Internal
+import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.gson
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import taboolib.common.platform.*
 
 /**
@@ -88,6 +90,10 @@ object BukkitComponentManager : ComponentManager {
             is Entity -> sender.uniqueId
             else -> null
         }?.let { Identity.identity(it) } ?: Identity.nil()
+
+        if (commandSender is Player && commandSender.data.ignored.contains(identity.uuid())) {
+            return
+        }
 
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
             return

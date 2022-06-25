@@ -9,7 +9,7 @@ import me.arasple.mc.trchat.module.display.menu.MenuFilterControl
 import me.arasple.mc.trchat.module.internal.command.sub.CommandColor
 import me.arasple.mc.trchat.module.internal.command.sub.CommandRemoveMessage
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -76,7 +76,7 @@ object CommandHandler {
     @CommandBody(permission = "trchat.command.spy", optional = true)
     val spy = subCommand {
         execute<Player> { sender, _, _ ->
-            val state = sender.getSession().switchSpy()
+            val state = sender.data.switchSpy()
             sender.sendLang(if (state) "Private-Message-Spy-On" else "Private-Message-Spy-Off")
         }
     }
@@ -84,7 +84,7 @@ object CommandHandler {
     @CommandBody(permission = "trchat.command.vanish", optional = true)
     val vanish = subCommand {
         execute<Player> { sender, _, _ ->
-            sender.getSession().switchVanish()
+            sender.data.switchVanish()
         }
     }
 

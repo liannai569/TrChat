@@ -5,7 +5,7 @@ import me.arasple.mc.trchat.module.display.channel.PrivateChannel
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.checkMute
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -33,7 +33,7 @@ object CommandReply {
         command("reply", listOf("r"), "Reply", permission = "trchat.private") {
             dynamic("message") {
                 execute<Player> { sender, _, argument ->
-                    val session = sender.getSession()
+                    val session = sender.session
                     if (sender.checkMute()) {
                         if (lastMessageFrom.containsKey(sender.name)) {
                             val to = BukkitPlayers.getPlayerFullName(lastMessageFrom[sender.name]!!)

@@ -2,7 +2,7 @@ package me.arasple.mc.trchat.module.internal.database
 
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.util.Internal
-import org.bukkit.entity.Player
+import org.bukkit.OfflinePlayer
 import taboolib.common.io.newFile
 import taboolib.common.platform.function.getDataFolder
 import taboolib.library.configuration.ConfigurationSection
@@ -43,37 +43,37 @@ class DatabaseSQLite : Database() {
         table.workspace(dataSource) { createTable(true) }.run()
     }
 
-    override fun pull(player: Player): ConfigurationSection {
-        return cache.computeIfAbsent(player.name) {
+    override fun pull(player: OfflinePlayer): ConfigurationSection {
+        return cache.computeIfAbsent(player.name!!) {
             table.workspace(dataSource) {
-                select { where { "user" eq player.name } }
+                select { where { "user" eq player.name!! } }
             }.firstOrNull {
                 Configuration.loadFromString(getString("data"))
             } ?: Configuration.empty(Type.YAML)
         }
     }
 
-    override fun push(player: Player) {
+    override fun push(player: OfflinePlayer) {
         val file = cache[player.name] ?: return
-        if (table.workspace(dataSource) { select { where { "user" eq player.name } } }.find()) {
+        if (table.workspace(dataSource) { select { where { "user" eq player.name!! } } }.find()) {
             table.workspace(dataSource) {
                 update {
                     set("data", file.saveToString())
                     where {
-                        "user" eq player.name
+                        "user" eq player.name!!
                     }
                 }
             }.run()
         } else {
             table.workspace(dataSource) {
                 insert("user", "data") {
-                    value(player.name, file.saveToString())
+                    value(player.name!!, file.saveToString())
                 }
             }.run()
         }
     }
 
-    override fun release(player: Player) {
+    override fun release(player: OfflinePlayer) {
         cache.remove(player.name)
     }
 }

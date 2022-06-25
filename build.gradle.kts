@@ -22,10 +22,12 @@ subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
-    tasks.withType<KotlinCompile> { kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs = listOf("-Xjvm-default=all")
-    }  }
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs = listOf("-Xjvm-default=all")
+        }
+    }
     configure<JavaPluginConvention> {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -42,6 +44,11 @@ tasks.build {
         val file = file("${plugin.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }
 
         file?.copyTo(file("$buildDir/libs/${project.name}-$version.jar"), true)
+
+        val pluginShaded = project(":plugin-shaded")
+        val fileShaded = file("${pluginShaded.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-shaded-$version-shaded.jar") }
+
+        fileShaded?.copyTo(file("$buildDir/libs/${project.name}-$version-shaded.jar"), true)
     }
-    dependsOn(project(":plugin").tasks.build)
+    dependsOn(project(":plugin").tasks.build, project(":plugin-shaded").tasks.build)
 }

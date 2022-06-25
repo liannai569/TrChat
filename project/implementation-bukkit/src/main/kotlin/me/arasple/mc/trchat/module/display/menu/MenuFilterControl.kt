@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.display.menu
 
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.Platform
@@ -40,7 +40,7 @@ object MenuFilterControl {
             set('A', getToggleButton(player))
             onClick(lock = true) {
                 if (it.slot == 'A') {
-                    player.getSession().setFilter(!player.getSession().isFilterEnabled)
+                    player.data.setFilter(!player.data.isFilterEnabled)
                     displayFor(player)
                 }
             }
@@ -49,7 +49,7 @@ object MenuFilterControl {
     }
 
     private fun getToggleButton(player: Player): ItemStack {
-        return if (player.getSession().isFilterEnabled) {
+        return if (player.data.isFilterEnabled) {
             buildItem(XMaterial.LIME_STAINED_GLASS_PANE) {
                 name = "&3聊天过滤器 &a√"
                 lore += listOf("", "&7你已经开启聊天过滤器,", "&7系统将会为您过滤掉聊天", "&7内容中的敏感内容, 祝您游戏愉快", "", "&6▶ &e点击关闭此功能")

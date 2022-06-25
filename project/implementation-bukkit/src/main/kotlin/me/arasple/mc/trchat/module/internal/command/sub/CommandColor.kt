@@ -2,7 +2,7 @@ package me.arasple.mc.trchat.module.internal.command.sub
 
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.MessageColors
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -23,9 +23,9 @@ object CommandColor {
             }
             execute<Player> { sender, _, argument ->
                 if (argument == "reset") {
-                    sender.getSession().selectColor(null)
+                    sender.data.selectColor(null)
                 } else {
-                    sender.getSession().selectColor(argument)
+                    sender.data.selectColor(argument)
                 }
 
             }

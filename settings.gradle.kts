@@ -1,6 +1,7 @@
 rootProject.name = "TrChat"
 
 include("plugin")
+include("plugin-shaded")
 include("project:common")
 include("project:implementation-common")
 include("project:implementation-bukkit")

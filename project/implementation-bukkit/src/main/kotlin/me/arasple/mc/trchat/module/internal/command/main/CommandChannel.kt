@@ -21,7 +21,7 @@ object CommandChannel {
 
     @Awake(LifeCycle.ENABLE)
     fun c() {
-        command("channel", listOf("chatchannel", "trchannel"), "聊天频道", permission = "trchat.channel") {
+        command("channel", listOf("chatchannel", "trchannel"), "聊天频道", permission = "trchat.command.channel") {
             literal("join") {
                 dynamic("channel") {
                     suggestion<Player> { _, _ ->

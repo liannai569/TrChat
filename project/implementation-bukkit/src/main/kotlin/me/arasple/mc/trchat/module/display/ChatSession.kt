@@ -9,12 +9,12 @@ import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.gson
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.flattener.ComponentFlattener
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.module.nms.Packet
 import taboolib.module.nms.sendPacket
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author wlys
@@ -22,8 +22,7 @@ import java.util.*
  */
 class ChatSession(
     val player: Player,
-    var channel: String,
-    var recipients: Set<Player>
+    var channel: String
 ) {
 
     var lastMessage = ""
@@ -31,26 +30,6 @@ class ChatSession(
     var lastPrivateTo = ""
 
     val receivedMessages = mutableListOf<ChatMessage>()
-
-    val isSpying get() = player.getDataContainer().getBoolean("spying", false)
-
-    val isFilterEnabled get() = player.getDataContainer().getBoolean("filter", true)
-
-    val muteTime get() = player.getDataContainer().getLong("mute_time", 0)
-
-    val isMuted get() = muteTime > System.currentTimeMillis()
-
-    val muteReason get() = player.getDataContainer().getString("mute_reason", "null")!!
-
-    val isVanishing get() = player.getDataContainer().getBoolean("vanish", false)
-
-    fun getChannel(): Channel? {
-        return Channel.channels[channel]
-    }
-
-    fun selectColor(color: String?) {
-        player.getDataContainer()["color"] = color
-    }
 
     fun getColor(default: CustomColor): CustomColor {
         val forces = MessageColors.getForceColors(player)
@@ -66,31 +45,11 @@ class ChatSession(
         }
     }
 
-    fun setFilter(value: Boolean) {
-        player.getDataContainer()["filter"] = value
+    fun getChannel(): Channel? {
+        return Channel.channels[channel]
     }
 
-    fun updateMuteTime(time: Long) {
-        player.getDataContainer()["mute_time"] = System.currentTimeMillis() + time
-    }
-
-    fun setMuteReason(reason: String?) {
-        player.getDataContainer()["mute_reason"] = reason
-    }
-
-    fun switchSpy(): Boolean {
-        player.getDataContainer()["spying"] = !isSpying
-        return isSpying
-    }
-
-    fun switchVanish(): Boolean {
-        player.getDataContainer()["vanish"] = !isVanishing
-        return isVanishing.also {
-            if (it) vanishing.add(player.name) else vanishing.remove(player.name)
-        }
-    }
-
-    internal fun addMessage(packet: Packet) {
+    fun addMessage(packet: Packet) {
         receivedMessages += ChatMessage(packet.source, packet.toMessage()?.replace("\\s".toRegex(), "")?.takeLast(48))
         if (receivedMessages.size > 100) {
             receivedMessages.removeFirstOrNull()
@@ -111,15 +70,11 @@ class ChatSession(
     companion object {
 
         @JvmField
-        val SESSIONS = mutableMapOf<UUID, ChatSession>()
-
-        val vanishing = mutableSetOf<String>()
+        val SESSIONS = ConcurrentHashMap<UUID, ChatSession>()
 
         fun getSession(player: Player): ChatSession {
             return SESSIONS.computeIfAbsent(player.uniqueId) {
-                ChatSession(player, Settings.defaultChannel, Bukkit.getOnlinePlayers().toSet()).also {
-                    if (it.isVanishing) vanishing.add(player.name)
-                }
+                ChatSession(player, Settings.defaultChannel)
             }
         }
 

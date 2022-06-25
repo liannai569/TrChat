@@ -2,7 +2,7 @@ package me.arasple.mc.trchat.module.internal.script.js
 
 import com.google.common.collect.Maps
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.session
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -52,7 +52,7 @@ object JavaScriptAgent {
 
     fun eval(player: Player, script: String, vararg additions: Pair<String, Any>, cacheScript: Boolean = true): CompletableFuture<Any?> {
         return try {
-            val session = player.getSession()
+            val session = player.session
             val context = SimpleScriptContext()
 
             context.setBindings(SimpleBindings(bindings).also {

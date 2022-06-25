@@ -28,9 +28,7 @@ object ListenerChatEvent {
     fun onChat(e: AsyncPlayerChatEvent) {
         e.isCancelled = true
         val player = e.player
-        val session = player.getSession()
-
-        session.recipients = e.recipients
+        val session = player.session
 
         if (!player.checkMute()) {
             return
@@ -77,7 +75,7 @@ object ListenerChatEvent {
             }
         }
         if (!player.hasPermission("trchat.bypass.repeat")) {
-            val lastMessage = player.getSession().lastMessage
+            val lastMessage = player.session.lastMessage
             if (Strings.similarDegree(lastMessage, message) > Settings.chatSimilarity) {
                 player.sendLang("General-Too-Similar")
                 return false

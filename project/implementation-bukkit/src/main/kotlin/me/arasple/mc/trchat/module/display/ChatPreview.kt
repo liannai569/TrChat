@@ -32,7 +32,7 @@ object ChatPreview {
 //    fun onSend(e: PacketSendEvent) {
 //        if (e.packet.name == "ClientboundChatPreviewPacket") {
 //            val (player, message) = processingQueries[e.packet.source.invokeMethod<Int>("queryId")!!] ?: return
-//            val component = player.getSession().channel?.execute(player, message, forward = false)?.first ?: return
+//            val component = player.session.channel?.execute(player, message, forward = false)?.first ?: return
 //            val iChatBaseComponent = TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true) ?: return
 //            e.packet.write("preview", iChatBaseComponent)
 //        }

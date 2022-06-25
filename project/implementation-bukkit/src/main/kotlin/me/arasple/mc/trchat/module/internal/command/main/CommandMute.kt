@@ -2,10 +2,11 @@ package me.arasple.mc.trchat.module.internal.command.main
 
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.muteDateFormat
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
@@ -28,6 +29,7 @@ import taboolib.platform.util.sendLang
 @PlatformSide([Platform.BUKKIT])
 object CommandMute {
 
+    @Suppress("Deprecation")
     @Awake(LifeCycle.ENABLE)
     fun c() {
         command("mute", description = "Mute", permission = "trchat.command.mute") {
@@ -36,31 +38,37 @@ object CommandMute {
                     onlinePlayers().map { it.name }
                 }
                 execute<CommandSender> { sender, _, argument ->
-                    val player = Bukkit.getPlayer(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
-                    val session = player.getSession()
-                    session.updateMuteTime("999d".parseMillis())
-                    sender.sendLang("Mute-Muted-Player", player.name, "999d", "null")
-                    player.sendLang("General-Muted", muteDateFormat.format(session.muteTime), session.muteReason)
+                    val player = Bukkit.getOfflinePlayer(argument)
+                    if (!player.hasPlayedBefore()) {
+                        return@execute sender.sendLang("Command-Player-Not-Exist")
+                    }
+                    val data = player.data
+                    data.updateMuteTime("999d".parseMillis())
+                    sender.sendLang("Mute-Muted-Player", player.name!!, "999d", "null")
+                    (player as? Player)?.sendLang("General-Muted", muteDateFormat.format(data.muteTime), data.muteReason)
                 }
                 dynamic("options", optional = true) {
                     suggestion<CommandSender>(uncheck = true) { _, _ ->
                         listOf("-t 1h", "-t 2d", "-t 15m", "-r 原因", "--cancel")
                     }
                     execute<CommandSender> { sender, context, argument ->
-                        val player = Bukkit.getPlayer(context.argument(-1)) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
-                        val session = player.getSession()
+                        val player = Bukkit.getOfflinePlayer(context.argument(-1))
+                        if (!player.hasPlayedBefore()) {
+                            return@execute sender.sendLang("Command-Player-Not-Exist")
+                        }
+                        val data = player.data
                         val de = Demand("mute $argument")
                         if (de.tags.contains("cancel")) {
-                            session.updateMuteTime(0)
-                            sender.sendLang("Mute-Cancel-Muted-Player", player.name)
-                            player.sendLang("General-Cancel-Muted")
+                            data.updateMuteTime(0)
+                            sender.sendLang("Mute-Cancel-Muted-Player", player.name!!)
+                            (player as? Player)?.sendLang("General-Cancel-Muted")
                         } else {
                             val time = de.get("t") ?: "999d"
                             val reason = de.get("r")
-                            session.updateMuteTime(time.parseMillis())
-                            session.setMuteReason(reason)
-                            sender.sendLang("Mute-Muted-Player", player.name, time, reason ?: "null")
-                            player.sendLang("General-Muted", muteDateFormat.format(session.muteTime), session.muteReason)
+                            data.updateMuteTime(time.parseMillis())
+                            data.setMuteReason(reason)
+                            sender.sendLang("Mute-Muted-Player", player.name!!, time, reason ?: "null")
+                            (player as? Player)?.sendLang("General-Muted", muteDateFormat.format(data.muteTime), data.muteReason)
                         }
                     }
                 }

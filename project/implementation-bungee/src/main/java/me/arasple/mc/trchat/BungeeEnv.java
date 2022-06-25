@@ -12,7 +12,7 @@ import taboolib.common.env.RuntimeDependency;
         initiative = true
 )
 @RuntimeDependency(
-        value = "!net.kyori:adventure-platform-bungeecord:4.1.0",
+        value = "!net.kyori:adventure-platform-bungeecord:4.1.1",
         test = "!net.kyori.adventure.platform.bungeecord.BungeeAudiences",
         repository = "https://repo.maven.apache.org/maven2",
         initiative = true

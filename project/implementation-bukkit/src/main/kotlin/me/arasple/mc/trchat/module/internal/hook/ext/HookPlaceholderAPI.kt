@@ -1,7 +1,9 @@
 package me.arasple.mc.trchat.module.internal.hook.ext
 
 import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.getSession
+import me.arasple.mc.trchat.util.data
+import me.arasple.mc.trchat.util.session
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -24,18 +26,37 @@ object HookPlaceholderAPI : PlaceholderExpansion {
     override fun onPlaceholderRequest(player: Player?, args: String): String {
         if (player != null && player.isOnline) {
             val params = args.split('_')
-            val session = player.getSession()
+            val session = player.session
+            val data = player.data
 
             return when (params[0].lowercase()) {
 //                "js" -> if (params.size > 1) JavaScriptAgent.eval(player, args.substringAfter('_')).get() else ""
-                "filter" -> session.isFilterEnabled
                 "channel" -> session.channel
                 "toplayer" -> session.lastPrivateTo
-                "spy" -> session.isSpying
                 "lastmessage" -> session.lastMessage
-                else -> ""
+                "spy" -> data.isSpying
+                "filter" -> data.isFilterEnabled
+                "mute" -> data.isMuted
+                "vanish" -> data.isVanishing
+                else -> "ERROR"
             }.toString()
         }
-        return "__"
+        return "ERROR"
+    }
+
+    override fun onPlaceholderRequest(player: OfflinePlayer?, args: String): String {
+        if (player != null) {
+            val params = args.split('_')
+            val data = player.data
+
+            return when (params[0].lowercase()) {
+                "spy" -> data.isSpying
+                "filter" -> data.isFilterEnabled
+                "mute" -> data.isMuted
+                "vanish" -> data.isVanishing
+                else -> "ERROR"
+            }.toString()
+        }
+        return "ERROR"
     }
 }

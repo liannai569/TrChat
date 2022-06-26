@@ -4,7 +4,6 @@ import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.library.kether.LocalizedException
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
@@ -37,11 +36,10 @@ class ActionChannel(val symbol: Symbol, val channel: String?): ScriptAction<Void
 
         @KetherParser(["channel"], namespace = "trchat", shared = true)
         fun parser() = scriptParser {
-            val symbol = when(val type = it.nextToken().lowercase()) {
+            val symbol = when(it.expects("join", "quit", "leave")) {
                 "join" -> Symbol.JOIN
-                "quit" -> Symbol.QUIT
-                "leave" -> Symbol.QUIT
-                else -> throw LocalizedException.of("load-error.custom", "Unknown channel operator $type")
+                "quit", "leave" -> Symbol.QUIT
+                else -> error("out of case")
             }
             ActionChannel(symbol, if (symbol == Symbol.JOIN) it.nextToken() else null)
         }

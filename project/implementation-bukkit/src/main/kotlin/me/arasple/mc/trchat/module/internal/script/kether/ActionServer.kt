@@ -4,8 +4,6 @@ import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.library.kether.ArgTypes
-import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
@@ -13,16 +11,16 @@ import java.util.concurrent.CompletableFuture
  * @author wlys
  * @since 2021/8/29 15:44
  */
-class ActionServer(val server: ParsedAction<*>): ScriptAction<Void>() {
+class ActionServer(val server: String): ScriptAction<Void>() {
 
     override fun run(frame: ScriptFrame): CompletableFuture<Void> {
         val s = frame.script()
         if (s.sender == null) {
             error("No sender selected.")
         }
-        frame.newFrame(server).run<Any>().thenAccept { server ->
-            BukkitProxyManager.sendCommonMessage(s.sender!!.cast(), "Connect", server.toString())
-        }
+
+        BukkitProxyManager.sendCommonMessage(s.sender!!.cast(), "Connect", server)
+
         return CompletableFuture.completedFuture(null)
     }
 
@@ -32,7 +30,7 @@ class ActionServer(val server: ParsedAction<*>): ScriptAction<Void>() {
 
         @KetherParser(["server", "bungee", "connect"], shared = true)
         fun parser() = scriptParser {
-            ActionServer(it.next(ArgTypes.ACTION))
+            ActionServer(it.nextToken())
         }
     }
 }

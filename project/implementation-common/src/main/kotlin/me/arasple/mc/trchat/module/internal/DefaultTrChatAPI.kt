@@ -52,14 +52,14 @@ object DefaultTrChatAPI : TrChatAPI {
         }
     }
 
-    override fun eval(sender: ProxyCommandSender, script: String): CompletableFuture<Any?> {
-        return eval(sender, listOf(script))
-    }
-
-    override fun eval(sender: ProxyCommandSender, script: List<String>): CompletableFuture<Any?> {
+    override fun eval(sender: ProxyCommandSender, script: String, vararg vars: Pair<String, Any?>): CompletableFuture<Any?> {
         return mirrorNow("Handler:Script:Evaluation") {
             return@mirrorNow try {
-                KetherShell.eval(script, namespace = listOf("trchat", "trmenu", "trhologram"), sender = sender)
+                KetherShell.eval(script, namespace = listOf("trchat", "trmenu", "trhologram"), sender = sender) {
+                    vars.forEach {
+                        set(it.first, it.second)
+                    }
+                }
             } catch (e: LocalizedException) {
                 println("§c[TrChat] §8Unexpected exception while parsing kether shell:")
                 e.localizedMessage.split("\n").forEach {
@@ -68,5 +68,9 @@ object DefaultTrChatAPI : TrChatAPI {
                 CompletableFuture.completedFuture(null)
             }
         }
+    }
+
+    override fun eval(sender: ProxyCommandSender, script: List<String>, vararg vars: Pair<String, Any?>): CompletableFuture<Any?> {
+        return eval(sender, script.joinToString("\n"), *vars)
     }
 }

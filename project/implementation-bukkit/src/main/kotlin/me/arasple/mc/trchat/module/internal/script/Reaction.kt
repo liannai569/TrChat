@@ -22,7 +22,7 @@ value class Reaction(private val script: List<String>) {
         fun eval(player: Player, script: List<String>, vararg additions: Pair<String, Any>): Any? {
             val (isJavaScript, js) = JavaScriptAgent.serialize(script.first())
             return if (isJavaScript) JavaScriptAgent.eval(player, js!!, *additions).get()
-            else TrChat.api().eval(adaptPlayer(player), script).get()
+            else TrChat.api().eval(adaptPlayer(player), script, *additions).get()
         }
     }
 }

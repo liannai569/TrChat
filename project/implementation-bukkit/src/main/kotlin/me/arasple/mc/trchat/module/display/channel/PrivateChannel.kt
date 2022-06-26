@@ -26,7 +26,7 @@ class PrivateChannel(
     id: String,
     settings: ChannelSettings,
     bindings: ChannelBindings,
-    events: ChannelEvents?,
+    events: ChannelEvents,
     val sender: List<Format>,
     val receiver: List<Format>
 ) : Channel(id, settings, bindings, events, emptyList()) {
@@ -82,7 +82,7 @@ class PrivateChannel(
         if (!event.call()) {
             return null
         }
-        val msg = event.message
+        val msg = events.process(player, event.message) ?: return null
 
         val builderSender = Component.text()
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->
@@ -107,6 +107,8 @@ class PrivateChannel(
         if (!forward) {
             return send to receive
         }
+
+        events.send(player, msg)
 
         player.sendComponent(player, send)
 

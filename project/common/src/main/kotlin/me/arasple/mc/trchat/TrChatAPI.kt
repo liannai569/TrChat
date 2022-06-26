@@ -39,11 +39,11 @@ interface TrChatAPI {
     /**
      * 执行Kether脚本 (命名空间为trchat, trmenu, trhologram)
      */
-    fun eval(sender: ProxyCommandSender, script: String): CompletableFuture<Any?>
+    fun eval(sender: ProxyCommandSender, script: String, vararg vars: Pair<String, Any?>): CompletableFuture<Any?>
 
     /**
      * 执行Kether脚本 (命名空间为trchat, trmenu, trhologram)
      */
-    fun eval(sender: ProxyCommandSender, script: List<String>): CompletableFuture<Any?>
+    fun eval(sender: ProxyCommandSender, script: List<String>, vararg vars: Pair<String, Any?>): CompletableFuture<Any?>
 
 }

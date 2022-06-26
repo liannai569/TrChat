@@ -22,7 +22,7 @@ import taboolib.platform.util.sendLang
  * @date 2019/11/30 12:10
  */
 @PlatformSide([Platform.BUKKIT])
-object ListenerChatEvent {
+object ListenerChat {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onChat(e: AsyncPlayerChatEvent) {
@@ -88,28 +88,28 @@ object ListenerChatEvent {
                 return false
             }
         }
-        if (!player.hasPermission("trchat.bypass.itemcd")) {
+        if (ItemShow.keys.any { message.contains(it, ignoreCase = true) } && !player.hasPermission("trchat.bypass.itemcd")) {
             val itemCooldown = player.getCooldownLeft(CooldownType.ITEM_SHOW)
-            if (ItemShow.keys.any { message.contains(it, ignoreCase = true) } && itemCooldown > 0) {
+            if (itemCooldown > 0) {
                 player.sendLang("Cooldowns-Item-Show", itemCooldown / 1000)
                 return false
             } else {
                 player.updateCooldown(CooldownType.ITEM_SHOW, ItemShow.cooldown.get())
             }
         }
-        if (!player.hasPermission("trchat.bypass.inventorycd")) {
+        if (InventoryShow.keys.any { message.contains(it, ignoreCase = true) } && !player.hasPermission("trchat.bypass.inventorycd")) {
             val inventoryCooldown = player.getCooldownLeft(CooldownType.INVENTORY_SHOW)
-            if (InventoryShow.keys.any { message.contains(it, ignoreCase = true) } && inventoryCooldown > 0) {
+            if (inventoryCooldown > 0) {
                 player.sendLang("Cooldowns-Inventory-Show", inventoryCooldown / 1000)
                 return false
             } else {
                 player.updateCooldown(CooldownType.INVENTORY_SHOW, InventoryShow.cooldown.get())
             }
         }
-        if (!player.hasPermission("trchat.bypass.enderchestcd")) {
-            val enderchestCooldown = player.getCooldownLeft(CooldownType.ENDERCHEST_SHOW)
-            if (EnderChestShow.keys.any { message.contains(it, ignoreCase = true) } && enderchestCooldown > 0) {
-                player.sendLang("Cooldowns-EnderChest-Show", enderchestCooldown / 1000)
+        if (EnderChestShow.keys.any { message.contains(it, ignoreCase = true) } && !player.hasPermission("trchat.bypass.enderchestcd")) {
+            val enderChestCooldown = player.getCooldownLeft(CooldownType.ENDERCHEST_SHOW)
+            if (enderChestCooldown > 0) {
+                player.sendLang("Cooldowns-EnderChest-Show", enderChestCooldown / 1000)
                 return false
             } else {
                 player.updateCooldown(CooldownType.ENDERCHEST_SHOW, EnderChestShow.cooldown.get())

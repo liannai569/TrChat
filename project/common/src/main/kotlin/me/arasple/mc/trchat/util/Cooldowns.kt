@@ -1,36 +1,30 @@
 package me.arasple.mc.trchat.util
 
-import com.google.common.collect.Maps
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author wlys
  * @since 2022/3/5 14:09
  */
-class Cooldowns {
+object Cooldowns {
 
-    val data = Maps.newConcurrentMap<String, Long>()!!
+    private val COOLDOWNS = ConcurrentHashMap<UUID, Cooldown>()
 
-    companion object {
+    fun getCooldownLeft(uuid: UUID, type: CooldownType): Long {
+        return COOLDOWNS.computeIfAbsent(uuid) { Cooldown() }.data.getOrDefault(type.alias, 0L) - System.currentTimeMillis()
+    }
 
-        private val COOLDOWNS = mutableMapOf<UUID, Cooldowns>()
+    fun isInCooldown(uuid: UUID, type: CooldownType): Boolean {
+        return getCooldownLeft(uuid, type) > 0
+    }
 
-        fun getCooldownLeft(uuid: UUID, type: CooldownType): Long {
-            return COOLDOWNS.computeIfAbsent(uuid) { Cooldowns() }.data[type.alias]?.let { it - System.currentTimeMillis() } ?: -1
-        }
-
-        fun isInCooldown(uuid: UUID, type: CooldownType): Boolean {
-            return getCooldownLeft(uuid, type) > 0
-        }
-
-        fun updateCooldown(uuid: UUID, type: CooldownType, lasts: Long) {
-            COOLDOWNS.computeIfAbsent(uuid) { Cooldowns() }.let { cooldowns ->
-                cooldowns.data[type.alias] = System.currentTimeMillis() + lasts
-            }
-        }
-
+    fun updateCooldown(uuid: UUID, type: CooldownType, lasts: Long) {
+        COOLDOWNS.computeIfAbsent(uuid) { Cooldown() }.data[type.alias] = System.currentTimeMillis() + lasts
     }
 }
+
+data class Cooldown(val data: ConcurrentHashMap<String, Long> = ConcurrentHashMap())
 
 enum class CooldownType(val alias: String) {
 

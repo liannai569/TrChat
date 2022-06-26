@@ -35,7 +35,7 @@ open class Channel(
     val id: String,
     val settings: ChannelSettings,
     val bindings: ChannelBindings,
-    val events: ChannelEvents?,
+    val events: ChannelEvents,
     val formats: List<Format>,
     val console: Format? = null,
     val listeners: MutableSet<UUID> = mutableSetOf()
@@ -129,7 +129,7 @@ open class Channel(
         if (!event.call()) {
             return null
         }
-        val msg = event.message
+        val msg = events.process(player, event.message) ?: return null
 
         val builder = Component.text()
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
@@ -144,6 +144,8 @@ open class Channel(
         if (!forward) {
             return component to null
         }
+
+        events.send(player, msg)
 
         if (settings.proxy && BukkitProxyManager.processor != null) {
             val gson = gson(component)

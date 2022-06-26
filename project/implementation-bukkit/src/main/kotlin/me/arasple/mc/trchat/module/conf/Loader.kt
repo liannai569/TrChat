@@ -133,7 +133,7 @@ object Loader {
             val process = it["Process"]?.asList() ?: emptyList()
             val send = it["Send"]?.asList() ?: emptyList()
             ChannelEvents(Reaction(process), Reaction(send))
-        }
+        } ?: ChannelEvents(null, null)
 
         if (private) {
             val sender = conf.getMapList("Sender").map { map ->

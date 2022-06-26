@@ -18,8 +18,11 @@ object CommandColor {
 
     val command = subCommand {
         dynamic("color") {
-            suggestion<Player> { sender, _ ->
-                MessageColors.getColors(sender) + listOf("reset")
+            suggestion<Player>(uncheck = true) { sender, _ ->
+                MessageColors.getColors(sender) + "reset"
+            }
+            restrict<Player> { sender, _, argument ->
+                argument.equals("reset", ignoreCase = true) || sender.hasPermission(MessageColors.COLOR_PERMISSION_NODE + argument)
             }
             execute<Player> { sender, _, argument ->
                 if (argument == "reset") {

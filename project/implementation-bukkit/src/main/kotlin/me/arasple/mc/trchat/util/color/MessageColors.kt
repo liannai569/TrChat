@@ -45,10 +45,10 @@ object MessageColors {
 
         if (player.hasPermission("$COLOR_PERMISSION_NODE*")) {
             string = string.colored()
-        } else {
-            getColorsFromPermissions(player, COLOR_PERMISSION_NODE).forEach {
-                string.replace(it, CustomColor(it).color)
-            }
+        }
+
+        getColors(player).forEach { color ->
+            string = string.replace(color, CustomColor.get(color).color)
         }
 
         string = if (player.hasPermission(COLOR_PERMISSION_NODE + "rainbow")) {
@@ -90,22 +90,23 @@ object MessageColors {
         return player.effectivePermissions.mapNotNull {
             val permission = it.permission
             if (permission.startsWith(prefix)) {
-                permission.split(".").last()
+                permission.removePrefix(prefix).let { color -> if (color.length == 1) "&$color" else color }
             } else {
                 null
             }
         }.filterNot { it in specialColors }
     }
 
-    fun getForceColors(player: HumanEntity): List<String> {
-        return getColorsFromPermissions(player, FORCE_CHAT_COLOR_PERMISSION_NODE)
-    }
-
     fun getColors(player: HumanEntity): List<String> {
         return getColorsFromPermissions(player, COLOR_PERMISSION_NODE)
     }
 
+    fun getForceColors(player: HumanEntity): List<String> {
+        return getColorsFromPermissions(player, FORCE_CHAT_COLOR_PERMISSION_NODE)
+    }
+
     enum class Type {
+
         DEFAULT, ANVIL, SIGN, BOOK
     }
 }

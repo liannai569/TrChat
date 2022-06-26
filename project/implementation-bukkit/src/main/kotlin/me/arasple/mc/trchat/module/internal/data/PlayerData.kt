@@ -35,7 +35,6 @@ class PlayerData(val player: OfflinePlayer) {
         player.getDataContainer()["color"] = color
     }
 
-
     fun setFilter(value: Boolean) {
         player.getDataContainer()["filter"] = value
     }

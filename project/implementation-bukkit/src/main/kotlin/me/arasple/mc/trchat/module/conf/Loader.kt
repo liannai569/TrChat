@@ -232,7 +232,7 @@ object Loader {
     }
 
     private fun parseMsg(content: Map<*, *>): MsgComponent {
-        val defaultColor = CustomColor(content["default-color"]?.toString() ?: "&7")
+        val defaultColor = CustomColor.get(content["default-color"]?.toString() ?: "&7")
         val hover = content["hover"]?.serialize()?.associate { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Hover(it) }
         val suggest = content["suggest"]?.serialize()?.map { Suggest(it.first, it.second[Property.CONDITION]?.toCondition()) }
         val command = content["command"]?.serialize()?.map { Command(it.first, it.second[Property.CONDITION]?.toCondition()) }

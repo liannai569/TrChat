@@ -34,11 +34,11 @@ class ChatSession(
     fun getColor(default: CustomColor): CustomColor {
         val forces = MessageColors.getForceColors(player)
         return if (forces.isNotEmpty()) {
-            CustomColor(forces[0])
+            CustomColor.get(forces[0])
         } else {
             val selectedColor = player.getDataContainer().getString("color")
             if (selectedColor != null && player.hasPermission(MessageColors.COLOR_PERMISSION_NODE + selectedColor)) {
-                CustomColor(selectedColor)
+                CustomColor.get(selectedColor)
             } else {
                 default
             }

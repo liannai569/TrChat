@@ -20,8 +20,9 @@ interface ComponentManager {
      *
      * @param receiver 接收者 (ProxyCommandSender / Platform CommandSender)
      * @param component 内容
+     * @param sender 发送者 (ProxyCommandSender / Platform CommandSender / UUID)
      */
-    fun sendSystemComponent(receiver: Any, component: Component)
+    fun sendSystemComponent(receiver: Any, component: Component, sender: Any? = null)
 
     /**
      * 发送玩家聊天Component

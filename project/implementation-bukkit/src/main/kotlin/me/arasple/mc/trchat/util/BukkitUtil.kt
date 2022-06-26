@@ -54,7 +54,7 @@ fun OfflinePlayer.getDataContainer(): ConfigurationSection {
 fun Any.sendComponent(sender: Any, component: Component) {
     when (val method = Settings.CONF.getString("Options.Send-Message-Method", "CHAT")!!.uppercase()) {
         "CHAT" -> BukkitComponentManager.sendChatComponent(this, component, sender)
-        "SYSTEM" -> BukkitComponentManager.sendSystemComponent(this, component)
+        "SYSTEM" -> BukkitComponentManager.sendSystemComponent(this, component, sender)
         else -> error("Unsupported send message method $method.")
     }
 }

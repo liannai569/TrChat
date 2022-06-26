@@ -62,20 +62,29 @@ object BukkitComponentManager : ComponentManager {
         }, maxLength)
     }
 
-    override fun sendSystemComponent(receiver: Any, component: Component) {
+    override fun sendSystemComponent(receiver: Any, component: Component, sender: Any?) {
         val commandSender = when (receiver) {
             is ProxyCommandSender -> receiver.cast()
             is CommandSender -> receiver
             else -> error("Unsupported receiver type $receiver.")
+        }
+        val identity = when (sender) {
+            is ProxyPlayer -> sender.uniqueId
+            is Entity -> sender.uniqueId
+            else -> null
+        }?.let { Identity.identity(it) } ?: Identity.nil()
+
+        if (commandSender is Player && commandSender.data.ignored.contains(identity.uuid())) {
+            return
         }
 
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
             return
         }
         if (TrChatBukkit.paperEnv) {
-            commandSender.sendMessage(component, MessageType.SYSTEM)
+            commandSender.sendMessage(identity, component, MessageType.SYSTEM)
         } else {
-            getAudienceProvider().sender(commandSender).sendMessage(component, MessageType.SYSTEM)
+            getAudienceProvider().sender(commandSender).sendMessage(identity, component, MessageType.SYSTEM)
         }
     }
 

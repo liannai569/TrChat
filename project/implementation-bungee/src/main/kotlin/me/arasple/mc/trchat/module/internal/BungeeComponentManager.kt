@@ -34,7 +34,7 @@ object BungeeComponentManager : ComponentManager {
         adventure?.close()
     }
 
-    override fun sendSystemComponent(receiver: Any, component: Component) {
+    override fun sendSystemComponent(receiver: Any, component: Component, sender: Any?) {
         TODO("Not yet implemented")
     }
 

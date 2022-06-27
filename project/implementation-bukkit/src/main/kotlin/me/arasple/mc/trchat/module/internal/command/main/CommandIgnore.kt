@@ -35,7 +35,7 @@ object CommandIgnore {
                     if (!player.hasPlayedBefore()) {
                         return@execute sender.sendLang("Command-Player-Not-Exist")
                     }
-                    player.data.switchIgnored(player.uniqueId)
+                    sender.data.switchIgnored(player.uniqueId)
                 }
             }
             incorrectSender { sender, _ ->

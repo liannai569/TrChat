@@ -46,6 +46,9 @@ object HookPlaceholderAPI : PlaceholderExpansion {
 
     override fun onPlaceholderRequest(player: OfflinePlayer?, args: String): String {
         if (player != null) {
+            if (player.isOnline) {
+                return onPlaceholderRequest(player.player, args)
+            }
             val params = args.split('_')
             val data = player.data
 

@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.internal.data
 
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.util.Internal
+import me.arasple.mc.trchat.util.print
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.io.newFile
@@ -31,16 +32,18 @@ object ChatLogs {
     @Awake(LifeCycle.DISABLE)
     fun writeToFile() {
         val logFile = newFile(File(getDataFolder(), "logs"), "${dateFormat0.format(System.currentTimeMillis())}.txt", create = true)
-        logFile.writer().use {
+        try {
             waveList.forEach { line ->
-                it.write(line)
-                it.appendLine()
+                logFile.appendText(line + "\n")
             }
+        } catch (t: Throwable) {
+            t.print("保存聊天日志失败!")
+            return
         }
         waveList.clear()
     }
 
-    @Schedule(delay = (20 * 15).toLong(), period = (20 * 60 * 5).toLong(), async = true)
+    @Schedule(period = (20 * 60 * 60).toLong(), async = true)
     fun autoDelete() {
         val days = Settings.CONF.getLong("General.Log-Delete-Time", 0L)
         if (days > 0) {

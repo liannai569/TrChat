@@ -6,13 +6,17 @@ import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.format.Format
+import me.arasple.mc.trchat.module.internal.command.main.CommandReply
+import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
+import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.command
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
@@ -126,6 +130,15 @@ class PrivateChannel(
                 it.sendLang("Private-Message-Receive", player.name)
             }
         }
+
+        PlayerData.DATA.filterValues { it.isSpying }.entries.forEach { (_, v) ->
+            v.player.player?.sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
+        }
+        console().sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
+
+        CommandReply.lastMessageFrom[session.lastPrivateTo] = player.name
+        ChatLogs.logPrivate(player.name, session.lastPrivateTo, message)
+        Metrics.increase(0)
 
         return send to receive
     }

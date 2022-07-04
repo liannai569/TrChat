@@ -117,7 +117,7 @@ object ListenerBungeeTransfer {
                 }
             }
             "FetchProxyChannels" -> {
-                BungeeChannelManager.sendAllProxyChannels()
+                BungeeChannelManager.sendAllProxyChannels(connection.address.port)
             }
             "LoadedProxyChannel" -> {
                 val id = data[1]

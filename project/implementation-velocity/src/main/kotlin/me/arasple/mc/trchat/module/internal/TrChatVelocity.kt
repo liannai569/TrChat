@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal
 
-import me.arasple.mc.trchat.module.internal.conf.VelocityChannelManager
+import me.arasple.mc.trchat.module.conf.VelocityChannelManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide

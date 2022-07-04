@@ -3,9 +3,9 @@ package me.arasple.mc.trchat.module.internal.listener
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ServerConnection
+import me.arasple.mc.trchat.module.conf.VelocityChannelManager
 import me.arasple.mc.trchat.module.internal.TrChatVelocity.plugin
 import me.arasple.mc.trchat.module.internal.VelocityProxyManager
-import me.arasple.mc.trchat.module.internal.conf.VelocityChannelManager
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -111,7 +111,7 @@ object ListenerVelocityTransfer {
                 }
             }
             "FetchProxyChannels" -> {
-                VelocityChannelManager.sendAllProxyChannels()
+                VelocityChannelManager.sendAllProxyChannels(connection.serverInfo.address.port)
             }
             "LoadedProxyChannel" -> {
                 val id = data[1]

@@ -4,6 +4,7 @@ import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.display.format.part.json.*
 import me.arasple.mc.trchat.module.display.function.*
 import me.arasple.mc.trchat.module.display.function.Function
+import me.arasple.mc.trchat.module.internal.script.Condition
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.legacy
@@ -22,7 +23,7 @@ import taboolib.common5.mirrorNow
  * @since 2021/12/12 13:46
  */
 class MsgComponent(
-    val defaultColor: CustomColor,
+    val defaultColor: List<Pair<CustomColor, Condition?>>,
     hover: Hover?,
     suggest: List<Suggest>?,
     command: List<Command>?,
@@ -56,7 +57,7 @@ class MsgComponent(
             message = it.apply(message)
         }
 
-        val defaultColor = sender.session.getColor(defaultColor)
+        val defaultColor = sender.session.getColor(defaultColor.first { it.second.pass(sender) }.first)
 
         for (part in parser.readToFlatten(message)) {
             if (part.isVariable) {
@@ -97,14 +98,15 @@ class MsgComponent(
         return mirrorNow("Chat:Format:Msg") {
             val message = vars[0]
             val builder = legacy(message).toBuilder()
+            val originMessage = builder.content()
 
-            hover?.process(builder, sender, *vars)
-            suggest?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars)
-            command?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars)
-            url?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars)
-            insertion?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars)
-            copy?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars)
-            font?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars)
+            hover?.process(builder, sender, *vars, message = originMessage)
+            suggest?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
+            command?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
+            url?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
+            insertion?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
+            copy?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
+            font?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
 
             builder.build()
         }

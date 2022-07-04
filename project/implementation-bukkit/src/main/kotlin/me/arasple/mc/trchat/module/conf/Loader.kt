@@ -71,6 +71,10 @@ object Loader {
         Channel.channels.values.forEach { it.unregister() }
         Channel.channels.clear()
 
+        if (Bukkit.getOnlinePlayers().isNotEmpty()) {
+            BukkitProxyManager.sendTrChatMessage(Bukkit.getOnlinePlayers().iterator().next(), "FetchProxyChannels")
+        }
+
         filterChannelFiles(folder).forEach {
             if (FileListener.isListening(it)) {
                 try {
@@ -91,10 +95,6 @@ object Loader {
                     }
                 }
             }
-        }
-
-        if (Bukkit.getOnlinePlayers().isNotEmpty()) {
-            BukkitProxyManager.sendTrChatMessage(Bukkit.getOnlinePlayers().iterator().next(), "FetchProxyChannels")
         }
 
         return Channel.channels.size
@@ -232,7 +232,7 @@ object Loader {
     }
 
     private fun parseMsg(content: Map<*, *>): MsgComponent {
-        val defaultColor = CustomColor.get(content["default-color"]?.toString() ?: "&7")
+        val defaultColor = content["default-color"]!!.serialize().map { CustomColor.get(it.first) to it.second[Property.CONDITION]?.toCondition() }
         val hover = content["hover"]?.serialize()?.associate { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Hover(it) }
         val suggest = content["suggest"]?.serialize()?.map { Suggest(it.first, it.second[Property.CONDITION]?.toCondition()) }
         val command = content["command"]?.serialize()?.map { Command(it.first, it.second[Property.CONDITION]?.toCondition()) }

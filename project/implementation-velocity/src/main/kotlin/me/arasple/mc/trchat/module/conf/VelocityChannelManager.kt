@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.module.internal.conf
+package me.arasple.mc.trchat.module.conf
 
 import me.arasple.mc.trchat.ChannelManager
 import me.arasple.mc.trchat.module.internal.TrChatVelocity
@@ -82,17 +82,19 @@ object VelocityChannelManager : ChannelManager {
     }
 
     @Suppress("Deprecation")
-    fun sendProxyChannel(id: String, channel: String) {
-        TrChatVelocity.plugin.server.allServers.filterNot {
-            loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
+    fun sendProxyChannel(id: String, channel: String, all: Boolean = false) {
+        TrChatVelocity.plugin.server.allServers.filter {
+            all || !loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
         }.forEach {
             VelocityProxyManager.sendTrChatMessage(it, "SendProxyChannel", id, channel)
         }
     }
 
-    fun sendAllProxyChannels() {
+    @Suppress("Deprecation")
+    fun sendAllProxyChannels(port: Int) {
+        val server = TrChatVelocity.plugin.server.allServers.firstOrNull { it.serverInfo.address.port == port } ?: return
         channels.forEach {
-            sendProxyChannel(it.key, it.value)
+            VelocityProxyManager.sendTrChatMessage(server, "SendProxyChannel", it.key, it.value)
         }
     }
 

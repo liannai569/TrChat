@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import taboolib.common.platform.*
+import java.util.*
 
 /**
  * @author wlys
@@ -71,6 +72,8 @@ object BukkitComponentManager : ComponentManager {
         val identity = when (sender) {
             is ProxyPlayer -> sender.uniqueId
             is Entity -> sender.uniqueId
+            is String -> UUID.fromString(sender)
+            is UUID -> sender
             else -> null
         }?.let { Identity.identity(it) } ?: Identity.nil()
 
@@ -82,9 +85,9 @@ object BukkitComponentManager : ComponentManager {
             return
         }
         if (TrChatBukkit.paperEnv) {
-            commandSender.sendMessage(identity, component, MessageType.SYSTEM)
+            commandSender.sendMessage(component, MessageType.SYSTEM)
         } else {
-            getAudienceProvider().sender(commandSender).sendMessage(identity, component, MessageType.SYSTEM)
+            getAudienceProvider().sender(commandSender).sendMessage(component, MessageType.SYSTEM)
         }
     }
 
@@ -97,6 +100,8 @@ object BukkitComponentManager : ComponentManager {
         val identity = when (sender) {
             is ProxyPlayer -> sender.uniqueId
             is Entity -> sender.uniqueId
+            is String -> UUID.fromString(sender)
+            is UUID -> sender
             else -> null
         }?.let { Identity.identity(it) } ?: Identity.nil()
 

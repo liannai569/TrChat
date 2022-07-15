@@ -38,7 +38,7 @@ General:
       - "@everyone"
       - "@everybody"
       - "@所有人"
-      - "@所有成员"
+      - "@全体成员"
   Inventory-Show:
     Enabled: true
     Permission: 'null'

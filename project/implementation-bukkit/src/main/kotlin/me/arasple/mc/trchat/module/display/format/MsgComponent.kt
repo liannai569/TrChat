@@ -47,7 +47,7 @@ class MsgComponent(
         if (!disabledFunctions.contains("Mention") && sender.passPermission(Mention.permission)) {
             message = Mention.replaceMessage(message, sender)
         }
-        if (!disabledFunctions.contains("MentionAll") && sender.passPermission(MentionAll.permission)) {
+        if (!disabledFunctions.contains("Mention-All") && sender.passPermission(MentionAll.permission)) {
             message = MentionAll.replaceMessage(message)
         }
         if (!disabledFunctions.contains("Inventory-Show") && sender.passPermission(InventoryShow.permission)) {

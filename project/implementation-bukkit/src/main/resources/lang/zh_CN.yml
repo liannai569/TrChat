@@ -59,6 +59,13 @@ Cooldowns-Chat:
     sound: 'ENTITY_ITEM_BREAK'
     volume: 1
     pitch: 2
+Cooldowns-Mention-All:
+  - type: actionbar
+    text: '&3&l您需要等待聊天冷却 &6{0}s &3&l后才能使用提及全体成员.'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 2
 Cooldowns-Item-Show:
   - type: actionbar
     text: '&3&l您需要等待冷却 &a{0}s &3&l后才能再次展示物品.'

@@ -59,9 +59,9 @@ object Mention {
         }
     }
 
-    fun createComponent(player: Player, target: String): Component {
+    fun createComponent(player: Player, target: String, forward: Boolean): Component {
         return mirrorNow("Function:Mention:CreateCompoennt") {
-            if (notify) {
+            if (notify && forward) {
                 player.sendProxyLang(target, "Mentions-Notify", player.name)
             }
             legacy(format.replaceWithOrder(target).colorify())

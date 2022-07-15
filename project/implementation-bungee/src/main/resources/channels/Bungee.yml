@@ -5,9 +5,9 @@ Options:
   Double-Transfer: true
   Auto-Join: true
 
-Bindings:
-  Prefix: ['!all']
-  Command: ['global', 'all', 'shout']
+#Bindings:
+#  Prefix: ['!all']
+#  Command: ['global', 'all', 'shout']
 
 Formats:
   - condition: null

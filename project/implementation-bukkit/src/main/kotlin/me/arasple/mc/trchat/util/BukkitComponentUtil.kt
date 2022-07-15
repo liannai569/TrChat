@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.util
 
 import io.papermc.paper.text.PaperComponents
+import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
@@ -18,6 +19,7 @@ import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.common.reflect.Reflex.Companion.setProperty
 import taboolib.module.nms.getI18nName
 import taboolib.module.nms.nmsClass
 import taboolib.platform.util.isNotAir
@@ -33,18 +35,28 @@ private val classNBTTagCompound by lazy {
 }
 
 private val LEGACY_SERIALIZER by lazy {
-    if (TrChatBukkit.paperEnv) {
+    val serializer = if (TrChatBukkit.paperEnv) {
         PaperComponents.legacySectionSerializer()
     } else {
         BukkitComponentSerializer.legacy()
     }
+    if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
+        serializer.toBuilder().useUnusualXRepeatedCharacterHexFormat().build()
+    } else {
+        serializer
+    }
 }
 
 private val GSON_SERIALIZER by lazy {
-    if (TrChatBukkit.paperEnv) {
+    val serializer = if (TrChatBukkit.paperEnv) {
         PaperComponents.gsonSerializer()
     } else {
         BukkitComponentSerializer.gson()
+    }
+    if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
+        serializer.toBuilder().also { it.setProperty("downsampleColor", false) }.build()
+    } else {
+        serializer
     }
 }
 

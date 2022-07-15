@@ -9,6 +9,7 @@ Options:
   Proxy: AUTO
   # CHAT, SYSTEM
   Send-Message-Method: CHAT
+  Force-Hex-Color: false
 
 Database:
   Method: SQLite

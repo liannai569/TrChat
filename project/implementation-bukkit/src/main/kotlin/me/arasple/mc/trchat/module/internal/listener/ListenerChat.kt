@@ -7,6 +7,7 @@ import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.EnderChestShow
 import me.arasple.mc.trchat.module.display.function.InventoryShow
 import me.arasple.mc.trchat.module.display.function.ItemShow
+import me.arasple.mc.trchat.module.display.function.MentionAll
 import me.arasple.mc.trchat.util.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -86,6 +87,15 @@ object ListenerChat {
             if (chatCooldown > 0) {
                 player.sendLang("Cooldowns-Chat", chatCooldown / 1000)
                 return false
+            }
+        }
+        if (MentionAll.keys.any { message.contains(it, ignoreCase = true) } && !player.hasPermission("trchat.bypass.mentionallcd")) {
+            val mentionAllCooldown = player.getCooldownLeft(CooldownType.MENTION_ALL)
+            if (mentionAllCooldown > 0) {
+                player.sendLang("Cooldowns-Mention-All", mentionAllCooldown / 1000)
+                return false
+            } else {
+                player.updateCooldown(CooldownType.MENTION_ALL, MentionAll.cooldown.get())
             }
         }
         if (ItemShow.keys.any { message.contains(it, ignoreCase = true) } && !player.hasPermission("trchat.bypass.itemcd")) {

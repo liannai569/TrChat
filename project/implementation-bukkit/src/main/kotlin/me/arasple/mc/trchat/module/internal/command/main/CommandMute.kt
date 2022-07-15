@@ -12,7 +12,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.command.command
-import taboolib.common.platform.function.onlinePlayers
+import taboolib.common.platform.command.suggestPlayers
 import taboolib.common5.Demand
 import taboolib.common5.util.parseMillis
 import taboolib.expansion.createHelper
@@ -34,9 +34,7 @@ object CommandMute {
     fun c() {
         command("mute", description = "Mute", permission = "trchat.command.mute") {
             dynamic("player") {
-                suggestion<CommandSender>(uncheck = true) { _, _ ->
-                    onlinePlayers().map { it.name }
-                }
+                suggestPlayers()
                 execute<CommandSender> { sender, _, argument ->
                     val player = Bukkit.getOfflinePlayer(argument)
                     if (!player.hasPlayedBefore()) {

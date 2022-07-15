@@ -42,10 +42,10 @@ taboolib {
 }
 
 repositories {
+    maven("https://jitpack.io")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://papermc.io/repo/repository/maven-public/")
-    maven("https://jitpack.io")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
@@ -54,8 +54,8 @@ dependencies {
 
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.1")
 
-    compileOnly("ink.ptms.core:v11900:11900-minimize:mapped")
-    compileOnly("ink.ptms.core:v11900:11900-minimize:universal")
+    compileOnly("ink.ptms.core:v11900:11900:mapped")
+    compileOnly("ink.ptms.core:v11900:11900:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
 

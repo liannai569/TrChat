@@ -15,8 +15,8 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageRecipient
 import taboolib.common.platform.function.console
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.submit
+import taboolib.platform.util.onlinePlayers
 import java.io.IOException
 import java.util.*
 
@@ -47,9 +47,9 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 val message = GsonComponentSerializer.gson().deserialize(raw)
 
                 if (permission == "null") {
-                    onlinePlayers().forEach { it.sendComponent(uuid, message) }
+                    onlinePlayers.forEach { it.sendComponent(uuid, message) }
                 } else {
-                    onlinePlayers().filter { it.hasPermission(permission) }.forEach { it.sendComponent(uuid, message) }
+                    onlinePlayers.filter { it.hasPermission(permission) }.forEach { it.sendComponent(uuid, message) }
                 }
                 console().sendComponent(uuid, message)
             }
@@ -59,8 +59,8 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 Loader.loadChannel(id, YamlConfiguration().also { it.loadFromString(channel) }).let {
                     Channel.channels[it.id] = it
                 }
-                if (Bukkit.getOnlinePlayers().isNotEmpty()) {
-                    BukkitProxyManager.sendTrChatMessage(Bukkit.getOnlinePlayers().iterator().next(), "LoadedProxyChannel", id)
+                if (onlinePlayers.isNotEmpty()) {
+                    BukkitProxyManager.sendTrChatMessage(onlinePlayers.iterator().next(), "LoadedProxyChannel", id)
                 }
             }
         }
@@ -85,8 +85,8 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, trChatChannel, BungeeSide())
             }
             submit(period = 60, async = true) {
-                if (Bukkit.getOnlinePlayers().isNotEmpty()) {
-                    sendCommonMessage(Bukkit.getOnlinePlayers().iterator().next(), "PlayerList", "ALL", async = false)
+                if (onlinePlayers.isNotEmpty()) {
+                    sendCommonMessage(onlinePlayers.iterator().next(), "PlayerList", "ALL", async = false)
                 }
             }
         }

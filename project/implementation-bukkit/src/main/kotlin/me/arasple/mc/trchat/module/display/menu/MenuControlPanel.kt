@@ -6,16 +6,12 @@ import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common5.util.parseMillis
 import taboolib.library.xseries.XMaterial
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Basic
 import taboolib.module.ui.type.Linked
-import taboolib.platform.util.buildItem
-import taboolib.platform.util.inventoryCenterSlots
-import taboolib.platform.util.nextChat
-import taboolib.platform.util.sendLang
+import taboolib.platform.util.*
 
 /**
  * MenuControlPanel
@@ -32,7 +28,7 @@ object MenuControlPanel {
         player.openMenu<Linked<Player>>("TrChat Control Panel") {
             rows(6)
             slots(inventoryCenterSlots)
-            elements { onlinePlayers().map { it.cast() } }
+            elements { onlinePlayers }
             setPreviousPage(47) { _, hasPreviousPage ->
                 if (hasPreviousPage) {
                     buildItem(XMaterial.SPECTRAL_ARROW) { name = "§fPrevious page" }

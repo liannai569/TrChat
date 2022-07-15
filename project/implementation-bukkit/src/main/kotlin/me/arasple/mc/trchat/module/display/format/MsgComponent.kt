@@ -33,7 +33,7 @@ class MsgComponent(
     font: List<Font>?
 ) : JsonComponent(null, hover, suggest, command, url, insertion, copy, font) {
 
-    fun serialize(sender: CommandSender, msg: String, disabledFunctions: List<String>): TextComponent {
+    fun serialize(sender: CommandSender, msg: String, disabledFunctions: List<String>, forward: Boolean): TextComponent {
         val component = Component.text()
         var message = msg
 
@@ -46,6 +46,9 @@ class MsgComponent(
         }
         if (!disabledFunctions.contains("Mention") && sender.passPermission(Mention.permission)) {
             message = Mention.replaceMessage(message, sender)
+        }
+        if (!disabledFunctions.contains("MentionAll") && sender.passPermission(MentionAll.permission)) {
+            message = MentionAll.replaceMessage(message)
         }
         if (!disabledFunctions.contains("Inventory-Show") && sender.passPermission(InventoryShow.permission)) {
             message = InventoryShow.replaceMessage(message)
@@ -68,7 +71,11 @@ class MsgComponent(
                         continue
                     }
                     "MENTION" -> {
-                        component.append(Mention.createComponent(sender, args[1]))
+                        component.append(Mention.createComponent(sender, args[1], forward))
+                        continue
+                    }
+                    "MENTIONALL" -> {
+                        component.append(MentionAll.createComponent(sender, forward))
                         continue
                     }
                     "INVENTORY" -> {

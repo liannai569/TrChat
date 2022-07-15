@@ -10,6 +10,4 @@ interface ProxyManager {
 
     fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean = true): Boolean
 
-    fun getPlayers(): List<String>
-
 }

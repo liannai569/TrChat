@@ -9,7 +9,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.command.command
-import taboolib.common.platform.function.onlinePlayers
+import taboolib.common.platform.command.suggestPlayers
 import taboolib.expansion.createHelper
 import taboolib.module.lang.sendLang
 import taboolib.platform.util.sendLang
@@ -27,9 +27,7 @@ object CommandIgnore {
     fun c() {
         command("ignore", permission = "trchat.command.ignore") {
             dynamic("player") {
-                suggestion<Player>(uncheck = true) { _, _ ->
-                    onlinePlayers().map { it.name }
-                }
+                suggestPlayers()
                 execute<Player> { sender, _, argument ->
                     val player = Bukkit.getOfflinePlayer(argument)
                     if (!player.hasPlayedBefore()) {

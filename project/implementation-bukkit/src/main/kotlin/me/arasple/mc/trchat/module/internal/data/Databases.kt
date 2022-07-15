@@ -11,7 +11,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Schedule
-import taboolib.common.platform.function.onlinePlayers
+import taboolib.platform.util.onlinePlayers
 
 /**
  * @author wlys
@@ -35,6 +35,6 @@ object Databases {
     @Schedule(delay = 100, period = (20 * 60 * 5).toLong(), async = true)
     @Awake(LifeCycle.DISABLE)
     fun save() {
-        onlinePlayers().forEach { database.push(it.cast()) }
+        onlinePlayers.forEach { database.push(it) }
     }
 }

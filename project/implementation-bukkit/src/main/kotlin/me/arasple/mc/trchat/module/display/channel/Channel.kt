@@ -19,12 +19,11 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.command.command
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.unregisterCommand
 import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
+import taboolib.platform.util.onlinePlayers
 import taboolib.platform.util.sendLang
-import taboolib.platform.util.toProxyLocation
 import java.util.*
 
 /**
@@ -43,13 +42,13 @@ open class Channel(
 
     init {
         if (settings.autoJoin) {
-            Bukkit.getOnlinePlayers().forEach {
+           onlinePlayers.forEach {
                 if (settings.joinPermission == null || it.hasPermission(settings.joinPermission)) {
                     listeners.add(it.uniqueId)
                 }
             }
         } else {
-            Bukkit.getOnlinePlayers().filter { it.session.channel == id }.forEach {
+            onlinePlayers.filter { it.session.channel == id }.forEach {
                 join(it, id, hint = false)
             }
         }
@@ -71,7 +70,7 @@ open class Channel(
                             console?.let { format ->
                                 format.prefix.forEach { prefix ->
                                     builder.append(prefix.value.first().content.toTextComponent(sender)) }
-                                builder.append(format.msg.serialize(sender, argument, settings.disabledFunctions))
+                                builder.append(format.msg.serialize(sender, argument, settings.disabledFunctions, true))
                                 format.suffix.forEach { suffix ->
                                     builder.append(suffix.value.first().content.toTextComponent(sender)) }
                             } ?: return@execute
@@ -135,7 +134,7 @@ open class Channel(
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
             format.prefix.forEach { prefix ->
                 builder.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-            builder.append(format.msg.serialize(player, msg, settings.disabledFunctions))
+            builder.append(format.msg.serialize(player, msg, settings.disabledFunctions, forward))
             format.suffix.forEach { suffix ->
                 builder.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
         } ?: return null
@@ -176,14 +175,14 @@ open class Channel(
                 }
             }
             Target.Range.SINGLE_WORLD -> {
-                onlinePlayers().filter { listeners.contains(it.uniqueId) && it.world == player.world.name }.forEach {
+                onlinePlayers.filter { listeners.contains(it.uniqueId) && it.world == player.world }.forEach {
                     it.sendComponent(player, component)
                 }
             }
             Target.Range.DISTANCE -> {
-                onlinePlayers().filter { listeners.contains(it.uniqueId)
-                        && it.world == player.world.name
-                        && it.location.distance(player.location.toProxyLocation()) <= settings.target.distance }.forEach {
+                onlinePlayers.filter { listeners.contains(it.uniqueId)
+                        && it.world == player.world
+                        && it.location.distance(player.location) <= settings.target.distance }.forEach {
                     it.sendComponent(player, component)
                 }
             }

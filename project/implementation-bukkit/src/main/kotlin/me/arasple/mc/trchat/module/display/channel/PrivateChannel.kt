@@ -92,7 +92,7 @@ class PrivateChannel(
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->
             format.prefix.forEach { prefix ->
                 builderSender.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-            builderSender.append(format.msg.serialize(player, msg, settings.disabledFunctions))
+            builderSender.append(format.msg.serialize(player, msg, settings.disabledFunctions, forward))
             format.suffix.forEach { suffix ->
                 builderSender.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
         } ?: return null
@@ -102,7 +102,7 @@ class PrivateChannel(
         receiver.firstOrNull { it.condition.pass(player) }?.let { format ->
             format.prefix.forEach { prefix ->
                 builderReceiver.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-            builderReceiver.append(format.msg.serialize(player, msg, settings.disabledFunctions))
+            builderReceiver.append(format.msg.serialize(player, msg, settings.disabledFunctions, forward))
             format.suffix.forEach { suffix ->
                 builderReceiver.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
         } ?: return null

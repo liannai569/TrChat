@@ -35,6 +35,7 @@ enum class CooldownType(val alias: String) {
     CHAT("Chat"),
     ITEM_SHOW("ItemShow"),
     MENTION("Mention"),
+    MENTION_ALL("MentionAll"),
     INVENTORY_SHOW("InventoryShow"),
     ENDERCHEST_SHOW("EnderChestShow")
 

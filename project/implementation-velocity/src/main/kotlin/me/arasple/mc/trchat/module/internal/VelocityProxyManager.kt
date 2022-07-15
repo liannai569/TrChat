@@ -54,8 +54,4 @@ object VelocityProxyManager : ProxyManager {
         return success
     }
 
-    override fun getPlayers(): List<String> {
-        return onlinePlayers().map { it.name }
-    }
-
 }

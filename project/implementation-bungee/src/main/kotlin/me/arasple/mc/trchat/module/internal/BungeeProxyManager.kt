@@ -8,7 +8,6 @@ import net.md_5.bungee.api.config.ServerInfo
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.server
 import taboolib.common.platform.function.submit
 import java.io.IOException
@@ -44,10 +43,6 @@ object BungeeProxyManager : ProxyManager {
         }
 
         return success
-    }
-
-    override fun getPlayers(): List<String> {
-        return onlinePlayers().map { it.name }
     }
 
 }

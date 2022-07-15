@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.command.subCommand
-import taboolib.common.platform.function.onlinePlayers
+import taboolib.platform.util.onlinePlayers
 
 /**
  * CommandIgnore
@@ -25,8 +25,8 @@ object CommandRemoveMessage {
                 sender.session.receivedMessages.mapNotNull { it.message }
             }
             execute<Player> { _, _, argument ->
-                onlinePlayers().forEach { it.cast<Player>().session.removeMessage(argument) }
-                onlinePlayers().forEach { it.cast<Player>().session.releaseMessage() }
+                onlinePlayers.forEach { it.session.removeMessage(argument) }
+                onlinePlayers.forEach { it.session.releaseMessage() }
             }
         }
     }

@@ -13,7 +13,6 @@ General:
     Format: '&8[&3{0} &bx{1}&8]'
     Origin-Name: false
     Compatible: false
-    Max: 5
     Keys:
       - "%i%"
       - "%i"
@@ -28,6 +27,18 @@ General:
     Format: '&r &a@&2{0}&r '
     Cooldown: '30s'
     Notify: true
+  Mention-All:
+    Enabled: true
+    Permission: 'trchat.function.mentionall'
+    Format: '&r &a@&2所有人&r '
+    Cooldown: '5m'
+    Notify: true
+    Keys:
+      - "@all"
+      - "@everyone"
+      - "@everybody"
+      - "@所有人"
+      - "@所有成员"
   Inventory-Show:
     Enabled: true
     Permission: 'null'
@@ -96,7 +107,7 @@ Custom:
         - '&7点击即可访问'
         - ''
         - '&3BV号: &b{0}'
-      url: 'https://www.bilibili.com/video/BV{0}'
+      url: 'https://www.bilibili.com/video/{0}'
 
   # 示例 —— 防止玩家暴露、分享真实手机号
   hidePhoneNumber:

@@ -51,10 +51,6 @@ object BukkitProxyManager : ProxyManager {
         return processor?.sendTrChatMessage(recipient, *args, async = async) ?: false
     }
 
-    override fun getPlayers(): List<String> {
-        return BukkitPlayers.getPlayers()
-    }
-
     fun sendProxyLang(player: Player, target: String, node: String, vararg args: String) {
         if (processor == null || Bukkit.getPlayerExact(target) != null) {
             getProxyPlayer(target)?.sendLang(node, *args)

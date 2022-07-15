@@ -20,7 +20,6 @@ import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.toCondition
-import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
@@ -34,6 +33,7 @@ import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.util.getMap
 import taboolib.module.lang.sendLang
+import taboolib.platform.util.onlinePlayers
 import java.io.File
 import kotlin.system.measureTimeMillis
 
@@ -71,8 +71,8 @@ object Loader {
         Channel.channels.values.forEach { it.unregister() }
         Channel.channels.clear()
 
-        if (Bukkit.getOnlinePlayers().isNotEmpty()) {
-            BukkitProxyManager.sendTrChatMessage(Bukkit.getOnlinePlayers().iterator().next(), "FetchProxyChannels")
+        if (onlinePlayers.isNotEmpty()) {
+            BukkitProxyManager.sendTrChatMessage(onlinePlayers.iterator().next(), "FetchProxyChannels")
         }
 
         filterChannelFiles(folder).forEach {

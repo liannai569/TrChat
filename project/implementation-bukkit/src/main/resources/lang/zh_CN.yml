@@ -22,7 +22,7 @@ Plugin-Updater-Header:
   - '&7▪ &e内容: '
 Plugin-Updater-Footer:
   - ''
-  - '&7▪ &2前往 Github 下载: &a&nhttps://github.com/FlickerProjects/TrChat/releases'
+  - '&7▪ &2前往 Github 下载: &a&nhttps://github.com/TrPlugins/TrChat/releases'
   - '&3--------------------------------------------------'
 Plugin-Debug-On:
   - type: title

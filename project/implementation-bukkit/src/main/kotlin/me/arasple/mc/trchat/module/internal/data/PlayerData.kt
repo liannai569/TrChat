@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.internal.data
 
 import me.arasple.mc.trchat.util.getDataContainer
+import me.arasple.mc.trchat.util.toUUID
 import org.bukkit.OfflinePlayer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -29,7 +30,7 @@ class PlayerData(val player: OfflinePlayer) {
 
     val isVanishing get() = player.getDataContainer().getBoolean("vanish", false)
 
-    val ignored get() = player.getDataContainer().getStringList("ignored").map { UUID.fromString(it) }
+    val ignored get() = player.getDataContainer().getStringList("ignored").map { it.toUUID() }
 
     fun selectColor(color: String?) {
         player.getDataContainer()["color"] = color
@@ -86,10 +87,6 @@ class PlayerData(val player: OfflinePlayer) {
             return DATA.computeIfAbsent(player.uniqueId) {
                 PlayerData(player)
             }
-        }
-
-        fun removeData(player: OfflinePlayer) {
-            DATA.remove(player.uniqueId)
         }
 
     }

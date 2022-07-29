@@ -5,6 +5,7 @@ import me.arasple.mc.trchat.module.internal.BungeeComponentManager
 import me.arasple.mc.trchat.module.internal.BungeeProxyManager
 import me.arasple.mc.trchat.module.internal.TrChatBungee
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
+import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -20,7 +21,6 @@ import taboolib.common.platform.function.server
 import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
 import java.io.IOException
-import java.util.*
 
 /**
  * ListenerBungeeTransfer
@@ -73,7 +73,7 @@ object ListenerBungeeTransfer {
                 } else {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         v.players.filter { permission == "null" || it.hasPermission(permission) }.forEach {
-                            BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
+                            BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                         }
                     }
                 }
@@ -98,7 +98,7 @@ object ListenerBungeeTransfer {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         if (ports.contains(v.address.port)) {
                             v.players.filter { permission == "null" || it.hasPermission(permission) }.forEach {
-                                BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
+                                BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                             }
                         }
                     }

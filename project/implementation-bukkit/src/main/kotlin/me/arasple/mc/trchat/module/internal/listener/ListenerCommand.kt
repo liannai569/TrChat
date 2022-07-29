@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.api.config.Functions
 import me.arasple.mc.trchat.util.Internal
+import me.arasple.mc.trchat.util.toCondition
 import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import taboolib.common.platform.Platform
@@ -40,8 +41,8 @@ object ListenerCommand {
                     || (!it.value.exact && cmd.substringBefore(' ').equals(it.key.substringBefore(' '), ignoreCase = true))
         }?.value ?: return
 
-        val condition = controller.condition
-        if (condition != null && !condition.eval(player)) {
+        val condition = controller.condition?.replaceWithOrder(*subList(command, 1).toTypedArray())
+        if (condition != null && !condition.toCondition().eval(player)) {
             e.isCancelled =  true
             player.sendLang("Command-Controller-Deny")
             return

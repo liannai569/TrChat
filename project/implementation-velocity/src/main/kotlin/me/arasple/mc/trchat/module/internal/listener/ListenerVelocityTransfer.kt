@@ -7,6 +7,7 @@ import me.arasple.mc.trchat.module.conf.VelocityChannelManager
 import me.arasple.mc.trchat.module.internal.TrChatVelocity.plugin
 import me.arasple.mc.trchat.module.internal.VelocityProxyManager
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
+import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
@@ -17,7 +18,6 @@ import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
 import java.io.IOException
-import java.util.*
 
 /**
  * ListenerVelocityTransfer
@@ -67,7 +67,7 @@ object ListenerVelocityTransfer {
                 } else {
                     plugin.server.allServers.forEach { server ->
                         server.playersConnected.filter { permission == "null" || it.hasPermission(permission) }.forEach { player ->
-                            player.sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
+                            player.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                         }
                     }
                 }
@@ -92,7 +92,7 @@ object ListenerVelocityTransfer {
                     plugin.server.allServers.forEach { server ->
                         if (ports.contains(server.serverInfo.address.port)) {
                             server.playersConnected.filter { permission == "null" || it.hasPermission(permission) }.forEach { player ->
-                                player.sendMessage(Identity.identity(UUID.fromString(uuid)), message, MessageType.CHAT)
+                                player.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                             }
                         }
                     }

@@ -8,6 +8,7 @@ import me.arasple.mc.trchat.util.buildMessage
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import me.arasple.mc.trchat.util.sendComponent
+import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -18,7 +19,6 @@ import taboolib.common.platform.function.console
 import taboolib.common.platform.function.submit
 import taboolib.platform.util.onlinePlayers
 import java.io.IOException
-import java.util.*
 
 /**
  * @author wlys
@@ -41,7 +41,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 }
             }
             "BroadcastRaw" -> {
-                val uuid = UUID.fromString(data[1])
+                val uuid = data[1].toUUID()
                 val raw = data[2]
                 val permission = data[3]
                 val message = GsonComponentSerializer.gson().deserialize(raw)

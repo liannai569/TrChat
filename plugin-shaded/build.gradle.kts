@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation("com.eatthepath:fast-uuid:0.2.0")
     implementation("net.kyori:adventure-api:4.11.0")
     implementation("net.kyori:adventure-platform-bukkit:4.1.1")
     implementation("net.kyori:adventure-platform-bungeecord:4.1.1")
@@ -21,6 +22,9 @@ tasks {
         exclude("META-INF/maven/**")
         exclude("META-INF/tf/**")
         exclude("module-info.java")
+        relocate("com.eatthepath.uuid", "me.arasple.mc.trchat.library.uuid")
+        relocate("net.kyori.adventure", "me.arasple.mc.trchat.library.adventure")
+        relocate("net.kyori.examination", "me.arasple.mc.trchat.library.examination")
     }
     build {
         dependsOn(shadowJar)

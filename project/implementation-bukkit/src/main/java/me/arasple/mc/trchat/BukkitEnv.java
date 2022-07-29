@@ -8,14 +8,12 @@ import taboolib.common.env.RuntimeDependency;
  */
 @RuntimeDependency(
         value = "!net.kyori:adventure-api:4.11.0",
-        test = "!net.kyori.adventure.Adventure",
-//        relocate = {"!net.kyori.adventure", "!net.kyori.adventure_4_11_0"},
+        test = "net.kyori.adventure.Adventure",
         initiative = true
 )
 @RuntimeDependency(
         value = "!net.kyori:adventure-platform-bukkit:4.1.1",
-        test = "!net.kyori.adventure.platform.bukkit.BukkitAudiences",
-//        relocate = {"!net.kyori.adventure", "!net.kyori.adventure_4_11_0"},
+        test = "net.kyori.adventure.platform.bukkit.BukkitAudiences",
         repository = "https://repo.maven.apache.org/maven2",
         initiative = true
 )

@@ -4,10 +4,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import me.arasple.mc.trchat.util.UtilKt;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,7 +44,7 @@ public class MessageReader {
             queueMessages.put(json.get("uid").getAsString(), message);
         }
         message.getMessages().add(new MessagePacket(
-                UUID.fromString(json.get("uid").getAsString()),
+                UtilKt.toUUID(json.get("uid").getAsString()),
                 json.get("data").getAsString(),
                 json.get("index").getAsInt(),
                 json.get("total").getAsInt()

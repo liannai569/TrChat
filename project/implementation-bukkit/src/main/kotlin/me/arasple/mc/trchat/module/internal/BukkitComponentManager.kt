@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.gson
+import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -72,7 +73,7 @@ object BukkitComponentManager : ComponentManager {
         val identity = when (sender) {
             is ProxyPlayer -> sender.uniqueId
             is Entity -> sender.uniqueId
-            is String -> UUID.fromString(sender)
+            is String -> sender.toUUID()
             is UUID -> sender
             else -> null
         }?.let { Identity.identity(it) } ?: Identity.nil()
@@ -100,7 +101,7 @@ object BukkitComponentManager : ComponentManager {
         val identity = when (sender) {
             is ProxyPlayer -> sender.uniqueId
             is Entity -> sender.uniqueId
-            is String -> UUID.fromString(sender)
+            is String -> sender.toUUID()
             is UUID -> sender
             else -> null
         }?.let { Identity.identity(it) } ?: Identity.nil()

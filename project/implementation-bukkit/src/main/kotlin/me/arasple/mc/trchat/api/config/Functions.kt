@@ -2,8 +2,6 @@ package me.arasple.mc.trchat.api.config
 
 import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.conf.Property
-import me.arasple.mc.trchat.module.internal.script.Condition
-import me.arasple.mc.trchat.util.toCondition
 import org.bukkit.Bukkit
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -43,7 +41,7 @@ object Functions {
             }
             val key = if (mCmd != null) mCmd.key + cmd.substringAfter(' ') else cmd
             val exact = property[Property.EXACT].toBoolean()
-            val condition = property[Property.CONDITION]?.toCondition()
+            val condition = property[Property.CONDITION]
             val baffle = property[Property.COOLDOWN]?.toFloat()?.let {
                 Baffle.of((it * 1000).toLong(), TimeUnit.MILLISECONDS)
             }
@@ -52,5 +50,5 @@ object Functions {
         }
     }
 
-    class Command(val exact: Boolean, val condition: Condition?, val baffle: Baffle?, val relocate: List<String>?)
+    class Command(val exact: Boolean, val condition: String?, val baffle: Baffle?, val relocate: List<String>?)
 }

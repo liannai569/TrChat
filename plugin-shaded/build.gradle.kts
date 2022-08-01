@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":project:implementation-common"))
     implementation(project(":project:implementation-bukkit"))
     implementation(project(":project:implementation-bungee"))
-    implementation(project(":project:implementation-velocity"))
+//    implementation(project(":project:implementation-velocity"))
 }
 
 tasks {

@@ -1,7 +1,7 @@
 plugins {
     id("org.gradle.java")
     id("org.gradle.maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "1.6.21" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.5.10" apply false
 }
 
 subprojects {

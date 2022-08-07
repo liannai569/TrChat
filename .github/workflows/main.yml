@@ -34,9 +34,9 @@ jobs:
       - name: capture build artifacts (shaded)
         uses: actions/upload-artifact@v2
         with:
-          name: TrChat Artifacts
+          name: TrChat Artifacts (shaded)
           path: plugin-shaded/build/libs/
-      - name: Automatic Releases
+      - name: automatic releases
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"

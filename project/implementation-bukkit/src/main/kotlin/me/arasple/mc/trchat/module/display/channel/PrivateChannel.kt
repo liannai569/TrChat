@@ -20,6 +20,7 @@ import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
+import taboolib.platform.util.onlinePlayers
 import taboolib.platform.util.sendLang
 
 /**
@@ -36,35 +37,43 @@ class PrivateChannel(
 ) : Channel(id, settings, bindings, events, emptyList()) {
 
     init {
-        if (!bindings.command.isNullOrEmpty()) {
-            command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
-                execute<Player> { sender, _, _ ->
-                    if (sender.session.channel == this@PrivateChannel.id) {
-                        quit(sender)
-                    } else {
-                        sender.sendLang("Private-Message-No-Player")
+        onlinePlayers.filter { it.session.channel == id }.forEach {
+            join(it, id, hint = false)
+        }
+        initCommand()
+    }
+
+    private fun initCommand() {
+        if (bindings.command.isNullOrEmpty()) {
+            return
+        }
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
+            execute<Player> { sender, _, _ ->
+                if (sender.session.channel == this@PrivateChannel.id) {
+                    quit(sender)
+                } else {
+                    sender.sendLang("Private-Message-No-Player")
+                }
+            }
+            dynamic("player", optional = true) {
+                suggestion<Player> { _, _ ->
+                    BukkitPlayers.getPlayers().filter { !PlayerData.vanishing.contains(it) }
+                }
+                execute<Player> { sender, _, argument ->
+                    sender.session.lastPrivateTo = BukkitPlayers.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
+                    join(sender, this@PrivateChannel)
+                }
+                dynamic("message", optional = true) {
+                    execute<Player> { sender, context, argument ->
+                        BukkitPlayers.getPlayerFullName(context.argument(-1))?.let {
+                            sender.session.lastPrivateTo = it
+                            execute(sender, argument)
+                        } ?: sender.sendLang("Command-Player-Not-Exist")
                     }
                 }
-                dynamic("player", optional = true) {
-                    suggestion<Player> { _, _ ->
-                        BukkitPlayers.getPlayers().filter { !PlayerData.vanishing.contains(it) }
-                    }
-                    execute<Player> { sender, _, argument ->
-                        sender.session.lastPrivateTo = BukkitPlayers.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
-                        join(sender, this@PrivateChannel)
-                    }
-                    dynamic("message", optional = true) {
-                        execute<Player> { sender, context, argument ->
-                            BukkitPlayers.getPlayerFullName(context.argument(-1))?.let {
-                                sender.session.lastPrivateTo = it
-                                execute(sender, argument)
-                            } ?: sender.sendLang("Command-Player-Not-Exist")
-                        }
-                    }
-                }
-                incorrectSender { sender, _ ->
-                    sender.sendLang("Command-Not-Player")
-                }
+            }
+            incorrectSender { sender, _ ->
+                sender.sendLang("Command-Not-Player")
             }
         }
     }

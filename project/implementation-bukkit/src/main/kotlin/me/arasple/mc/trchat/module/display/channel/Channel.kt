@@ -53,64 +53,73 @@ open class Channel(
                 join(it, id, hint = false)
             }
         }
-        if (!bindings.command.isNullOrEmpty()) {
-            command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
-                execute<Player> { sender, _, _ ->
-                    if (sender.session.channel == this@Channel.id) {
-                        quit(sender)
-                    } else {
-                        join(sender, this@Channel)
-                    }
-                }
-                dynamic("message", optional = true) {
-                    execute<CommandSender> { sender, _, argument ->
-                        if (sender is Player) {
-                            execute(sender, argument)
-                        } else {
-                            val builder = Component.text()
-                            console?.let { format ->
-                                format.prefix.forEach { prefix ->
-                                    builder.append(prefix.value.first().content.toTextComponent(sender)) }
-                                builder.append(format.msg.serialize(sender, argument, settings.disabledFunctions, true))
-                                format.suffix.forEach { suffix ->
-                                    builder.append(suffix.value.first().content.toTextComponent(sender)) }
-                            } ?: return@execute
-                            val component = builder.build()
+        initCommand()
+    }
 
-                            if (settings.proxy && BukkitProxyManager.processor != null) {
-                                val gson = gson(component)
-                                if (settings.ports != null) {
-                                    Bukkit.getServer().sendTrChatMessage(
-                                        "ForwardRaw",
-                                        Identity.nil().uuid().string(),
-                                        gson,
-                                        settings.joinPermission ?: "null",
-                                        settings.ports.joinToString(";"),
-                                        settings.doubleTransfer.toString()
-                                    )
-                                } else {
-                                    Bukkit.getServer().sendTrChatMessage(
-                                        "BroadcastRaw",
-                                        Identity.nil().uuid().string(),
-                                        gson,
-                                        settings.joinPermission ?: "null",
-                                        settings.doubleTransfer.toString()
-                                    )
-                                }
-                                return@execute
-                            }
-                            listeners.forEach {
-                                getProxyPlayer(it)?.sendComponent(it, component)
-                            }
-                            sender.sendComponent(null, component)
-                        }
-                    }
-                }
-                incorrectSender { sender, _ ->
-                    sender.sendLang("Command-Not-Player")
+    private fun initCommand() {
+        if (bindings.command.isNullOrEmpty()) {
+            return
+        }
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
+            execute<Player> { sender, _, _ ->
+                if (sender.session.channel == this@Channel.id) {
+                    quit(sender)
+                } else {
+                    join(sender, this@Channel)
                 }
             }
+            dynamic("message", optional = true) {
+                execute<CommandSender> { sender, _, argument ->
+                    if (sender is Player) {
+                        execute(sender, argument)
+                    } else {
+                        execute(sender, argument)
+                    }
+                }
+            }
+            incorrectSender { sender, _ ->
+                sender.sendLang("Command-Not-Player")
+            }
         }
+    }
+
+    open fun execute(sender: CommandSender, message: String) {
+        val builder = Component.text()
+        console?.let { format ->
+            format.prefix.forEach { prefix ->
+                builder.append(prefix.value.first().content.toTextComponent(sender)) }
+            builder.append(format.msg.serialize(sender, message, settings.disabledFunctions, true))
+            format.suffix.forEach { suffix ->
+                builder.append(suffix.value.first().content.toTextComponent(sender)) }
+        } ?: return
+        val component = builder.build()
+
+        if (settings.proxy && BukkitProxyManager.processor != null) {
+            val gson = gson(component)
+            if (settings.ports != null) {
+                Bukkit.getServer().sendTrChatMessage(
+                    "ForwardRaw",
+                    Identity.nil().uuid().string(),
+                    gson,
+                    settings.joinPermission ?: "null",
+                    settings.ports.joinToString(";"),
+                    settings.doubleTransfer.toString()
+                )
+            } else {
+                Bukkit.getServer().sendTrChatMessage(
+                    "BroadcastRaw",
+                    Identity.nil().uuid().string(),
+                    gson,
+                    settings.joinPermission ?: "null",
+                    settings.doubleTransfer.toString()
+                )
+            }
+            return
+        }
+        listeners.forEach {
+            getProxyPlayer(it)?.sendComponent(it, component)
+        }
+        sender.sendComponent(null, component)
     }
 
     open fun execute(player: Player, message: String, forward: Boolean = true): Pair<Component, Component?>? {

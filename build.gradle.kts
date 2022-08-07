@@ -26,21 +26,17 @@ subprojects {
     }
 }
 
-gradle.buildFinished {
-    buildDir.deleteRecursively()
-}
-
 tasks.build {
     doLast {
         val plugin = project(":plugin")
         val file = file("${plugin.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }
 
-        file?.renameTo(file("${plugin.buildDir}/libs/${project.name}-$version.jar"))
+        file?.copyTo(file("$buildDir/libs/${project.name}-$version.jar"), true)
 
         val pluginShaded = project(":plugin-shaded")
         val fileShaded = file("${pluginShaded.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-shaded-$version-shaded.jar") }
 
-        fileShaded?.renameTo(file("${pluginShaded.buildDir}/libs/${project.name}-$version-shaded.jar"))
+        fileShaded?.copyTo(file("$buildDir/libs/${project.name}-$version-shaded.jar"), true)
     }
     dependsOn(project(":plugin").tasks.build, project(":plugin-shaded").tasks.build)
 }

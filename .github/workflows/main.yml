@@ -30,19 +30,13 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: TrChat Artifacts
-          path: plugin/build/libs/
-      - name: capture build artifacts (shaded)
-        uses: actions/upload-artifact@v2
-        with:
-          name: TrChat Artifacts (shaded)
-          path: plugin-shaded/build/libs/
+          path: build/libs/
       - name: automatic releases
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
-          title: "TrChat 自动构建版本"
+          title: "TrChat 自动构建最新版本"
           files: |
-            plugin/build/libs/*.jar
-            plugin-shaded/build/libs/*.jar
+            build/libs/*.jar

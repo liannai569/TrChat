@@ -9,7 +9,7 @@ object TrChat {
     private var api: TrChatAPI? = null
 
     fun api(): TrChatAPI {
-        return api!!
+        return api ?: error("TrChat failed to load!")
     }
 
     fun register(api: TrChatAPI) {

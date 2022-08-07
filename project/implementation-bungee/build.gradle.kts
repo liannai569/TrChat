@@ -21,7 +21,7 @@ taboolib {
         "module-lang",
         "platform-bungee"
     )
-    options("skip-minimize", "keep-kotlin-module")
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
@@ -33,9 +33,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":project:common"))
-
+    api(project(":project:common"))
     compileOnly("net.kyori:adventure-platform-bungeecord:4.1.1")
-
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
 }

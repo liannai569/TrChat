@@ -12,6 +12,7 @@ import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
+import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -81,7 +82,7 @@ open class Channel(
                                 if (settings.ports != null) {
                                     Bukkit.getServer().sendTrChatMessage(
                                         "ForwardRaw",
-                                        UUID.randomUUID().toString(),
+                                        Identity.nil().uuid().string(),
                                         gson,
                                         settings.joinPermission ?: "null",
                                         settings.ports.joinToString(";"),
@@ -90,7 +91,7 @@ open class Channel(
                                 } else {
                                     Bukkit.getServer().sendTrChatMessage(
                                         "BroadcastRaw",
-                                        UUID.randomUUID().toString(),
+                                        Identity.nil().uuid().string(),
                                         gson,
                                         settings.joinPermission ?: "null",
                                         settings.doubleTransfer.toString()
@@ -101,7 +102,7 @@ open class Channel(
                             listeners.forEach {
                                 getProxyPlayer(it)?.sendComponent(it, component)
                             }
-                            sender.sendComponent(UUID.randomUUID(), component)
+                            sender.sendComponent(null, component)
                         }
                     }
                 }
@@ -120,7 +121,7 @@ open class Channel(
             player.sendLang("Channel-No-Speak-Permission")
             return null
         }
-        if (settings.filterBeforeSending && TrChat.api().filter(message).sensitiveWords > 0) {
+        if (settings.filterBeforeSending && TrChat.api().getFilterManager().filter(message).sensitiveWords > 0) {
             player.sendLang("Channel-Bad-Language")
             return null
         }
@@ -151,7 +152,7 @@ open class Channel(
             if (settings.ports != null) {
                 player.sendTrChatMessage(
                     "ForwardRaw",
-                    player.uniqueId.toString(),
+                    player.uniqueId.string(),
                     gson,
                     settings.joinPermission ?: "null",
                     settings.ports.joinToString(";"),
@@ -160,7 +161,7 @@ open class Channel(
             } else {
                 player.sendTrChatMessage(
                     "BroadcastRaw",
-                    player.uniqueId.toString(),
+                    player.uniqueId.string(),
                     gson,
                     settings.joinPermission ?: "null",
                     settings.doubleTransfer.toString()

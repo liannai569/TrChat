@@ -1,9 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("org.gradle.java")
     id("org.gradle.maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "1.5.10" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.6.21" apply false
 }
 
 subprojects {
@@ -14,19 +12,13 @@ subprojects {
         mavenCentral()
     }
     dependencies {
-        compileOnly(kotlin("stdlib"))
         compileOnly("com.google.code.gson:gson:2.8.5")
         compileOnly("com.google.guava:guava:21.0")
         compileOnly("net.kyori:adventure-api:4.11.0")
+        compileOnly(kotlin("stdlib"))
     }
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-    }
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-Xjvm-default=all")
-        }
     }
     configure<JavaPluginConvention> {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -34,21 +26,21 @@ subprojects {
     }
 }
 
-//gradle.buildFinished {
-//    buildDir.deleteRecursively()
-//}
+gradle.buildFinished {
+    buildDir.deleteRecursively()
+}
 
 tasks.build {
     doLast {
         val plugin = project(":plugin")
         val file = file("${plugin.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }
 
-        file?.copyTo(file("$buildDir/libs/${project.name}-$version.jar"), true)
+        file?.renameTo(file("${plugin.buildDir}/libs/${project.name}-$version.jar"))
 
         val pluginShaded = project(":plugin-shaded")
         val fileShaded = file("${pluginShaded.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-shaded-$version-shaded.jar") }
 
-        fileShaded?.copyTo(file("$buildDir/libs/${project.name}-$version-shaded.jar"), true)
+        fileShaded?.renameTo(file("${pluginShaded.buildDir}/libs/${project.name}-$version-shaded.jar"))
     }
     dependsOn(project(":plugin").tasks.build, project(":plugin-shaded").tasks.build)
 }

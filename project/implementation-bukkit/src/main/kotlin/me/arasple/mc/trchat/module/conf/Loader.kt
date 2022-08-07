@@ -8,14 +8,14 @@ import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.channel.obj.Target
 import me.arasple.mc.trchat.module.display.format.Format
+import me.arasple.mc.trchat.module.display.format.Group
 import me.arasple.mc.trchat.module.display.format.JsonComponent
 import me.arasple.mc.trchat.module.display.format.MsgComponent
-import me.arasple.mc.trchat.module.display.format.part.Group
-import me.arasple.mc.trchat.module.display.format.part.json.*
+import me.arasple.mc.trchat.module.display.format.obj.Style
+import me.arasple.mc.trchat.module.display.format.obj.Text
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.print
@@ -29,7 +29,9 @@ import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.util.asList
 import taboolib.common.util.orNull
+import taboolib.common.util.unsafeLazy
 import taboolib.common5.Coerce
+import taboolib.common5.FileWatcher
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.util.getMap
 import taboolib.module.lang.sendLang
@@ -45,7 +47,7 @@ import kotlin.system.measureTimeMillis
 @PlatformSide([Platform.BUKKIT])
 object Loader {
 
-    private val folder by lazy {
+    private val folder by unsafeLazy {
         val folder = File(getDataFolder(), "channels")
 
         if (!folder.exists()) {
@@ -76,7 +78,7 @@ object Loader {
         }
 
         filterChannelFiles(folder).forEach {
-            if (FileListener.isListening(it)) {
+            if (FileWatcher.INSTANCE.hasListener(it)) {
                 try {
                     loadChannel(it.nameWithoutExtension, YamlConfiguration.loadConfiguration(it)).let { channel ->
                         Channel.channels[channel.id] = channel
@@ -85,7 +87,7 @@ object Loader {
                     t.print("Channel file ${it.name} loaded failed!")
                 }
             } else {
-                FileListener.listen(it, runFirst = true) {
+                FileWatcher.INSTANCE.addSimpleListener(it, {
                     try {
                         loadChannel(it.nameWithoutExtension, YamlConfiguration.loadConfiguration(it)).let { channel ->
                             Channel.channels[channel.id] = channel
@@ -93,7 +95,7 @@ object Loader {
                     } catch (t: Throwable) {
                         t.print("Channel file ${it.name} loaded failed!")
                     }
-                }
+                }, true)
             }
         }
 
@@ -221,26 +223,30 @@ object Loader {
 
     private fun parseJSON(content: Map<*, *>): JsonComponent {
         val text = Property.serialize(content["text"] ?: "null").map { Text(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val hover = content["hover"]?.serialize()?.associate { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Hover(it) }
-        val suggest = content["suggest"]?.serialize()?.map { Suggest(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val command = content["command"]?.serialize()?.map { Command(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val url = content["url"]?.serialize()?.map { Url(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val insertion = content["insertion"]?.serialize()?.map { Insertion(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val copy = content["copy"]?.serialize()?.map { Copy(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val font = content["font"]?.serialize()?.map { Font(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        return JsonComponent(text, hover, suggest, command, url, insertion, copy, font)
+        val style = mutableListOf<Style?>()
+        style += content["hover"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Hover.Text(it) }
+        style += content["suggest"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Suggest(it) }
+        style += content["command"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Command(it) }
+        style += content["url"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Url(it) }
+        style += content["copy"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Copy(it) }
+        style += content["file"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.File(it) }
+        style += content["insertion"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Insertion(it) }
+        style += content["font"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Font(it) }
+        return JsonComponent(text, style.filterNotNull())
     }
 
     private fun parseMsg(content: Map<*, *>): MsgComponent {
         val defaultColor = content["default-color"]!!.serialize().map { CustomColor.get(it.first) to it.second[Property.CONDITION]?.toCondition() }
-        val hover = content["hover"]?.serialize()?.associate { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Hover(it) }
-        val suggest = content["suggest"]?.serialize()?.map { Suggest(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val command = content["command"]?.serialize()?.map { Command(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val url = content["url"]?.serialize()?.map { Url(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val insertion = content["insertion"]?.serialize()?.map { Insertion(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val copy = content["copy"]?.serialize()?.map { Copy(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        val font = content["font"]?.serialize()?.map { Font(it.first, it.second[Property.CONDITION]?.toCondition()) }
-        return MsgComponent(defaultColor, hover, suggest, command, url, insertion, copy, font)
+        val style = mutableListOf<Style?>()
+        style += content["hover"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Hover.Text(it) }
+        style += content["suggest"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Suggest(it) }
+        style += content["command"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Command(it) }
+        style += content["url"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Url(it) }
+        style += content["copy"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Copy(it) }
+        style += content["file"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.File(it) }
+        style += content["insertion"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Insertion(it) }
+        style += content["font"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Font(it) }
+        return MsgComponent(defaultColor, style.filterNotNull())
     }
 
     private fun filterChannelFiles(file: File): List<File> {

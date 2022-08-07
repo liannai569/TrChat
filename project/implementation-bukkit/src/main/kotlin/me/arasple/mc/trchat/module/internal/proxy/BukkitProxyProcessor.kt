@@ -17,6 +17,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageRecipient
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.submit
+import taboolib.platform.util.bukkitPlugin
 import taboolib.platform.util.onlinePlayers
 import java.io.IOException
 
@@ -24,9 +25,13 @@ import java.io.IOException
  * @author wlys
  * @since 2022/6/18 16:17
  */
-interface BukkitProxyProcessor : PluginMessageListener {
+sealed interface BukkitProxyProcessor : PluginMessageListener {
 
     fun init()
+
+    fun close() {
+        Bukkit.getMessenger().unregisterIncomingPluginChannel(bukkitPlugin)
+    }
 
     fun sendCommonMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean = true): Boolean
 
@@ -66,23 +71,23 @@ interface BukkitProxyProcessor : PluginMessageListener {
         }
     }
 
-    class BungeeSide : BukkitProxyProcessor {
+    object BungeeSide : BukkitProxyProcessor {
 
-        private val trChatChannel = "trchat:main"
-        private val bungeeChannel = "BungeeCord"
+        private const val TRCHAT_CHANNEL = "trchat:main"
+        private const val BUNGEE_CHANNEL = "BungeeCord"
 
         override fun init() {
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, bungeeChannel)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, bungeeChannel)
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, BUNGEE_CHANNEL)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, BUNGEE_CHANNEL)
             }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, bungeeChannel)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, bungeeChannel, BungeeSide())
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, BUNGEE_CHANNEL)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, BUNGEE_CHANNEL, BungeeSide)
             }
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, trChatChannel)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, trChatChannel)
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, TRCHAT_CHANNEL)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, TRCHAT_CHANNEL)
             }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, trChatChannel)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, trChatChannel, BungeeSide())
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, TRCHAT_CHANNEL)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, TRCHAT_CHANNEL, BungeeSide)
             }
             submit(period = 60, async = true) {
                 if (onlinePlayers.isNotEmpty()) {
@@ -105,7 +110,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
                     success = false
                 }
 
-                recipient.sendPluginMessage(TrChatBukkit.plugin, bungeeChannel, out.toByteArray())
+                recipient.sendPluginMessage(bukkitPlugin, BUNGEE_CHANNEL, out.toByteArray())
             }
 
             return success
@@ -116,7 +121,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
             submit(async = async) {
                 try {
                     for (bytes in buildMessage(*args)) {
-                        recipient.sendPluginMessage(TrChatBukkit.plugin, trChatChannel, bytes)
+                        recipient.sendPluginMessage(bukkitPlugin, TRCHAT_CHANNEL, bytes)
                     }
                 } catch (e: IOException) {
                     e.print("Failed to send proxy trchat message!")
@@ -128,7 +133,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
         }
 
         override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-            if (channel == bungeeChannel) {
+            if (channel == BUNGEE_CHANNEL) {
                 try {
                     val data = ByteStreams.newDataInput(message)
                     val subChannel = data.readUTF()
@@ -139,7 +144,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
                 } catch (_: IOException) {
                 }
             }
-            if (channel == trChatChannel) {
+            if (channel == TRCHAT_CHANNEL) {
                 try {
                     val data = MessageReader.read(message)
                     if (data.isCompleted) {
@@ -151,17 +156,17 @@ interface BukkitProxyProcessor : PluginMessageListener {
         }
     }
 
-    class VelocitySide : BukkitProxyProcessor {
+    object VelocitySide : BukkitProxyProcessor {
 
-        private val incoming = "trchat:server"
-        private val outgoing = "trchat:proxy"
+        private const val incoming = "trchat:server"
+        private const val outgoing = "trchat:proxy"
 
         override fun init() {
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(TrChatBukkit.plugin, outgoing)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(TrChatBukkit.plugin, outgoing)
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, outgoing)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, outgoing)
             }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(TrChatBukkit.plugin, incoming)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(TrChatBukkit.plugin, incoming, VelocitySide())
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, incoming)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, incoming, VelocitySide)
             }
         }
 
@@ -174,7 +179,7 @@ interface BukkitProxyProcessor : PluginMessageListener {
             submit(async = async) {
                 try {
                     for (bytes in buildMessage(*args)) {
-                        recipient.sendPluginMessage(TrChatBukkit.plugin, outgoing, bytes)
+                        recipient.sendPluginMessage(bukkitPlugin, outgoing, bytes)
                     }
                 } catch (e: IOException) {
                     e.print("Failed to send proxy trchat message!")

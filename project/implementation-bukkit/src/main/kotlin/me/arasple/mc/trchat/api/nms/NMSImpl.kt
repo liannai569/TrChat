@@ -13,8 +13,8 @@ import net.minecraft.server.v1_16_R3.NBTTagCompound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
-import taboolib.common.reflect.Reflex.Companion.getProperty
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.library.reflex.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.module.nms.MinecraftVersion.isUniversal
 import taboolib.module.nms.sendPacket
 import taboolib.platform.util.isAir
@@ -32,9 +32,9 @@ class NMSImpl : NMS() {
     override fun filterIChatComponent(iChat: Any?): Any? {
         iChat ?: return null
         return try {
-            val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", iChat, fixed = true)!!
+            val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", iChat, isStatic = true)!!
             val component = BukkitComponentManager.filterComponent(gson(json), 32000)!!
-            TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)!!
+            TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true)!!
         } catch (t: Throwable) {
             if (!TrChatBukkit.reportedErrors.contains("filterIChatComponent")) {
                 t.print("Error occurred while filtering chat component.")
@@ -47,7 +47,7 @@ class NMSImpl : NMS() {
     override fun filterItem(item: Any?) {
         item ?: return
         kotlin.runCatching {
-            val itemStack = TrChatBukkit.classCraftItemStack.invokeMethod<ItemStack>("asCraftMirror", item, fixed = true)!!
+            val itemStack = TrChatBukkit.classCraftItemStack.invokeMethod<ItemStack>("asCraftMirror", item, isStatic = true)!!
             filterItemStack(itemStack)
         }
     }
@@ -66,7 +66,7 @@ class NMSImpl : NMS() {
     override fun optimizeNBT(itemStack: ItemStack, nbtWhitelist: Array<String>): ItemStack {
         try {
             val nmsItem = TrChatBukkit.classCraftItemStack
-                .invokeMethod<net.minecraft.server.v1_16_R3.ItemStack>("asNMSCopy", itemStack, fixed = true)!!
+                .invokeMethod<net.minecraft.server.v1_16_R3.ItemStack>("asNMSCopy", itemStack, isStatic = true)!!
             if (itemStack.isNotAir() && nmsItem.hasTag()) {
                 val nbtTag = NBTTagCompound()
                 val mapNew = nbtTag.getProperty<HashMap<String, NBTBase>>(if (isUniversal) "tags" else "map")!!
@@ -77,7 +77,7 @@ class NMSImpl : NMS() {
                     }
                 }
                 nmsItem.tag = nbtTag
-                return TrChatBukkit.classCraftItemStack.invokeMethod<ItemStack>("asBukkitCopy", nmsItem, fixed = true)!!
+                return TrChatBukkit.classCraftItemStack.invokeMethod<ItemStack>("asBukkitCopy", nmsItem, isStatic = true)!!
             }
         } catch (_: Throwable) {
         }
@@ -86,7 +86,7 @@ class NMSImpl : NMS() {
 
     override fun sendChatPreview(player: Player, queryId: Int, query: String) {
         val component = player.session.getChannel()?.execute(player, query, forward = false)?.first ?: return
-        val iChatBaseComponent = TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true)
+        val iChatBaseComponent = TrChatBukkit.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true)
         player.sendPacket(ClientboundChatPreviewPacket(queryId, iChatBaseComponent))
     }
 
@@ -97,11 +97,11 @@ class NMSImpl : NMS() {
         }
         itemStack.modifyMeta<ItemMeta> {
             if (hasDisplayName()) {
-                setDisplayName(TrChat.api().filter(displayName).filtered)
+                setDisplayName(TrChat.api().getFilterManager().filter(displayName).filtered)
             }
             modifyLore {
                 if (isNotEmpty()) {
-                    replaceAll { TrChat.api().filter(it).filtered }
+                    replaceAll { TrChat.api().getFilterManager().filter(it).filtered }
                 }
             }
         }

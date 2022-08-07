@@ -7,11 +7,11 @@ plugins {
 taboolib {
     install("common", "common-5")
     install("module-kether")
-    options("skip-minimize", "keep-kotlin-module")
+    options("skip-minimize", "keep-kotlin-module", "skip-plugin-file", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
 
 dependencies {
-    compileOnly(project(":project:common"))
+    api(project(":project:common"))
 }

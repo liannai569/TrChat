@@ -10,6 +10,7 @@ import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
+import taboolib.common.util.unsafeLazy
 import taboolib.module.lang.sendLang
 
 /**
@@ -25,14 +26,14 @@ object BukkitProxyManager : ProxyManager {
 
     var processor: BukkitProxyProcessor? = null
 
-    val platform by lazy {
+    val platform by unsafeLazy {
         val force = Settings.CONF.getString("Options.Proxy")?.uppercase()
         if (Bukkit.getServer().spigot().config.getBoolean("settings.bungeecord") || force == "BUNGEE") {
-            processor = BukkitProxyProcessor.BungeeSide().also { it.init() }
+            processor = BukkitProxyProcessor.BungeeSide.also { it.init() }
             console().sendLang("Plugin-Proxy-Supported", "Bungee")
             Platform.BUNGEE
         } else if (kotlin.runCatching { Bukkit.getServer().spigot().paperConfig.getBoolean("settings.velocity-support.enabled") }.getOrDefault(false) || force == "VELOCITY") {
-            processor = BukkitProxyProcessor.VelocitySide().also { it.init() }
+            processor = BukkitProxyProcessor.VelocitySide.also { it.init() }
             console().sendLang("Plugin-Proxy-Supported", "Velocity")
             Platform.VELOCITY
         } else {

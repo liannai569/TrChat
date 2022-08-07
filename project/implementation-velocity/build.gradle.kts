@@ -22,7 +22,7 @@ taboolib {
         "platform-velocity",
         "expansion-command-helper",
     )
-    options("skip-minimize", "keep-kotlin-module")
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
@@ -32,7 +32,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":project:common"))
-
+    api(project(":project:common"))
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
 }

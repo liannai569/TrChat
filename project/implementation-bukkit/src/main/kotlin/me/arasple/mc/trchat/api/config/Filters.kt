@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.api.config
 
-import me.arasple.mc.trchat.module.display.filter.ChatFilter
+import me.arasple.mc.trchat.module.internal.filter.ChatFilter
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform

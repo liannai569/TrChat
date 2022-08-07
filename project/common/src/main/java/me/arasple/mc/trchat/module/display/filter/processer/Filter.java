@@ -70,13 +70,6 @@ public class Filter {
     }
 
     public static FilteredObject doFilter(String src) {
-        return doFilter(src, true);
-    }
-
-    public static FilteredObject doFilter(String src, boolean filter) {
-        if (!filter) {
-            return new FilteredObject(src, 0);
-        }
         char[] chs = src.toCharArray();
         int length = chs.length, curr, curry, k, count = 0;
         WordNode node;

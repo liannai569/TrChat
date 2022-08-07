@@ -36,7 +36,7 @@ taboolib {
         "expansion-command-helper",
         "expansion-javascript"
     )
-    options("skip-minimize", "keep-kotlin-module")
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolibVersion
 }
@@ -50,12 +50,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly(project(":project:common"))
+    api(project(":project:common"))
 
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.1")
 
-    compileOnly("ink.ptms.core:v11900:11900:mapped")
-    compileOnly("ink.ptms.core:v11900:11900:universal")
+    compileOnly("ink.ptms.core:v11901:11901:mapped")
+    compileOnly("ink.ptms.core:v11901:11901:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
 
@@ -63,4 +63,11 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.1") { isTransitive = false }
 
     compileOnly(fileTree("libs"))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
 }

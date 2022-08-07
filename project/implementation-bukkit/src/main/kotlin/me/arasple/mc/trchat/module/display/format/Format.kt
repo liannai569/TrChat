@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.display.format
 
-import me.arasple.mc.trchat.module.display.format.part.Group
 import me.arasple.mc.trchat.module.internal.script.Condition
 
 /**

@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.module.display.format.part.json
+package me.arasple.mc.trchat.module.display.format.obj
 
 import me.arasple.mc.trchat.module.internal.script.Condition
 import me.arasple.mc.trchat.util.Regexs
@@ -8,6 +8,7 @@ import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.util.replaceWithOrder
+import taboolib.common.util.unsafeLazy
 import taboolib.platform.compat.replacePlaceholder
 
 /**
@@ -16,7 +17,7 @@ import taboolib.platform.compat.replacePlaceholder
  */
 class Text(val content: String, val condition: Condition?) {
 
-    val dynamic by lazy { Regexs.containsPlaceholder(content) }
+    val dynamic by unsafeLazy { Regexs.containsPlaceholder(content) }
 
     fun process(sender: CommandSender, vararg vars: String, message: String = ""): TextComponent.Builder {
         val text = if (!dynamic || sender !is Player) {

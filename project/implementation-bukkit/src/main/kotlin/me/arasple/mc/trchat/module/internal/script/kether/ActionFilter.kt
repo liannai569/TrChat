@@ -22,7 +22,7 @@ class ActionFilter {
             frame.newFrame(action).run<String>().thenAccept {
                 string = it
             }
-            return CompletableFuture.completedFuture(TrChat.api().filter(string).sensitiveWords > 0)
+            return CompletableFuture.completedFuture(TrChat.api().getFilterManager().filter(string).sensitiveWords > 0)
         }
 
     }
@@ -34,7 +34,7 @@ class ActionFilter {
             frame.newFrame(action).run<String>().thenAccept {
                 string = it
             }
-            return CompletableFuture.completedFuture(TrChat.api().filter(string).filtered)
+            return CompletableFuture.completedFuture(TrChat.api().getFilterManager().filter(string).filtered)
         }
 
     }

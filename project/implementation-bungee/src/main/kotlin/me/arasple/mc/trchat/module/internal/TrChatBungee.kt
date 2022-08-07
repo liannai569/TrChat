@@ -11,7 +11,6 @@ import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
 import taboolib.common.platform.function.server
 import taboolib.module.lang.sendLang
-import taboolib.platform.BungeePlugin
 
 /**
  * @author Arasple
@@ -19,8 +18,6 @@ import taboolib.platform.BungeePlugin
  */
 @PlatformSide([Platform.BUNGEE])
 object TrChatBungee : Plugin() {
-
-    val plugin by lazy { BungeePlugin.getInstance() }
 
     const val TRCHAT_CHANNEL = "trchat:main"
 

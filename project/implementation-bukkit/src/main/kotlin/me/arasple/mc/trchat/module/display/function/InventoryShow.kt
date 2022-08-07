@@ -12,10 +12,10 @@ import org.bukkit.inventory.ItemStack
 import taboolib.common.io.digest
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
 import taboolib.common.util.replaceWithOrder
 import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer

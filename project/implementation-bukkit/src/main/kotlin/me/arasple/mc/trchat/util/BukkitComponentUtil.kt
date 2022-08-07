@@ -17,9 +17,10 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.inventory.meta.ItemMeta
-import taboolib.common.reflect.Reflex.Companion.invokeConstructor
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
-import taboolib.common.reflect.Reflex.Companion.setProperty
+import taboolib.common.util.unsafeLazy
+import taboolib.library.reflex.Reflex.Companion.invokeConstructor
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
+import taboolib.library.reflex.Reflex.Companion.setProperty
 import taboolib.module.nms.getI18nName
 import taboolib.module.nms.nmsClass
 import taboolib.platform.util.isNotAir
@@ -30,11 +31,11 @@ import taboolib.platform.util.modifyMeta
  * @since 2022/6/19 10:16
  */
 
-private val classNBTTagCompound by lazy {
+private val classNBTTagCompound by unsafeLazy {
     nmsClass("NBTTagCompound")
 }
 
-private val LEGACY_SERIALIZER by lazy {
+private val LEGACY_SERIALIZER by unsafeLazy {
     val serializer = if (TrChatBukkit.paperEnv) {
         PaperComponents.legacySectionSerializer()
     } else {
@@ -47,7 +48,7 @@ private val LEGACY_SERIALIZER by lazy {
     }
 }
 
-private val GSON_SERIALIZER by lazy {
+private val GSON_SERIALIZER by unsafeLazy {
     val serializer = if (TrChatBukkit.paperEnv) {
         PaperComponents.gsonSerializer()
     } else {
@@ -72,10 +73,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     var newItem = item.optimizeShulkerBox()
     newItem = NMS.INSTANCE.optimizeNBT(newItem)
     newItem = HookPlugin.getEcoEnchants().displayItem(newItem, player)
-    if (TrChatBukkit.paperEnv) {
-        return hoverEvent(newItem.asHoverEvent())
-    }
-    val nmsItemStack = TrChatBukkit.classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, fixed = true)!!
+    val nmsItemStack = TrChatBukkit.classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, isStatic = true)!!
     val nmsNBTTabCompound = classNBTTagCompound.invokeConstructor()
     val itemJson = nmsItemStack.invokeMethod<Any>("save", nmsNBTTabCompound)!!
     val id = itemJson.invokeMethod<String>("getString", "id") ?: "minecraft:air"
@@ -83,7 +81,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     return hoverEvent(HoverEvent.showItem(Key.key(id), newItem.amount, BinaryTagHolder.binaryTagHolder(tag)))
 }
 
-@Suppress("Deprecation", "USELESS_ELVIS")
+@Suppress("Deprecation")
 private fun ItemStack.optimizeShulkerBox(): ItemStack {
     try {
         if (!type.name.endsWith("SHULKER_BOX")) {

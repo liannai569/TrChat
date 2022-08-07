@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.api.nms
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import taboolib.common.util.unsafeLazy
 import taboolib.module.chat.TellrawJson
 import taboolib.module.nms.nmsProxy
 
@@ -29,6 +30,6 @@ abstract class NMS {
 
     companion object {
 
-        val INSTANCE by lazy { nmsProxy<NMS>() }
+        val INSTANCE by unsafeLazy { nmsProxy<NMS>() }
     }
 }

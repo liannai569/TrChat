@@ -1,13 +1,9 @@
 package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.*
-import me.arasple.mc.trchat.module.display.filter.processer.Filter
-import me.arasple.mc.trchat.module.display.filter.processer.FilteredObject
-import me.arasple.mc.trchat.module.internal.service.Metrics
 import taboolib.common.platform.Awake
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.ProxyCommandSender
-import taboolib.common.platform.ProxyPlayer
 import taboolib.common5.mirrorNow
 import taboolib.library.kether.LocalizedException
 import taboolib.module.kether.KetherShell
@@ -36,20 +32,8 @@ object DefaultTrChatAPI : TrChatAPI {
         return PlatformFactory.getAPI()
     }
 
-    override fun filter(string: String, execute: Boolean): FilteredObject {
-        return mirrorNow("Handler:DoFilter") {
-            Filter.doFilter(string, execute).also {
-                Metrics.increase(1, it.sensitiveWords)
-            }
-        }
-    }
-
-    override fun filterString(player: ProxyPlayer, string: String, execute: Boolean): FilteredObject {
-        return if (execute) {
-            filter(string, !player.hasPermission("trchat.bypass.filter"))
-        } else {
-            FilteredObject(string, 0)
-        }
+    override fun getFilterManager(): FilterManager {
+        return PlatformFactory.getAPI()
     }
 
     override fun eval(sender: ProxyCommandSender, script: String, vararg vars: Pair<String, Any?>): CompletableFuture<Any?> {

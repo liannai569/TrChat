@@ -15,7 +15,7 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.module.nms.MinecraftVersion.majorLegacy
 import taboolib.module.nms.PacketSendEvent
 
@@ -103,7 +103,7 @@ object NMSListener {
 
     private fun filterComponent(component: BaseComponent): BaseComponent {
         if (component is TextComponent && component.text.isNotEmpty()) {
-            component.text = TrChat.api().filter(component.text).filtered
+            component.text = TrChat.api().getFilterManager().filter(component.text).filtered
         }
         if (!component.extra.isNullOrEmpty()) {
             component.extra = component.extra.map { filterComponent(it) }

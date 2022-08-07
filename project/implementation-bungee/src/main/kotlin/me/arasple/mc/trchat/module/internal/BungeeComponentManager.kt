@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
+import taboolib.platform.util.bungeePlugin
 
 /**
  * @author wlys
@@ -27,7 +28,7 @@ object BungeeComponentManager : ComponentManager {
     }
 
     override fun init() {
-        adventure = BungeeAudiences.create(TrChatBungee.plugin)
+        adventure = BungeeAudiences.create(bungeePlugin)
     }
 
     override fun release() {

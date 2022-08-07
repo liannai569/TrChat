@@ -4,8 +4,8 @@ import me.arasple.mc.trchat.BukkitEnv
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.conf.Loader
-import me.arasple.mc.trchat.module.display.filter.ChatFilter
 import me.arasple.mc.trchat.module.internal.data.Databases
+import me.arasple.mc.trchat.module.internal.filter.ChatFilter
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
@@ -17,20 +17,18 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
+import taboolib.common.util.unsafeLazy
 import taboolib.module.kether.Kether
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion.majorLegacy
 import taboolib.module.nms.nmsClass
 import taboolib.module.nms.obcClass
-import taboolib.platform.BukkitPlugin
 
 /**
  * @author Arasple
  */
 @PlatformSide([Platform.BUKKIT])
 object TrChatBukkit : Plugin() {
-
-    val plugin by lazy { BukkitPlugin.getInstance() }
 
     var paperEnv = false
         private set
@@ -39,11 +37,11 @@ object TrChatBukkit : Plugin() {
 
     val reportedErrors = mutableListOf<String>()
 
-    val classCraftItemStack by lazy {
+    val classCraftItemStack by unsafeLazy {
         obcClass("inventory.CraftItemStack")
     }
 
-    val classChatSerializer by lazy {
+    val classChatSerializer by unsafeLazy {
         nmsClass("IChatBaseComponent\$ChatSerializer")
     }
 
@@ -89,5 +87,6 @@ object TrChatBukkit : Plugin() {
         if (!paperEnv) {
             BukkitComponentManager.release()
         }
+        BukkitProxyManager.processor?.close()
     }
 }

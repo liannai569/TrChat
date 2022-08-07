@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.conf
 
 import me.arasple.mc.trchat.ChannelManager
 import me.arasple.mc.trchat.module.internal.BungeeProxyManager
-import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.print
 import net.md_5.bungee.api.ProxyServer
 import taboolib.common.io.newFile
@@ -13,6 +12,8 @@ import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.server
+import taboolib.common.util.unsafeLazy
+import taboolib.common5.FileWatcher
 import taboolib.module.lang.sendLang
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -28,7 +29,7 @@ object BungeeChannelManager : ChannelManager {
         PlatformFactory.registerAPI<ChannelManager>(this)
     }
 
-    private val folder by lazy {
+    private val folder by unsafeLazy {
         val folder = File(getDataFolder(), "channels")
 
         if (!folder.exists()) {
@@ -51,7 +52,7 @@ object BungeeChannelManager : ChannelManager {
 
             filterChannelFiles(folder).forEach {
                 val id = it.nameWithoutExtension
-                if (FileListener.isListening(it)) {
+                if (FileWatcher.INSTANCE.hasListener(it)) {
                     try {
                         val channel = it.readText()
                         channels[id] = channel
@@ -61,7 +62,7 @@ object BungeeChannelManager : ChannelManager {
                         t.print("Channel file ${it.name} loaded failed!")
                     }
                 } else {
-                    FileListener.listen(it, runFirst = true) {
+                    FileWatcher.INSTANCE.addSimpleListener(it, {
                         try {
                             val channel = it.readText()
                             channels[id] = channel
@@ -70,7 +71,7 @@ object BungeeChannelManager : ChannelManager {
                         } catch (t: Throwable) {
                             t.print("Channel file ${it.name} loaded failed!")
                         }
-                    }
+                    }, true)
                 }
             }
         }.let {

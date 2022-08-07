@@ -27,7 +27,7 @@ object MenuControlPanel {
     fun displayFor(player: Player) {
         player.openMenu<Linked<Player>>("TrChat Control Panel") {
             rows(6)
-            slots(inventoryCenterSlots)
+            slots(Slots.CENTER)
             elements { onlinePlayers }
             setPreviousPage(47) { _, hasPreviousPage ->
                 if (hasPreviousPage) {

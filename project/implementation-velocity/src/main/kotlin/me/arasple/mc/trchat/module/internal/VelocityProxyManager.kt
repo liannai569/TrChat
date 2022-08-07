@@ -8,6 +8,7 @@ import me.arasple.mc.trchat.util.print
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.submit
 import java.io.IOException
@@ -26,10 +27,12 @@ object VelocityProxyManager : ProxyManager {
         PlatformFactory.registerAPI<ProxyManager>(this)
         incoming = MinecraftChannelIdentifier.from("trchat:proxy")
         outgoing = MinecraftChannelIdentifier.from("trchat:server")
-        submit(period = 60, async = true) {
-            TrChatVelocity.plugin.server.allServers.forEach { server ->
-                sendTrChatMessage(server, "PlayerList", onlinePlayers().joinToString(", ") { it.name })
-            }
+    }
+
+    @Schedule(async = true, period = 60)
+    fun sendPlayerList() {
+        TrChatVelocity.plugin.server.allServers.forEach { server ->
+            sendTrChatMessage(server, "PlayerList", onlinePlayers().joinToString(", ") { it.name }, async = false)
         }
     }
 

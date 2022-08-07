@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.conf
 import me.arasple.mc.trchat.ChannelManager
 import me.arasple.mc.trchat.module.internal.TrChatVelocity
 import me.arasple.mc.trchat.module.internal.VelocityProxyManager
-import me.arasple.mc.trchat.util.FileListener
 import me.arasple.mc.trchat.util.print
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
@@ -12,6 +11,8 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
+import taboolib.common.util.unsafeLazy
+import taboolib.common5.FileWatcher
 import taboolib.module.lang.sendLang
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -27,7 +28,7 @@ object VelocityChannelManager : ChannelManager {
         PlatformFactory.registerAPI<ChannelManager>(this)
     }
 
-    private val folder by lazy {
+    private val folder by unsafeLazy {
         val folder = File(getDataFolder(), "channels")
 
         if (!folder.exists()) {
@@ -50,7 +51,7 @@ object VelocityChannelManager : ChannelManager {
 
             filterChannelFiles(folder).forEach {
                 val id = it.nameWithoutExtension
-                if (FileListener.isListening(it)) {
+                if (FileWatcher.INSTANCE.hasListener(it)) {
                     try {
                         val channel = it.readText()
                         channels[id] = channel
@@ -60,7 +61,7 @@ object VelocityChannelManager : ChannelManager {
                         t.print("Channel file ${it.name} loaded failed!")
                     }
                 } else {
-                    FileListener.listen(it, runFirst = true) {
+                    FileWatcher.INSTANCE.addSimpleListener(it, {
                         try {
                             val channel = it.readText()
                             channels[id] = channel
@@ -69,7 +70,7 @@ object VelocityChannelManager : ChannelManager {
                         } catch (t: Throwable) {
                             t.print("Channel file ${it.name} loaded failed!")
                         }
-                    }
+                    }, true)
                 }
             }
         }.let {
@@ -81,7 +82,6 @@ object VelocityChannelManager : ChannelManager {
         return channels[id]
     }
 
-    @Suppress("Deprecation")
     fun sendProxyChannel(id: String, channel: String, all: Boolean = false) {
         TrChatVelocity.plugin.server.allServers.filter {
             all || !loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
@@ -90,7 +90,6 @@ object VelocityChannelManager : ChannelManager {
         }
     }
 
-    @Suppress("Deprecation")
     fun sendAllProxyChannels(port: Int) {
         val server = TrChatVelocity.plugin.server.allServers.firstOrNull { it.serverInfo.address.port == port } ?: return
         channels.forEach {

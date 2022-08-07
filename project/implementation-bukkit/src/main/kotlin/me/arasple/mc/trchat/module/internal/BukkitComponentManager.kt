@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import taboolib.common.platform.*
+import taboolib.platform.util.bukkitPlugin
 import java.util.*
 
 /**
@@ -37,7 +38,7 @@ object BukkitComponentManager : ComponentManager {
     }
 
     override fun init() {
-        adventure = BukkitAudiences.create(TrChatBukkit.plugin)
+        adventure = BukkitAudiences.create(bukkitPlugin)
     }
 
     override fun release() {
@@ -47,7 +48,7 @@ object BukkitComponentManager : ComponentManager {
     override fun filterComponent(component: Component?, maxLength: Int): Component? {
         component ?: return null
         val newComponent = if (component is TextComponent && component.content().isNotEmpty()) {
-            component.content(TrChat.api().filter(component.content()).filtered)
+            component.content(TrChat.api().getFilterManager().filter(component.content()).filtered)
         } else {
             component
         }

@@ -10,7 +10,7 @@ import me.arasple.mc.trchat.util.gson
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.flattener.ComponentFlattener
 import org.bukkit.entity.Player
-import taboolib.common.reflect.Reflex.Companion.invokeMethod
+import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.module.nms.Packet
 import taboolib.module.nms.sendPacket
 import java.util.*
@@ -85,7 +85,7 @@ class ChatSession(
         private fun Packet.toMessage(): String? {
             return kotlin.runCatching {
                 val component = if (!TrChatBukkit.paperEnv) {
-                    val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, fixed = true)!!
+                    val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, isStatic = true)!!
                     gson(json)
                 } else {
                     read<Component>("adventure\$message")!!

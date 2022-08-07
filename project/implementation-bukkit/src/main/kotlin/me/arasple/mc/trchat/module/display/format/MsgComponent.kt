@@ -1,7 +1,8 @@
 package me.arasple.mc.trchat.module.display.format
 
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.module.display.format.part.json.*
+import me.arasple.mc.trchat.module.display.format.obj.Style
+import me.arasple.mc.trchat.module.display.format.obj.Style.Companion.applyTo
 import me.arasple.mc.trchat.module.display.function.*
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.script.Condition
@@ -22,16 +23,7 @@ import taboolib.common5.mirrorNow
  * @author wlys
  * @since 2021/12/12 13:46
  */
-class MsgComponent(
-    val defaultColor: List<Pair<CustomColor, Condition?>>,
-    hover: Hover?,
-    suggest: List<Suggest>?,
-    command: List<Command>?,
-    url: List<Url>?,
-    insertion: List<Insertion>?,
-    copy: List<Copy>?,
-    font: List<Font>?
-) : JsonComponent(null, hover, suggest, command, url, insertion, copy, font) {
+class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style: List<Style>) : JsonComponent(null, style) {
 
     fun serialize(sender: CommandSender, msg: String, disabledFunctions: List<String>, forward: Boolean): TextComponent {
         val component = Component.text()
@@ -107,13 +99,9 @@ class MsgComponent(
             val builder = legacy(message).toBuilder()
             val originMessage = builder.content()
 
-            hover?.process(builder, sender, *vars, message = originMessage)
-            suggest?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
-            command?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
-            url?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
-            insertion?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
-            copy?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
-            font?.firstOrNull { it.condition.pass(sender) }?.process(builder, sender, *vars, message = originMessage)
+            style.forEach {
+                it.applyTo(builder, sender, *vars, message = originMessage)
+            }
 
             builder.build()
         }
@@ -124,7 +112,7 @@ class MsgComponent(
         private val parser = VariableReader()
 
         private fun Player.passPermission(permission: String?): Boolean {
-            return permission == null || permission == "null" || hasPermission(permission)
+            return permission == null || permission.equals("null", ignoreCase = true) || hasPermission(permission)
         }
 
     }

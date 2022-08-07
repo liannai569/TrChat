@@ -77,7 +77,7 @@ class PrivateChannel(
             player.sendLang("Channel-No-Speak-Permission")
             return null
         }
-        if (settings.filterBeforeSending && TrChat.api().filter(message).sensitiveWords > 0) {
+        if (settings.filterBeforeSending && TrChat.api().getFilterManager().filter(message).sensitiveWords > 0) {
             player.sendLang("Channel-Bad-Language")
             return null
         }

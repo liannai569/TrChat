@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.module.internal.hook
 import me.arasple.mc.trchat.util.Internal
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
+import taboolib.common.util.unsafeLazy
 
 /**
  * @author Arasple
@@ -11,13 +12,13 @@ import org.bukkit.plugin.Plugin
 @Internal
 abstract class HookAbstract {
 
-    open val name by lazy { getPluginName() }
+    open val name by unsafeLazy { getPluginName() }
 
-    val plugin: Plugin? by lazy {
+    val plugin: Plugin? by unsafeLazy {
         Bukkit.getPluginManager().getPlugin(name)
     }
 
-    val isHooked by lazy {
+    val isHooked by unsafeLazy {
         plugin != null && plugin!!.isEnabled
     }
 

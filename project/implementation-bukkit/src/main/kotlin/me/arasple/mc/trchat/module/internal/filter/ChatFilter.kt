@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.module.display.filter
+package me.arasple.mc.trchat.module.internal.filter
 
 import me.arasple.mc.trchat.api.config.Filters
 import me.arasple.mc.trchat.module.display.filter.processer.Filter

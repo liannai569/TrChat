@@ -5,15 +5,15 @@ plugins {
 }
 
 dependencies {
-    implementation("com.eatthepath:fast-uuid:0.2.0")
-    implementation("net.kyori:adventure-api:4.11.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.1.1")
-    implementation("net.kyori:adventure-platform-bungeecord:4.1.1")
     implementation(project(":project:common"))
     implementation(project(":project:implementation-common"))
     implementation(project(":project:implementation-bukkit"))
     implementation(project(":project:implementation-bungee"))
-//    implementation(project(":project:implementation-velocity"))
+    implementation(project(":project:implementation-velocity"))
+    implementation("com.eatthepath:fast-uuid:0.2.0")
+    implementation("net.kyori:adventure-api:4.11.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.1.1")
+    implementation("net.kyori:adventure-platform-bungeecord:4.1.1")
 }
 
 tasks {
@@ -25,6 +25,7 @@ tasks {
         relocate("com.eatthepath.uuid", "me.arasple.mc.trchat.library.uuid")
         relocate("net.kyori.adventure", "me.arasple.mc.trchat.library.adventure")
         relocate("net.kyori.examination", "me.arasple.mc.trchat.library.examination")
+        relocate("taboolib", "me.arasple.mc.trchat.taboolib")
     }
     build {
         dependsOn(shadowJar)

@@ -9,6 +9,7 @@ import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.command
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
+import taboolib.common.util.unsafeLazy
 import taboolib.module.lang.sendLang
 import taboolib.platform.VelocityPlugin
 
@@ -22,7 +23,7 @@ import taboolib.platform.VelocityPlugin
 @PlatformSide([Platform.VELOCITY])
 object TrChatVelocity : Plugin() {
 
-    val plugin by lazy { VelocityPlugin.getInstance() }
+    val plugin by unsafeLazy { VelocityPlugin.getInstance() }
 
     override fun onLoad() {
         console().sendLang("Plugin-Loading", plugin.server.version.version)

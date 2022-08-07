@@ -32,7 +32,7 @@ object ListenerSignChange {
                     line = MessageColors.replaceWithPermission(p, line ?: "", MessageColors.Type.SIGN)
                 }
                 if (Filters.CONF.getBoolean("Enable.Sign")) {
-                    TrChat.api().filterString(adaptPlayer(p), line).filtered
+                    TrChat.api().getFilterManager().filter(line, player = adaptPlayer(p)).filtered
                 } else {
                     line
                 }

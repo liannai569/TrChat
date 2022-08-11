@@ -17,12 +17,9 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
-import taboolib.common.util.unsafeLazy
 import taboolib.module.kether.Kether
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion.majorLegacy
-import taboolib.module.nms.nmsClass
-import taboolib.module.nms.obcClass
 
 /**
  * @author Arasple
@@ -36,14 +33,6 @@ object TrChatBukkit : Plugin() {
     var isGlobalMuting = false
 
     val reportedErrors = mutableListOf<String>()
-
-    val classCraftItemStack by unsafeLazy {
-        obcClass("inventory.CraftItemStack")
-    }
-
-    val classChatSerializer by unsafeLazy {
-        nmsClass("IChatBaseComponent\$ChatSerializer")
-    }
 
     @Awake
     fun loadDependency() {

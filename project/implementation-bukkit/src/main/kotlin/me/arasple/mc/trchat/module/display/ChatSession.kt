@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.module.display
 import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
+import me.arasple.mc.trchat.util.classChatSerializer
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.getDataContainer
@@ -85,7 +86,7 @@ class ChatSession(
         private fun Packet.toMessage(): String? {
             return kotlin.runCatching {
                 val component = if (!TrChatBukkit.paperEnv) {
-                    val json = TrChatBukkit.classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, isStatic = true)!!
+                    val json = classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, isStatic = true)!!
                     gson(json)
                 } else {
                     read<Component>("adventure\$message")!!

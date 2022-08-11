@@ -19,7 +19,7 @@ Plugin-Updater-Header:
   - '&3--------------------------------------------------'
   - '&7▪ &3TrChat &aUpdate Notify &8{0} &7➦ &8{1}'
 Plugin-Updater-Footer:
-  - '&7▪ &2Github: &a&nhttps://github.com/FlickerProjects/TrChat/releases'
+  - '&7▪ &2Github: &a&nhttps://github.com/TrPlugins/TrChat/releases'
   - '&3--------------------------------------------------'
 Plugin-Debug-On:
   - type: title

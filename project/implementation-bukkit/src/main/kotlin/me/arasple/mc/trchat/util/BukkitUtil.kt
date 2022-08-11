@@ -13,13 +13,22 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageRecipient
+import taboolib.common.util.unsafeLazy
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.nms.nmsClass
+import taboolib.module.nms.obcClass
 import taboolib.platform.util.sendLang
 
 /**
  * @author wlys
  * @since 2022/6/8 12:48
  */
+val classCraftItemStack = obcClass("inventory.CraftItemStack")
+
+val classChatSerializer by unsafeLazy {
+    nmsClass("IChatBaseComponent\$ChatSerializer")
+}
+
 fun String.toCondition() = Condition(this)
 
 fun Condition?.pass(commandSender: CommandSender): Boolean {

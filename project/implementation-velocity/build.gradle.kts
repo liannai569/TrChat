@@ -1,7 +1,7 @@
 val taboolibVersion: String by project
 
 plugins {
-    id("io.izzel.taboolib") version "1.40"
+    id("io.izzel.taboolib") version "1.42"
 }
 
 taboolib {
@@ -22,7 +22,7 @@ taboolib {
         "platform-velocity",
         "expansion-command-helper",
     )
-    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
+    options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion
 }

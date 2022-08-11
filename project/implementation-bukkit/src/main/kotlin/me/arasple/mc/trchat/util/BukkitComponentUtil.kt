@@ -73,7 +73,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     var newItem = item.optimizeShulkerBox()
     newItem = NMS.INSTANCE.optimizeNBT(newItem)
     newItem = HookPlugin.getEcoEnchants().displayItem(newItem, player)
-    val nmsItemStack = TrChatBukkit.classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, isStatic = true)!!
+    val nmsItemStack = classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, isStatic = true)!!
     val nmsNBTTabCompound = classNBTTagCompound.invokeConstructor()
     val itemJson = nmsItemStack.invokeMethod<Any>("save", nmsNBTTabCompound)!!
     val id = itemJson.invokeMethod<String>("getString", "id") ?: "minecraft:air"
@@ -81,7 +81,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     return hoverEvent(HoverEvent.showItem(Key.key(id), newItem.amount, BinaryTagHolder.binaryTagHolder(tag)))
 }
 
-@Suppress("Deprecation")
+@Suppress("Deprecation", "USELESS_ELVIS")
 private fun ItemStack.optimizeShulkerBox(): ItemStack {
     try {
         if (!type.name.endsWith("SHULKER_BOX")) {

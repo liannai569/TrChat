@@ -2,11 +2,9 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.ComponentManager
 import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
-import me.arasple.mc.trchat.util.Internal
-import me.arasple.mc.trchat.util.data
-import me.arasple.mc.trchat.util.gson
-import me.arasple.mc.trchat.util.toUUID
+import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -86,7 +84,9 @@ object BukkitComponentManager : ComponentManager {
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
             return
         }
-        if (TrChatBukkit.paperEnv) {
+        if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
+            commandSender.sendMessage(legacy(component))
+        } else if (TrChatBukkit.paperEnv) {
             commandSender.sendMessage(component, MessageType.SYSTEM)
         } else {
             getAudienceProvider().sender(commandSender).sendMessage(component, MessageType.SYSTEM)
@@ -114,7 +114,9 @@ object BukkitComponentManager : ComponentManager {
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
             return
         }
-        if (TrChatBukkit.paperEnv) {
+        if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
+            commandSender.sendMessage(legacy(component))
+        } else if (TrChatBukkit.paperEnv) {
             commandSender.sendMessage(identity, component, MessageType.CHAT)
         } else {
             getAudienceProvider().sender(commandSender).sendMessage(identity, component, MessageType.CHAT)

@@ -54,8 +54,8 @@ dependencies {
 
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.1")
 
-    compileOnly("ink.ptms.core:v11901:11901:mapped")
-    compileOnly("ink.ptms.core:v11901:11901:universal")
+    compileOnly("ink.ptms.core:v11902:11902:mapped")
+    compileOnly("ink.ptms.core:v11902:11902:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
 

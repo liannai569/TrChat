@@ -27,15 +27,21 @@ import taboolib.module.nms.PacketSendEvent
 @PlatformSide([Platform.BUKKIT])
 object NMSListener {
 
+    @SubscribeEvent
+    fun secure(e: PacketSendEvent) {
+        if (majorLegacy >= 11902 && e.packet.name == "ClientboundServerDataPacket") {
+            e.packet.write("enforcesSecureChat", true)
+        }
+    }
+
     @SubscribeEvent(EventPriority.LOWEST)
-    fun e(e: PacketSendEvent) {
+    fun filter(e: PacketSendEvent) {
         val session = e.player.session
         val data = e.player.data
         // Chat Filter
         when (e.packet.name) {
             "ClientboundPlayerChatPacket" -> {
                 // TODO: 1.19 聊天过滤
-                return
             }
             "PacketPlayOutChat" -> {
                 if (Settings.CONF.getString("Options.Send-Message-Method", "CHAT")?.uppercase() == "CHAT") {
@@ -59,7 +65,6 @@ object NMSListener {
                 } else {
                     e.packet.write("adventure\$message", BukkitComponentManager.filterComponent(e.packet.read<Component>("adventure\$message"), 32000))
                 }
-                return
             }
             "PacketPlayOutWindowItems" -> {
                 if (!Filters.CONF.getBoolean("Enable.Item") || !data.isFilterEnabled) {
@@ -70,7 +75,6 @@ object NMSListener {
                 } else {
                     NMS.INSTANCE.filterItemList(e.packet.read<Any>("b"))
                 }
-                return
             }
             "PacketPlayOutSetSlot" -> {
                 if (!Filters.CONF.getBoolean("Enable.Item") || !data.isFilterEnabled) {
@@ -81,24 +85,8 @@ object NMSListener {
                 } else {
                     NMS.INSTANCE.filterItem(e.packet.read<Any>("c"))
                 }
-                return
             }
         }
-        // Tab Complete
-//        if (TrChatFiles.settings.getBoolean("GENERAL.PREVENT-TAB-COMPLETE", false)
-//            && e.packet.name == "PacketPlayOutTabComplete"
-//            && !e.player.hasPermission("trchat.bypass.tabcomplete")) {
-//            if (majorLegacy >= 11700) {
-//                e.isCancelled = (e.packet.read<Suggestions>("suggestions") ?: Suggestions.empty().get())
-//                    .list.none { Bukkit.getPlayerExact(it.text) != null }
-//            } else if (majorLegacy >= 11300) {
-//                e.isCancelled = (e.packet.read<Suggestions>("b") ?: Suggestions.empty().get())
-//                    .list.none { Bukkit.getPlayerExact(it.text) != null }
-//            } else {
-//                e.isCancelled = listOf(*e.packet.read<Array<String>>("a") ?: emptyArray())
-//                    .none { Bukkit.getPlayerExact(it) != null }
-//            }
-//        }
     }
 
     private fun filterComponent(component: BaseComponent): BaseComponent {

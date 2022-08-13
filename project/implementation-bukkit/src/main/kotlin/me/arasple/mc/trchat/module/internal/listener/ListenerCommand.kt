@@ -21,7 +21,7 @@ import taboolib.platform.util.sendLang
 @PlatformSide([Platform.BUKKIT])
 object ListenerCommand {
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @SubscribeEvent(priority = EventPriority.LOWEST, ignoreCancelled = true)
     fun onCommand(e: PlayerCommandPreprocessEvent) {
         val player = e.player
         var cmd = e.message.removePrefix("/").trimIndent()

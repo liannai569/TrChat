@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.api.config
+package me.arasple.mc.trchat.module.conf.file
 
 import me.arasple.mc.trchat.module.internal.filter.ChatFilter
 import taboolib.common.LifeCycle

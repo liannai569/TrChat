@@ -91,7 +91,7 @@ class PrivateChannel(
             return null
         }
         val session = player.session
-        val event = TrChatEvent(this, session, message, !forward)
+        val event = TrChatEvent(this, session, message, forward)
         if (!event.call()) {
             return null
         }

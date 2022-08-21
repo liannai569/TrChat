@@ -16,25 +16,13 @@ import taboolib.module.nms.PacketReceiveEvent
 @PlatformSide([Platform.BUKKIT])
 object ChatPreview {
 
-//    val processingQueries = ConcurrentHashMap<Int, Pair<Player, String>>()
-
     @SubscribeEvent
     fun onReceive(e: PacketReceiveEvent) {
         if (e.packet.name == "ServerboundChatPreviewPacket") {
             val queryId = e.packet.source.invokeMethod<Int>("queryId")!!
             val query = e.packet.source.invokeMethod<String>("query")!!
-//            processingQueries[queryId] = e.player to query
             NMS.INSTANCE.sendChatPreview(e.player, queryId, query)
         }
     }
 
-//    @SubscribeEvent
-//    fun onSend(e: PacketSendEvent) {
-//        if (e.packet.name == "ClientboundChatPreviewPacket") {
-//            val (player, message) = processingQueries[e.packet.source.invokeMethod<Int>("queryId")!!] ?: return
-//            val component = player.session.channel?.execute(player, message, forward = false)?.first ?: return
-//            val iChatBaseComponent = TrChatAPI.classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), fixed = true) ?: return
-//            e.packet.write("preview", iChatBaseComponent)
-//        }
-//    }
 }

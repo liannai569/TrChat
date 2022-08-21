@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.data
 
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.print
 import org.bukkit.entity.Player

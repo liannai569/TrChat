@@ -18,12 +18,12 @@ import org.bukkit.inventory.ItemStack
 class HookInteractiveChat : HookAbstract() {
 
     fun sendMessage(receiver: CommandSender, component: Component): Boolean {
-         return if (isHooked) {
-             InteractiveChatAPI.sendMessage(receiver, InteractiveChatComponentSerializer.gson().deserialize(gson(component)))
+        return if (isHooked) {
+            InteractiveChatAPI.sendMessage(receiver, InteractiveChatComponentSerializer.gson().deserialize(gson(component)))
             true
         } else {
             false
-         }
+        }
     }
 
     fun createItemDisplayComponent(player: Player, item: ItemStack): Component? {

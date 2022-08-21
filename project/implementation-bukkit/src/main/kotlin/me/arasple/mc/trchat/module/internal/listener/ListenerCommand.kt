@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.api.config.Functions
+import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.toCondition
 import org.bukkit.Bukkit

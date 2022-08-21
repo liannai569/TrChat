@@ -1,8 +1,8 @@
 package me.arasple.mc.trchat.module.display.channel
 
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.api.event.TrChatEvent
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
@@ -134,7 +134,7 @@ open class Channel(
             player.sendLang("Channel-Bad-Language")
             return null
         }
-        val event = TrChatEvent(this, player.session, message, !forward)
+        val event = TrChatEvent(this, player.session, message, forward)
         if (!event.call()) {
             return null
         }

@@ -1,9 +1,9 @@
 package me.arasple.mc.trchat.module.internal.command
 
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.api.config.Filters
-import me.arasple.mc.trchat.api.config.Functions
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Filters
+import me.arasple.mc.trchat.module.conf.file.Functions
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.menu.MenuControlPanel
 import me.arasple.mc.trchat.module.display.menu.MenuFilterControl
 import me.arasple.mc.trchat.module.internal.command.sub.CommandColor

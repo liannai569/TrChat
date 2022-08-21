@@ -37,6 +37,17 @@ tasks.build {
         val fileShaded = file("${pluginShaded.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-shaded-$version-shaded.jar") }
 
         fileShaded?.copyTo(file("$buildDir/libs/${project.name}-$version-shaded.jar"), true)
+
+        val ver = file("$buildDir/libs/版本说明 Versions.txt")
+        ver.createNewFile()
+        ver.writeText("""
+            1.16.5及以上的paper或分支: 必须使用普通版本
+            其他情况下二者皆可
+            若低版本与其他插件依赖冲突, 使用shaded版本
+            
+            paper and its forks above 1.16.5: must use common version.
+            if conflict occurred with other plugins in lower minecraft versions, use shaded version.
+        """.trimIndent())
     }
     dependsOn(project(":plugin").tasks.build, project(":plugin-shaded").tasks.build)
 }

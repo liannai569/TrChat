@@ -1,16 +1,16 @@
 package me.arasple.mc.trchat.util
 
 import io.papermc.paper.text.PaperComponents
-import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.api.BinaryTagHolder
-import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
@@ -20,7 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import taboolib.common.util.unsafeLazy
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.library.reflex.Reflex.Companion.invokeMethod
-import taboolib.library.reflex.Reflex.Companion.setProperty
+import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.getI18nName
 import taboolib.module.nms.nmsClass
 import taboolib.platform.util.isNotAir
@@ -31,33 +31,26 @@ import taboolib.platform.util.modifyMeta
  * @since 2022/6/19 10:16
  */
 
-private val classNBTTagCompound by unsafeLazy {
-    nmsClass("NBTTagCompound")
-}
+private val classNBTTagCompound by unsafeLazy { nmsClass("NBTTagCompound") }
 
 private val LEGACY_SERIALIZER by unsafeLazy {
-    val serializer = if (TrChatBukkit.paperEnv) {
+    if (TrChatBukkit.paperEnv) {
         PaperComponents.legacySectionSerializer()
     } else {
-        BukkitComponentSerializer.legacy()
-    }
-    if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
-        serializer.toBuilder().useUnusualXRepeatedCharacterHexFormat().build()
-    } else {
-        serializer
+        LegacyComponentSerializer.builder()
+            .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
+            .build()
     }
 }
 
 private val GSON_SERIALIZER by unsafeLazy {
-    val serializer = if (TrChatBukkit.paperEnv) {
+    if (TrChatBukkit.paperEnv) {
         PaperComponents.gsonSerializer()
     } else {
-        BukkitComponentSerializer.gson()
-    }
-    if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
-        serializer.toBuilder().also { it.setProperty("downsampleColor", false) }.build()
-    } else {
-        serializer
+        GsonComponentSerializer.builder()
+            .also { if (MinecraftVersion.majorLegacy < 11600) it.emitLegacyHoverEvent() }
+            .build()
     }
 }
 

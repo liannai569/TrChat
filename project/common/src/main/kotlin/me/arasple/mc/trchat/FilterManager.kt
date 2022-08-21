@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat
 
-import me.arasple.mc.trchat.module.display.filter.processer.FilteredObject
+import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
 import taboolib.common.platform.ProxyPlayer
 
 interface FilterManager {

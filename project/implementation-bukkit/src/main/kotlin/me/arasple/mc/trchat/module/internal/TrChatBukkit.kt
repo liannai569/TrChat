@@ -2,8 +2,8 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.BukkitEnv
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.api.config.Settings
 import me.arasple.mc.trchat.module.conf.Loader
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.filter.ChatFilter
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin

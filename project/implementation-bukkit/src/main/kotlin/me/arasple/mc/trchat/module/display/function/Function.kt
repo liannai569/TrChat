@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.display.function
 
 import me.arasple.mc.trchat.module.display.format.JsonComponent
 import me.arasple.mc.trchat.module.internal.script.Condition
-import taboolib.common.util.replaceWithOrder
 
 /**
  * @author wlys
@@ -19,20 +18,21 @@ class Function(
 ) {
 
     fun apply(string: String): String {
-        return string.replaceRegex(regex, filterTextRegex, "{{${id}:{0}}}")
+        return string.replaceRegex(regex, filterTextRegex) { "{{$id:$it}}" }
     }
 
     companion object {
 
+        @JvmStatic
         val functions = mutableListOf<Function>()
 
-        fun String.replaceRegex(regex: Regex, replaceRegex: Regex?, replacement: String): String {
+        fun String.replaceRegex(regex: Regex, replaceRegex: Regex?, replacement: (String) -> String): String {
             var string = this
             regex.findAll(string).forEach {
                 val str = it.value
                 val result = replaceRegex?.find(str)?.value ?: str
-                val rep = replacement.replaceWithOrder(result)
-                string = string.replace(str, rep)
+                val rep = replacement(result)
+                string = string.replaceFirst(str, rep)
             }
             return string
         }

@@ -2,7 +2,7 @@
 
 package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.EnderChestShow
 import me.arasple.mc.trchat.module.display.function.InventoryShow

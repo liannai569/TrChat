@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.module.display.filter.processer;
+package me.arasple.mc.trchat.module.internal.filter.processer;
 
 public class BCConvert {
 

@@ -2,19 +2,18 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.ComponentManager
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.api.nms.NMS
+import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
-import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import taboolib.common.platform.*
-import taboolib.platform.util.bukkitPlugin
 import java.util.*
 
 /**
@@ -29,22 +28,7 @@ object BukkitComponentManager : ComponentManager {
         PlatformFactory.registerAPI<ComponentManager>(this)
     }
 
-    private var adventure: BukkitAudiences? = null
-
-    override fun getAudienceProvider(): BukkitAudiences {
-        return adventure!!
-    }
-
-    override fun init() {
-        adventure = BukkitAudiences.create(bukkitPlugin)
-    }
-
-    override fun release() {
-        adventure?.close()
-    }
-
-    override fun filterComponent(component: Component?, maxLength: Int): Component? {
-        component ?: return null
+    override fun filterComponent(component: Component, maxLength: Int): Component {
         val newComponent = if (component is TextComponent && component.content().isNotEmpty()) {
             component.content(TrChat.api().getFilterManager().filter(component.content()).filtered)
         } else {
@@ -52,7 +36,7 @@ object BukkitComponentManager : ComponentManager {
         }
         return validateComponent(if (newComponent.children().isNotEmpty()) {
             Component.text { builder ->
-                newComponent.children().forEach { builder.append(filterComponent(it, -1)!!) }
+                newComponent.children().forEach { builder.append(filterComponent(it, -1)) }
                 builder.style(newComponent.style())
                 if (newComponent is TextComponent) {
                     builder.content(newComponent.content())
@@ -67,7 +51,7 @@ object BukkitComponentManager : ComponentManager {
         val commandSender = when (receiver) {
             is ProxyCommandSender -> receiver.cast()
             is CommandSender -> receiver
-            else -> error("Unsupported receiver type $receiver.")
+            else -> error("Unknown receiver type $receiver.")
         }
         val identity = when (sender) {
             is ProxyPlayer -> sender.uniqueId
@@ -80,16 +64,23 @@ object BukkitComponentManager : ComponentManager {
         if (commandSender is Player && commandSender.data.ignored.contains(identity.uuid())) {
             return
         }
+        val newComponent = if (commandSender is Player && Filters.CONF.getBoolean("Enable.Chat") && commandSender.data.isFilterEnabled) {
+            TrChat.api().getComponentManager().filterComponent(component)
+        } else {
+            component
+        }
 
-        if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
+        if (HookPlugin.getInteractiveChat().sendMessage(commandSender, newComponent)) {
             return
         }
-        if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
-            commandSender.sendMessage(legacy(component))
-        } else if (TrChatBukkit.paperEnv) {
-            commandSender.sendMessage(component, MessageType.SYSTEM)
+        if (TrChatBukkit.paperEnv) {
+            commandSender.sendMessage(identity, newComponent, MessageType.SYSTEM)
         } else {
-            getAudienceProvider().sender(commandSender).sendMessage(component, MessageType.SYSTEM)
+            if (commandSender is Player) {
+                NMS.INSTANCE.sendSystemChatMessage(commandSender, newComponent, identity.uuid())
+            } else {
+                commandSender.sendMessage(legacy(newComponent))
+            }
         }
     }
 
@@ -97,7 +88,7 @@ object BukkitComponentManager : ComponentManager {
         val commandSender = when (receiver) {
             is ProxyCommandSender -> receiver.cast()
             is CommandSender -> receiver
-            else -> error("Unsupported receiver type $receiver.")
+            else -> error("Unknown receiver type $receiver.")
         }
         val identity = when (sender) {
             is ProxyPlayer -> sender.uniqueId
@@ -110,23 +101,30 @@ object BukkitComponentManager : ComponentManager {
         if (commandSender is Player && commandSender.data.ignored.contains(identity.uuid())) {
             return
         }
+        val newComponent = if (commandSender is Player && Filters.CONF.getBoolean("Enable.Chat") && commandSender.data.isFilterEnabled) {
+            TrChat.api().getComponentManager().filterComponent(component)
+        } else {
+            component
+        }
 
-        if (HookPlugin.getInteractiveChat().sendMessage(commandSender, component)) {
+        if (HookPlugin.getInteractiveChat().sendMessage(commandSender, newComponent)) {
             return
         }
-        if (Settings.CONF.getBoolean("Force-Hex-Color", false)) {
-            commandSender.sendMessage(legacy(component))
-        } else if (TrChatBukkit.paperEnv) {
-            commandSender.sendMessage(identity, component, MessageType.CHAT)
+        if (TrChatBukkit.paperEnv) {
+            commandSender.sendMessage(identity, newComponent, MessageType.CHAT)
         } else {
-            getAudienceProvider().sender(commandSender).sendMessage(identity, component, MessageType.CHAT)
+            if (commandSender is Player) {
+                NMS.INSTANCE.sendPlayerChatMessage(commandSender, newComponent, identity.uuid())
+            } else {
+                commandSender.sendMessage(legacy(newComponent))
+            }
         }
     }
 
     private fun validateComponent(component: Component, maxLength: Int): Component {
         if (maxLength <= 0) return component
         return if (gson(component).length > maxLength) {
-            Component.text("This chat component is too big.")
+            Component.text("This chat component is too big (> $maxLength).")
         } else {
             component
         }

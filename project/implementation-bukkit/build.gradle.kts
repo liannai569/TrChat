@@ -17,25 +17,24 @@ taboolib {
             name("EcoEnchants").with("bukkit").optional(true)
             name("ItemsAdder").with("bukkit").optional(true)
             name("InteractiveChat").with("bukkit").optional(true)
+            name("Multiverse-Core").loadafter(true)
         }
     }
+    install("common", "common-5")
     install(
-        "common",
-        "common-5",
         "module-chat",
         "module-configuration",
         "module-database",
-        "module-database-mongodb",
+//        "module-database-mongodb",
         "module-kether",
         "module-lang",
         "module-metrics",
         "module-nms",
         "module-nms-util",
-        "module-ui",
-        "platform-bukkit",
-        "expansion-command-helper",
-        "expansion-javascript"
+        "module-ui"
     )
+    install("platform-bukkit")
+    install("expansion-command-helper", "expansion-javascript")
     options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion
@@ -55,6 +54,7 @@ dependencies {
     compileOnly("net.kyori:adventure-platform-bukkit:4.1.1")
 
     compileOnly("ink.ptms.core:v11902:11902:mapped")
+//    compileOnly("ink.ptms.core:v11900:11900:mapped")
     compileOnly("ink.ptms.core:v11902:11902:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")

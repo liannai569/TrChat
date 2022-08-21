@@ -10,7 +10,7 @@ import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.onlinePlayers
-import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import java.io.IOException
 
 /**
@@ -41,9 +41,11 @@ object VelocityProxyManager : ProxyManager {
     }
 
     override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
-        if (recipient !is ChannelMessageSink) return false
+        if (recipient !is ChannelMessageSink) {
+            return false
+        }
         var success = true
-        submit(async = async) {
+        fun send() {
             try {
                 for (bytes in buildMessage(*args)) {
                     recipient.sendPluginMessage(outgoing, bytes)
@@ -52,6 +54,13 @@ object VelocityProxyManager : ProxyManager {
                 e.print("Failed to send proxy trchat message!")
                 success = false
             }
+        }
+        if (async) {
+            submitAsync {
+                send()
+            }
+        } else {
+            send()
         }
 
         return success

@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.conf
 
-import me.arasple.mc.trchat.api.config.Functions
+import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.channel.PrivateChannel
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings

@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.util
 
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.clip.placeholderapi.PlaceholderAPIPlugin
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide

@@ -1,8 +1,7 @@
 package me.arasple.mc.trchat.module.internal.data
 
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.internal.database.Database
-import me.arasple.mc.trchat.module.internal.database.DatabaseMongodb
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQL
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQLite
 import me.arasple.mc.trchat.util.Internal
@@ -27,7 +26,6 @@ object Databases {
         database = when (val type = Settings.CONF.getString("Database.Method")!!.uppercase()) {
             "SQLITE" -> DatabaseSQLite()
             "SQL" -> DatabaseSQL()
-            "MONGODB" -> DatabaseMongodb()
             else -> error("Unsupported database type: $type")
         }
     }

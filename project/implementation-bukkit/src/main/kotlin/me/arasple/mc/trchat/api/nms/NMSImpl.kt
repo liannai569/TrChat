@@ -4,10 +4,10 @@ import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.*
+import net.kyori.adventure.text.Component
 import net.minecraft.network.protocol.game.ClientboundChatPreviewPacket
-import net.minecraft.server.v1_16_R3.IChatBaseComponent
-import net.minecraft.server.v1_16_R3.NBTBase
-import net.minecraft.server.v1_16_R3.NBTTagCompound
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
+import net.minecraft.server.v1_16_R3.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -15,11 +15,13 @@ import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.library.reflex.Reflex.Companion.invokeMethod
 import taboolib.module.nms.MinecraftVersion.isUniversal
+import taboolib.module.nms.MinecraftVersion.majorLegacy
 import taboolib.module.nms.sendPacket
 import taboolib.platform.util.isAir
 import taboolib.platform.util.isNotAir
 import taboolib.platform.util.modifyLore
 import taboolib.platform.util.modifyMeta
+import java.util.*
 
 /**
  * @author Arasple
@@ -32,7 +34,7 @@ class NMSImpl : NMS() {
         iChat ?: return null
         return try {
             val json = classChatSerializer.invokeMethod<String>("a", iChat, isStatic = true)!!
-            val component = BukkitComponentManager.filterComponent(gson(json), 32000)!!
+            val component = BukkitComponentManager.filterComponent(gson(json), 32000)
             classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true)!!
         } catch (t: Throwable) {
             if (!TrChatBukkit.reportedErrors.contains("filterIChatComponent")) {
@@ -86,6 +88,46 @@ class NMSImpl : NMS() {
         val component = player.session.getChannel()?.execute(player, query, forward = false)?.first ?: return
         val iChatBaseComponent = classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true)
         player.sendPacket(ClientboundChatPreviewPacket::class.java.invokeConstructor(queryId, iChatBaseComponent))
+    }
+
+    override fun sendPlayerChatMessage(receiver: Player, component: Component, sender: UUID?) {
+        if (majorLegacy >= 11901) {
+            receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
+                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                false
+            ))
+        } else if (majorLegacy == 11900) {
+            receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
+                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                0
+            ))
+        } else {
+            receiver.sendPacket(PacketPlayOutChat(
+                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                ChatMessageType.CHAT,
+                sender
+            ))
+        }
+    }
+
+    override fun sendSystemChatMessage(receiver: Player, component: Component, sender: UUID?) {
+        if (majorLegacy >= 11901) {
+            receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
+                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                false
+            ))
+        } else if (majorLegacy == 11900) {
+            receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
+                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                0
+            ))
+        } else {
+            receiver.sendPacket(PacketPlayOutChat(
+                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                ChatMessageType.SYSTEM,
+                sender
+            ))
+        }
     }
 
     @Suppress("Deprecation")

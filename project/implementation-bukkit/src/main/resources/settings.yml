@@ -9,7 +9,6 @@ Options:
   Proxy: AUTO
   # CHAT, SYSTEM
   Send-Message-Method: CHAT
-  Force-Hex-Color: false
 
 Database:
   Method: SQLite
@@ -23,10 +22,6 @@ Database:
     password: root
     database: trixey
     table: trchat_user_data
-  Mongodb:
-    client: 'mongodb://localhost:3307'
-    database: trixey
-    collection: chat
 
 Chat:
   Anti-Repeat: 0.85

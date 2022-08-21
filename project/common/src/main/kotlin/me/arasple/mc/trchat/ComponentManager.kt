@@ -9,11 +9,15 @@ import net.kyori.adventure.text.Component
  */
 interface ComponentManager {
 
-    fun getAudienceProvider(): AudienceProvider
+    fun getAudienceProvider(): AudienceProvider? = null
 
-    fun init()
+    fun init() {
 
-    fun release()
+    }
+
+    fun release() {
+
+    }
 
     /**
      * 发送系统Component
@@ -40,6 +44,6 @@ interface ComponentManager {
      * @param maxLength 最大长度 (负数为不验证)
      * @return 过滤后内容
      */
-    fun filterComponent(component: Component?, maxLength: Int = -1): Component?
+    fun filterComponent(component: Component, maxLength: Int = -1): Component
 
 }

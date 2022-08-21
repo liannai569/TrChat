@@ -1,8 +1,8 @@
 package me.arasple.mc.trchat.module.internal.filter
 
-import me.arasple.mc.trchat.api.config.Filters
-import me.arasple.mc.trchat.module.display.filter.processer.Filter
+import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
+import me.arasple.mc.trchat.module.internal.filter.processer.Filter
 import me.arasple.mc.trchat.util.parseJson
 import me.arasple.mc.trchat.util.print
 import taboolib.common.env.DependencyDownloader.readFully
@@ -90,7 +90,7 @@ object ChatFilter {
         val collected = mutableListOf<String>()
 
         return kotlin.runCatching {
-            URL(url).openStream().use { inputStream ->
+            URL(url).openConnection().also { it.connectTimeout = 60 * 1000 }.getInputStream().use { inputStream ->
                 BufferedInputStream(inputStream).use { bufferedInputStream ->
                     val database = readFully(bufferedInputStream, StandardCharsets.UTF_8).parseJson().asJsonObject
                     if (!database.has("lastUpdateDate") || !database.has("words")) {

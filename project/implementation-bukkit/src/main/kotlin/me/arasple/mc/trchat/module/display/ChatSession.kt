@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.display
 
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.classChatSerializer
@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.flattener.ComponentFlattener
 import org.bukkit.entity.Player
 import taboolib.library.reflex.Reflex.Companion.invokeMethod
+import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.Packet
 import taboolib.module.nms.sendPacket
 import java.util.*
@@ -85,7 +86,10 @@ class ChatSession(
 
         private fun Packet.toMessage(): String? {
             return kotlin.runCatching {
-                val component = if (!TrChatBukkit.paperEnv) {
+                val component = if (MinecraftVersion.majorLegacy >= 11900) {
+                    val json = classChatSerializer.invokeMethod<String>("a", read<Any>("content")!!, isStatic = true)!!
+                    gson(json)
+                } else if (!TrChatBukkit.paperEnv) {
                     val json = classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, isStatic = true)!!
                     gson(json)
                 } else {

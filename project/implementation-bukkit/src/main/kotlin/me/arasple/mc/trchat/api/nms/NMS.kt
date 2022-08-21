@@ -1,10 +1,11 @@
 package me.arasple.mc.trchat.api.nms
 
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import taboolib.common.util.unsafeLazy
 import taboolib.module.chat.TellrawJson
 import taboolib.module.nms.nmsProxy
+import java.util.*
 
 /**
  * @author Arasple
@@ -28,8 +29,13 @@ abstract class NMS {
 
     abstract fun sendChatPreview(player: Player, queryId: Int, query: String)
 
+    abstract fun sendPlayerChatMessage(receiver: Player, component: Component, sender: UUID?)
+
+    abstract fun sendSystemChatMessage(receiver: Player, component: Component, sender: UUID?)
+
     companion object {
 
-        val INSTANCE by unsafeLazy { nmsProxy<NMS>() }
+        @JvmStatic
+        val INSTANCE = nmsProxy<NMS>()
     }
 }

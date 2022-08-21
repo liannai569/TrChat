@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.database
 
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.Internal
 import org.bukkit.OfflinePlayer
 import taboolib.common.io.newFile

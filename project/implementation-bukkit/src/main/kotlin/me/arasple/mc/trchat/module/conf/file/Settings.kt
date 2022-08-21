@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.api.config
+package me.arasple.mc.trchat.module.conf.file
 
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide

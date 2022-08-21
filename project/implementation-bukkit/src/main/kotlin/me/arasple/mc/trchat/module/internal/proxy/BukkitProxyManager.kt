@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.internal.proxy
 
 import me.arasple.mc.trchat.ProxyManager
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Settings
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageRecipient

@@ -1,8 +1,8 @@
 package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.api.config.Filters
-import me.arasple.mc.trchat.api.config.Settings
+import me.arasple.mc.trchat.module.conf.file.Filters
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.MessageColors
 import org.bukkit.event.inventory.InventoryType

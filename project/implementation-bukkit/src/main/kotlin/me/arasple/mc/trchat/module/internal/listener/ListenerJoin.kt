@@ -23,7 +23,7 @@ import taboolib.platform.util.sendLang
 object ListenerJoin {
 
     @SubscribeEvent(EventPriority.HIGHEST)
-    fun e(e: PlayerJoinEvent) {
+    fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
 
         BukkitProxyManager.sendTrChatMessage(player, "FetchProxyChannels")

@@ -21,7 +21,7 @@ import taboolib.common.platform.function.submit
 object ListenerQuit {
 
     @SubscribeEvent(EventPriority.HIGHEST)
-    fun e(e: PlayerQuitEvent) {
+    fun onQuit(e: PlayerQuitEvent) {
         val player = e.player
 
         Channel.channels.values.forEach { it.listeners.remove(player.uniqueId) }
@@ -35,7 +35,7 @@ object ListenerQuit {
     }
 
     @SubscribeEvent(EventPriority.HIGHEST, ignoreCancelled = true)
-    fun e(e: PlayerKickEvent) {
+    fun onKick(e: PlayerKickEvent) {
         val player = e.player
 
         Channel.channels.values.forEach { it.listeners.remove(player.uniqueId) }

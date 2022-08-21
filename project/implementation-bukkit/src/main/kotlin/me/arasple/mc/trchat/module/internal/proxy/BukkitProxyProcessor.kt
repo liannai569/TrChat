@@ -17,6 +17,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageRecipient
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.platform.util.bukkitPlugin
 import taboolib.platform.util.onlinePlayers
 import java.io.IOException
@@ -98,7 +99,7 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
 
         override fun sendCommonMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): Boolean {
             var success = true
-            submit(async = async) {
+            fun send() {
                 val out = ByteStreams.newDataOutput()
 
                 try {
@@ -112,13 +113,20 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
 
                 recipient.sendPluginMessage(bukkitPlugin, BUNGEE_CHANNEL, out.toByteArray())
             }
+            if (async) {
+                submitAsync {
+                    send()
+                }
+            } else {
+                send()
+            }
 
             return success
         }
 
         override fun sendTrChatMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): Boolean {
             var success = true
-            submit(async = async) {
+            fun send() {
                 try {
                     for (bytes in buildMessage(*args)) {
                         recipient.sendPluginMessage(bukkitPlugin, TRCHAT_CHANNEL, bytes)
@@ -127,6 +135,13 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                     e.print("Failed to send proxy trchat message!")
                     success = false
                 }
+            }
+            if (async) {
+                submitAsync {
+                    send()
+                }
+            } else {
+                send()
             }
 
             return success
@@ -176,7 +191,7 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
 
         override fun sendTrChatMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): Boolean {
             var success = true
-            submit(async = async) {
+            fun send() {
                 try {
                     for (bytes in buildMessage(*args)) {
                         recipient.sendPluginMessage(bukkitPlugin, outgoing, bytes)
@@ -185,6 +200,13 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                     e.print("Failed to send proxy trchat message!")
                     success = false
                 }
+            }
+            if (async) {
+                submitAsync {
+                    send()
+                }
+            } else {
+                send()
             }
 
             return success

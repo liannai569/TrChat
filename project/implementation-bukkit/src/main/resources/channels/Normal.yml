@@ -2,10 +2,6 @@ Options:
   Target: ALL
   Auto-Join: true
 
-Events:
-  Process: |-
-    filter get &message
-
 Formats:
   - condition: ~
     priority: 100

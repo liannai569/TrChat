@@ -5,10 +5,6 @@ Options:
   Double-Transfer: true
   Auto-Join: true
 
-Events:
-  Process: |-
-    filter get &message
-
 Bindings:
   Prefix: ['!all']
   Command: ['global', 'all', 'shout']

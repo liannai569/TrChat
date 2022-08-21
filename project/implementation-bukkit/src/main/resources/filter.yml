@@ -1,5 +1,5 @@
 Enable:
-  Chat: false
+  Chat: true
   Sign: true
   Anvil: true
   Item: false

@@ -43,7 +43,7 @@ object BungeeComponentManager : ComponentManager {
         TODO("Not yet implemented")
     }
 
-    override fun filterComponent(component: Component?, maxLength: Int): Component? {
+    override fun filterComponent(component: Component, maxLength: Int): Component {
         error("Not supported.")
     }
 }

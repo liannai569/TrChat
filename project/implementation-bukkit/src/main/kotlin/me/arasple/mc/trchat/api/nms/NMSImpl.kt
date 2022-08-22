@@ -35,7 +35,7 @@ class NMSImpl : NMS() {
         return try {
             val json = classChatSerializer.invokeMethod<String>("a", iChat, isStatic = true)!!
             val component = BukkitComponentManager.filterComponent(gson(json), 32000)
-            classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true)!!
+            component.toIChatBaseComponent()
         } catch (t: Throwable) {
             if (!TrChatBukkit.reportedErrors.contains("filterIChatComponent")) {
                 t.print("Error occurred while filtering chat component.")
@@ -86,26 +86,30 @@ class NMSImpl : NMS() {
 
     override fun sendChatPreview(player: Player, queryId: Int, query: String) {
         val component = player.session.getChannel()?.execute(player, query, forward = false)?.first ?: return
-        val iChatBaseComponent = classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true)
-        player.sendPacket(ClientboundChatPreviewPacket::class.java.invokeConstructor(queryId, iChatBaseComponent))
+        player.sendPacket(ClientboundChatPreviewPacket::class.java.invokeConstructor(queryId, component.toIChatBaseComponent()))
     }
 
     override fun sendPlayerChatMessage(receiver: Player, component: Component, sender: UUID?) {
         if (majorLegacy >= 11901) {
             receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
-                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                component.toIChatBaseComponent(),
                 false
             ))
         } else if (majorLegacy == 11900) {
             receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
-                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                component.toIChatBaseComponent(),
                 0
             ))
-        } else {
-            receiver.sendPacket(PacketPlayOutChat(
-                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+        } else if (majorLegacy >= 11600) {
+            receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
+                component.toIChatBaseComponent(),
                 ChatMessageType.CHAT,
                 sender
+            ))
+        } else {
+            receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
+                component.toIChatBaseComponent(),
+                ChatMessageType.CHAT
             ))
         }
     }
@@ -113,19 +117,24 @@ class NMSImpl : NMS() {
     override fun sendSystemChatMessage(receiver: Player, component: Component, sender: UUID?) {
         if (majorLegacy >= 11901) {
             receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
-                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                component.toIChatBaseComponent(),
                 false
             ))
         } else if (majorLegacy == 11900) {
             receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
-                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+                component.toIChatBaseComponent(),
                 0
             ))
-        } else {
-            receiver.sendPacket(PacketPlayOutChat(
-                classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(component), isStatic = true),
+        } else if (majorLegacy >= 11600) {
+            receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
+                component.toIChatBaseComponent(),
                 ChatMessageType.SYSTEM,
                 sender
+            ))
+        } else {
+            receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
+                component.toIChatBaseComponent(),
+                ChatMessageType.SYSTEM
             ))
         }
     }
@@ -146,4 +155,11 @@ class NMSImpl : NMS() {
             }
         }
     }
+
+    private fun Component.toIChatBaseComponent() = if (majorLegacy >= 10900) {
+        classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(this), isStatic = true)!!
+    } else {
+        classChatSerializer.invokeMethod<IChatBaseComponent>("a", gson(this), isStatic = true)!!
+    }
+
 }

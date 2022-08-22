@@ -87,7 +87,7 @@ class ChatSession(
         private fun Packet.toMessage(): String? {
             return kotlin.runCatching {
                 val component = if (MinecraftVersion.majorLegacy >= 11900) {
-                    val json = classChatSerializer.invokeMethod<String>("a", read<Any>("content")!!, isStatic = true)!!
+                    val json = classChatSerializer.invokeMethod<String>("a", source.invokeMethod<Any>("content")!!, isStatic = true)!!
                     gson(json)
                 } else if (!TrChatBukkit.paperEnv) {
                     val json = classChatSerializer.invokeMethod<String>("a", read<Any>("a")!!, isStatic = true)!!

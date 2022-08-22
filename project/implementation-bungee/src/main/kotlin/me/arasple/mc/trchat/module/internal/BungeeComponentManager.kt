@@ -46,4 +46,5 @@ object BungeeComponentManager : ComponentManager {
     override fun filterComponent(component: Component, maxLength: Int): Component {
         error("Not supported.")
     }
+
 }

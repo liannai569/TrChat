@@ -12,6 +12,7 @@ import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.submit
+import taboolib.common.util.decodeUnicode
 import taboolib.module.lang.sendLang
 import java.io.BufferedInputStream
 import java.net.URL
@@ -104,7 +105,7 @@ object ChatFilter {
                         else -> lastUpdateDate
                     }
                     database["words"].asJsonArray.forEach {
-                        val word = it.asString
+                        val word = it.asString.decodeUnicode()
                         if (whitelist.none { w -> w.equals(word, ignoreCase = true) }) {
                             collected.add(word)
                         }

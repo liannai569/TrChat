@@ -4,6 +4,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.legacy
+import me.arasple.mc.trchat.util.passPermission
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.entity.Player
@@ -30,14 +31,18 @@ import java.util.concurrent.TimeUnit
  * @author wlys
  * @since 2022/3/18 19:14
  */
+@StandardFunction
 @PlatformSide([Platform.BUKKIT])
-object EnderChestShow {
+object EnderChestShow : Function("ENDERCHEST") {
+
+    override val alias: String
+        get() = "EnderChest-Show"
 
     @ConfigNode("General.EnderChest-Show.Enabled", "function.yml")
     var enabled = true
 
     @ConfigNode("General.EnderChest-Show.Permission", "function.yml")
-    var permission = "null"
+    var permission = "none"
 
     @ConfigNode("General.EnderChest-Show.Format", "function.yml")
     var format = "&8[&3{0}'s Inventory&8]"
@@ -52,7 +57,7 @@ object EnderChestShow {
         .expireAfterWrite(10L, TimeUnit.MINUTES)
         .build()
 
-    fun replaceMessage(message: String): String {
+    override fun createVariable(sender: Player, message: String): String {
         return if (!enabled) {
             message
         } else {
@@ -64,22 +69,26 @@ object EnderChestShow {
         }
     }
 
-    fun createComponent(player: Player): Component {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
         return mirrorNow("Function:EnderChestShow:CreateComponent") {
-            val menu = buildMenu<Linked<ItemStack>>("${player.name}'s Ender Chest") {
+            val menu = buildMenu<Linked<ItemStack>>("${sender.name}'s Ender Chest") {
                 rows(3)
                 slots(inventorySlots)
                 elements {
-                    (0..26).map { player.enderChest.getItem(it).replaceAir() }
+                    (0..26).map { sender.enderChest.getItem(it).replaceAir() }
                 }
                 onGenerate { _, element, _, _ ->
                     element
                 }
             }
-            val sha1 = Base64.getEncoder().encodeToString(player.inventory.serializeToByteArray()).digest("sha-1")
+            val sha1 = Base64.getEncoder().encodeToString(sender.inventory.serializeToByteArray()).digest("sha-1")
             cache.put(sha1, menu)
-            legacy(format.replaceWithOrder(player.name).colorify()).clickEvent(ClickEvent.runCommand("/view-enderchest $sha1"))
+            legacy(format.replaceWithOrder(sender.name).colorify()).clickEvent(ClickEvent.runCommand("/view-enderchest $sha1"))
         }
+    }
+
+    override fun canUse(sender: Player): Boolean {
+        return sender.passPermission(permission)
     }
 
     private val inventorySlots = IntRange(0, 26).toList()

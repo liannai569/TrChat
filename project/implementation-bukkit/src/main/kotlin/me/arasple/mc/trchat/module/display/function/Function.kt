@@ -1,40 +1,39 @@
 package me.arasple.mc.trchat.module.display.function
 
-import me.arasple.mc.trchat.module.display.format.JsonComponent
-import me.arasple.mc.trchat.module.internal.script.Condition
+import me.arasple.mc.trchat.api.event.TrChatReloadEvent
+import me.arasple.mc.trchat.module.internal.script.Reaction
+import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
+import taboolib.common.io.getInstance
+import taboolib.common.io.runningClassesWithoutLibrary
 
-/**
- * @author wlys
- * @since 2021/12/12 11:41
- */
-class Function(
-    val id: String,
-    val condition: Condition?,
-    val priority: Int,
-    val regex: Regex,
-    val filterTextRegex: Regex?,
-    val displayJson: JsonComponent,
-    val action: String?
-) {
+abstract class Function(val id: String) {
 
-    fun apply(string: String): String {
-        return string.replaceRegex(regex, filterTextRegex) { "{{$id:$it}}" }
-    }
+    open val alias = id
+
+    open val reaction: Reaction? = null
+
+    abstract fun createVariable(sender: Player, message: String): String
+
+    abstract fun parseVariable(sender: Player, forward: Boolean, arg: String): Component
+
+    abstract fun canUse(sender: Player): Boolean
 
     companion object {
 
         @JvmStatic
         val functions = mutableListOf<Function>()
 
-        fun String.replaceRegex(regex: Regex, replaceRegex: Regex?, replacement: (String) -> String): String {
-            var string = this
-            regex.findAll(string).forEach {
-                val str = it.value
-                val result = replaceRegex?.find(str)?.value ?: str
-                val rep = replacement(result)
-                string = string.replaceFirst(str, rep)
+        fun reload(customFunctions: List<CustomFunction>) {
+            functions.clear()
+            if (TrChatReloadEvent.Function(customFunctions).call()) {
+                functions.addAll(runningClassesWithoutLibrary
+                    .filter { it.isAnnotationPresent(StandardFunction::class.java) }
+                    .mapNotNull { it.getInstance()?.get() as? Function }
+                )
+                functions.addAll(customFunctions)
             }
-            return string
         }
+
     }
 }

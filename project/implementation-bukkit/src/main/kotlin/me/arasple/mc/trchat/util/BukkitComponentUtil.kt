@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.gson.LegacyHoverEventSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
 import org.bukkit.block.ShulkerBox
@@ -49,6 +50,10 @@ private val GSON_SERIALIZER by unsafeLazy {
         PaperComponents.gsonSerializer()
     } else {
         GsonComponentSerializer.builder()
+            .legacyHoverEventSerializer(
+                Class.forName("net.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer")
+                    .invokeMethod<LegacyHoverEventSerializer>("get", isStatic = true)
+            )
             .also { if (MinecraftVersion.majorLegacy < 11600) it.emitLegacyHoverEvent() }
             .build()
     }

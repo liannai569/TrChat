@@ -255,7 +255,7 @@ object Hex {
      * @return The closest ChatColor value
      */
     private fun translateHex(hex: String): String {
-        return if (MinecraftVersion.majorLegacy >= 11600) ChatColor.of(hex).toString() else translateHex(Color.decode(hex))
+        return if (MinecraftVersion.majorLegacy >= 11600) ChatColor.of(hex).toString() else hex
     }
 
     private fun translateHex(color: Color): String {

@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.util.Internal
 import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import taboolib.common.platform.Ghost
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
@@ -20,6 +21,7 @@ import taboolib.common.platform.function.submit
 @PlatformSide([Platform.BUKKIT])
 object ListenerQuit {
 
+    @Ghost
     @SubscribeEvent(EventPriority.HIGHEST)
     fun onQuit(e: PlayerQuitEvent) {
         val player = e.player

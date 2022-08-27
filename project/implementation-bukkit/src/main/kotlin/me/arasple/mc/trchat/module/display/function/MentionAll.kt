@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.module.display.function
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.legacy
+import me.arasple.mc.trchat.util.passPermission
 import me.arasple.mc.trchat.util.sendProxyLang
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -17,8 +18,12 @@ import taboolib.module.configuration.ConfigNodeTransfer
  * @author wlys
  * @since 2022/3/18 19:14
  */
+@StandardFunction
 @PlatformSide([Platform.BUKKIT])
-object MentionAll {
+object MentionAll : Function("MENTIONALL") {
+
+    override val alias: String
+        get() = "Mention-All"
 
     @ConfigNode("General.Mention-All.Enabled", "function.yml")
     var enabled = true
@@ -38,7 +43,7 @@ object MentionAll {
     @ConfigNode("General.Mention-All.Keys", "function.yml")
     var keys = emptyList<String>()
 
-    fun replaceMessage(message: String): String {
+    override fun createVariable(sender: Player, message: String): String {
         return if (!enabled) {
             message
         } else {
@@ -50,14 +55,19 @@ object MentionAll {
         }
     }
 
-    fun createComponent(player: Player, forward: Boolean): Component {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
         return mirrorNow("Function:Mention:CreateCompoennt") {
             if (notify && forward) {
                 BukkitPlayers.getPlayers().forEach {
-                    player.sendProxyLang(it, "Mentions-Notify", player.name)
+                    sender.sendProxyLang(it, "Mentions-Notify", sender.name)
                 }
             }
             legacy(format.colorify())
         }
     }
+
+    override fun canUse(sender: Player): Boolean {
+        return sender.passPermission(permission)
+    }
+
 }

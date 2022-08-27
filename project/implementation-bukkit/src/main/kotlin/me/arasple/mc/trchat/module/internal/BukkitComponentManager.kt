@@ -11,6 +11,7 @@ import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.command.CommandSender
+import org.bukkit.command.ProxiedCommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import taboolib.common.platform.*
@@ -50,6 +51,7 @@ object BukkitComponentManager : ComponentManager {
     override fun sendSystemComponent(receiver: Any, component: Component, sender: Any?) {
         val commandSender = when (receiver) {
             is ProxyCommandSender -> receiver.cast()
+            is ProxiedCommandSender -> receiver.callee
             is CommandSender -> receiver
             else -> error("Unknown receiver type $receiver.")
         }
@@ -65,9 +67,9 @@ object BukkitComponentManager : ComponentManager {
             return
         }
         val newComponent = if (commandSender is Player && Filters.CONF.getBoolean("Enable.Chat") && commandSender.data.isFilterEnabled) {
-            TrChat.api().getComponentManager().filterComponent(component)
+            TrChat.api().getComponentManager().filterComponent(component, 32000)
         } else {
-            component
+            validateComponent(component, 32000)
         }
 
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, newComponent)) {
@@ -87,6 +89,7 @@ object BukkitComponentManager : ComponentManager {
     override fun sendChatComponent(receiver: Any, component: Component, sender: Any?) {
         val commandSender = when (receiver) {
             is ProxyCommandSender -> receiver.cast()
+            is ProxiedCommandSender -> receiver.callee
             is CommandSender -> receiver
             else -> error("Unknown receiver type $receiver.")
         }
@@ -102,9 +105,9 @@ object BukkitComponentManager : ComponentManager {
             return
         }
         val newComponent = if (commandSender is Player && Filters.CONF.getBoolean("Enable.Chat") && commandSender.data.isFilterEnabled) {
-            TrChat.api().getComponentManager().filterComponent(component)
+            TrChat.api().getComponentManager().filterComponent(component, 32000)
         } else {
-            component
+            validateComponent(component, 32000)
         }
 
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, newComponent)) {

@@ -1,5 +1,6 @@
 package me.arasple.mc.trchat.module.conf
 
+import me.arasple.mc.trchat.api.event.TrChatReloadEvent
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.channel.PrivateChannel
@@ -13,6 +14,7 @@ import me.arasple.mc.trchat.module.display.format.JsonComponent
 import me.arasple.mc.trchat.module.display.format.MsgComponent
 import me.arasple.mc.trchat.module.display.format.obj.Style
 import me.arasple.mc.trchat.module.display.format.obj.Text
+import me.arasple.mc.trchat.module.display.function.CustomFunction
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
@@ -72,6 +74,10 @@ object Loader {
     fun loadChannels(): Int {
         Channel.channels.values.forEach { it.unregister() }
         Channel.channels.clear()
+
+        if (!TrChatReloadEvent.Channel().call()) {
+            return 0
+        }
 
         if (onlinePlayers.isNotEmpty()) {
             BukkitProxyManager.sendTrChatMessage(onlinePlayers.iterator().next(), "FetchProxyChannels")
@@ -177,13 +183,11 @@ object Loader {
 
     fun loadFunctions(sender: ProxyCommandSender) {
         measureTimeMillis { loadFunctions() }.let {
-            sender.sendLang("Plugin-Loaded-Functions", Function.functions.size + 3, it)
+            sender.sendLang("Plugin-Loaded-Functions", Function.functions.size, it)
         }
     }
 
     fun loadFunctions() {
-        Function.functions.clear()
-
         val customs = Functions.CONF.getMap<String, ConfigurationSection>("Custom")
         val functions = customs.map { (id, map) ->
             val condition = map.getString("condition")?.toCondition()
@@ -191,12 +195,12 @@ object Loader {
             val regex = map.getString("pattern")!!.toRegex()
             val filterTextRegex = map.getString("text-filter")?.toRegex()
             val displayJson = parseJSON(map.getConfigurationSection("display")!!.toMap())
-            val action = map["action"]?.toString()
+            val reaction = map["action"]?.let { Reaction(it.asList()) }
 
-            Function(id, condition, priority, regex, filterTextRegex, displayJson, action)
+            CustomFunction(id, condition, priority, regex, filterTextRegex, displayJson, reaction)
         }.sortedBy { it.priority }
 
-        Function.functions.addAll(functions)
+        Function.reload(functions)
     }
 
     private fun parseGroups(map: LinkedHashMap<*, *>?): Map<String, List<Group>> {

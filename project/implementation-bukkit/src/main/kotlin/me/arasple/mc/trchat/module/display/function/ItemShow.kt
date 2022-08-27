@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.hoverItemFixed
 import me.arasple.mc.trchat.util.legacy
+import me.arasple.mc.trchat.util.passPermission
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -26,14 +27,18 @@ import java.util.concurrent.TimeUnit
  * @author wlys
  * @since 2022/3/12 19:14
  */
+@StandardFunction
 @PlatformSide([Platform.BUKKIT])
-object ItemShow {
+object ItemShow : Function("ITEM") {
+
+    override val alias: String
+        get() = "Item-Show"
 
     @ConfigNode("General.Item-Show.Enabled", "function.yml")
     var enabled = true
 
     @ConfigNode("General.Item-Show.Permission", "function.yml")
-    var permission = "null"
+    var permission = "none"
 
     @ConfigNode("General.Item-Show.Format", "function.yml")
     var format = "&8[&3{0} &bx{1}&8]"
@@ -54,7 +59,7 @@ object ItemShow {
         .expireAfterWrite(10L, TimeUnit.MINUTES)
         .build()
 
-    fun replaceMessage(message: String, player: Player): String {
+    override fun createVariable(sender: Player, message: String): String {
         return if (!enabled) {
             message
         } else {
@@ -64,15 +69,15 @@ object ItemShow {
                     result = result.replace("$key-$it", "{{ITEM:$it}}", ignoreCase = true)
                     result = result.replace("$key$it", "{{ITEM:$it}}", ignoreCase = true)
                 }
-                result = result.replace(key, "{{ITEM:${player.inventory.heldItemSlot + 1}}}", ignoreCase = true)
+                result = result.replace(key, "{{ITEM:${sender.inventory.heldItemSlot + 1}}}", ignoreCase = true)
             }
             return result
         }
     }
 
-    fun createComponent(player: Player, slot: Int): Component {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
         return mirrorNow("Function:ItemShow:CreateComponent") {
-            val item = (player.inventory.getItem(slot - 1) ?: ItemStack(Material.AIR)).run {
+            val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).run {
                 if (compatible) {
                     buildItem(this) { material = Material.STONE }
                 } else {
@@ -80,12 +85,16 @@ object ItemShow {
                 }
             }
             cache.getIfPresent(item) ?: kotlin.run {
-                HookPlugin.getInteractiveChat().createItemDisplayComponent(player, item) ?:
-                legacy(format.replaceWithOrder(item.getDisplayName(player), item.amount.toString()).colorify())
-                    .hoverItemFixed(item, player)
+                HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item) ?:
+                legacy(format.replaceWithOrder(item.getDisplayName(sender), item.amount.toString()).colorify())
+                    .hoverItemFixed(item, sender)
                     .also { cache.put(item, it) }
             }
         }
+    }
+
+    override fun canUse(sender: Player): Boolean {
+        return sender.passPermission(permission)
     }
 
     @Suppress("Deprecation")
@@ -99,4 +108,5 @@ object ItemShow {
             itemMeta!!.displayName
         }
     }
+
 }

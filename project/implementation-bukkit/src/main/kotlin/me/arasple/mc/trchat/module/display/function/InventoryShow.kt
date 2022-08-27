@@ -4,6 +4,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.legacy
+import me.arasple.mc.trchat.util.passPermission
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.entity.Player
@@ -31,14 +32,18 @@ import java.util.concurrent.TimeUnit
  * @author wlys
  * @since 2022/3/18 19:14
  */
+@StandardFunction
 @PlatformSide([Platform.BUKKIT])
-object InventoryShow {
+object InventoryShow : Function("INVENTORY") {
+
+    override val alias: String
+        get() = "Inventory-Show"
 
     @ConfigNode("General.Inventory-Show.Enabled", "function.yml")
     var enabled = true
 
     @ConfigNode("General.Inventory-Show.Permission", "function.yml")
-    var permission = "null"
+    var permission = "none"
 
     @ConfigNode("General.Inventory-Show.Format", "function.yml")
     var format = "&8[&3{0}'s Inventory&8]"
@@ -53,7 +58,7 @@ object InventoryShow {
         .expireAfterWrite(10L, TimeUnit.MINUTES)
         .build()
 
-    fun replaceMessage(message: String): String {
+    override fun createVariable(sender: Player, message: String): String {
         return if (!enabled) {
             message
         } else {
@@ -66,35 +71,39 @@ object InventoryShow {
     }
 
     @Suppress("Deprecation")
-    fun createComponent(player: Player): Component {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
         return mirrorNow("Function:InventoryShow:CreateComponent") {
-            val menu = buildMenu<Linked<ItemStack>>("${player.name}'s Inventory") {
+            val menu = buildMenu<Linked<ItemStack>>("${sender.name}'s Inventory") {
                 rows(6)
                 slots(inventorySlots)
                 elements {
-                    (9..35).map { player.inventory.getItem(it).replaceAir() } +
-                            (0..8).map { player.inventory.getItem(it).replaceAir() }
+                    (9..35).map { sender.inventory.getItem(it).replaceAir() } +
+                            (0..8).map { sender.inventory.getItem(it).replaceAir() }
                 }
                 onGenerate { _, element, _, _ ->
                     element
                 }
                 onBuild {
                     it.setItem(0, PLACEHOLDER_ITEM)
-                    it.setItem(1, player.inventory.invokeMethod<ItemStack>("getItemInOffHand").replaceAir())
-                    it.setItem(2, buildItem(XMaterial.PLAYER_HEAD) { name = "§e${player.name}" })
-                    it.setItem(3, player.inventory.itemInHand.replaceAir())
+                    it.setItem(1, sender.inventory.invokeMethod<ItemStack>("getItemInOffHand").replaceAir())
+                    it.setItem(2, buildItem(XMaterial.PLAYER_HEAD) { name = "§e${sender.name}" })
+                    it.setItem(3, sender.inventory.itemInHand.replaceAir())
                     it.setItem(4, PLACEHOLDER_ITEM)
-                    it.setItem(5, player.inventory.helmet.replaceAir())
-                    it.setItem(6, player.inventory.chestplate.replaceAir())
-                    it.setItem(7, player.inventory.leggings.replaceAir())
-                    it.setItem(8, player.inventory.boots.replaceAir())
+                    it.setItem(5, sender.inventory.helmet.replaceAir())
+                    it.setItem(6, sender.inventory.chestplate.replaceAir())
+                    it.setItem(7, sender.inventory.leggings.replaceAir())
+                    it.setItem(8, sender.inventory.boots.replaceAir())
                     (9..17).forEach { slot -> it.setItem(slot, PLACEHOLDER_ITEM) }
                 }
             }
-            val sha1 = Base64.getEncoder().encodeToString(player.inventory.serializeToByteArray()).digest("sha-1")
+            val sha1 = Base64.getEncoder().encodeToString(sender.inventory.serializeToByteArray()).digest("sha-1")
             cache.put(sha1, menu)
-            legacy(format.replaceWithOrder(player.name).colorify()).clickEvent(ClickEvent.runCommand("/view-inventory $sha1"))
+            legacy(format.replaceWithOrder(sender.name).colorify()).clickEvent(ClickEvent.runCommand("/view-inventory $sha1"))
         }
+    }
+
+    override fun canUse(sender: Player): Boolean {
+        return sender.passPermission(permission)
     }
 
     private val inventorySlots = IntRange(18, 53).toList()
@@ -103,4 +112,5 @@ object InventoryShow {
     private val PLACEHOLDER_ITEM = buildItem(XMaterial.WHITE_STAINED_GLASS_PANE) { name = "§r" }
 
     private fun ItemStack?.replaceAir() = if (isAir()) AIR_ITEM else this!!
+
 }

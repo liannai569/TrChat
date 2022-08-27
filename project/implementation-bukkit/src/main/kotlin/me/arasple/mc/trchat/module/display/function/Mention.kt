@@ -17,14 +17,18 @@ import taboolib.module.configuration.ConfigNodeTransfer
  * @author wlys
  * @since 2022/3/18 19:14
  */
+@StandardFunction
 @PlatformSide([Platform.BUKKIT])
-object Mention {
+object Mention : Function("MENTION") {
+
+    override val alias: String
+        get() = "Mention"
 
     @ConfigNode("General.Mention.Enabled", "function.yml")
     var enabled = true
 
     @ConfigNode("General.Mention.Permission", "function.yml")
-    var permission = "null"
+    var permission = "none"
 
     @ConfigNode("General.Mention.Format", "function.yml")
     var format = "&8[&3{0} &bx{1}&8]"
@@ -38,33 +42,38 @@ object Mention {
     @ConfigNode("General.Mention.Cooldown", "function.yml")
     val cooldown = ConfigNodeTransfer<String, Long> { parseMillis() }
 
-    fun replaceMessage(message: String, player: Player): String {
+    override fun createVariable(sender: Player, message: String): String {
         return mirrorNow("Function:Mention:ReplaceMessage") {
             if (!enabled) {
                 message
             } else {
                 var result = message
                 var mentioned = false
-                BukkitPlayers.getRegex(player).forEach { regex ->
-                    if (result.contains(regex) && !player.isInCooldown(CooldownType.MENTION)) {
+                BukkitPlayers.getRegex(sender).forEach { regex ->
+                    if (result.contains(regex) && !sender.isInCooldown(CooldownType.MENTION)) {
                         result = regex.replace(result, "{{MENTION:\$1}}")
                         mentioned = true
                     }
                 }
-                if (mentioned && !player.hasPermission("trchat.bypass.mentioncd")) {
-                    player.updateCooldown(CooldownType.MENTION, cooldown.get())
+                if (mentioned && !sender.hasPermission("trchat.bypass.mentioncd")) {
+                    sender.updateCooldown(CooldownType.MENTION, cooldown.get())
                 }
                 result
             }
         }
     }
 
-    fun createComponent(player: Player, target: String, forward: Boolean): Component {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
         return mirrorNow("Function:Mention:CreateCompoennt") {
             if (notify && forward) {
-                player.sendProxyLang(target, "Mentions-Notify", player.name)
+                sender.sendProxyLang(arg, "Mentions-Notify", sender.name)
             }
-            legacy(format.replaceWithOrder(target).colorify())
+            legacy(format.replaceWithOrder(arg).colorify())
         }
     }
+
+    override fun canUse(sender: Player): Boolean {
+        return sender.passPermission(permission)
+    }
+
 }

@@ -33,7 +33,7 @@ import taboolib.platform.util.sendLang
  */
 @Internal
 @PlatformSide([Platform.BUKKIT])
-@CommandHeader("trchat", ["trc"], "TrChat主命令", permission = "trchat.access")
+@CommandHeader("trchat", ["trc"], "TrChat main command", permission = "trchat.access")
 object CommandHandler {
 
     @CommandBody(permission = "trchat.command.reload", optional = true)

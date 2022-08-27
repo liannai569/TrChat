@@ -106,10 +106,15 @@ class NMSImpl : NMS() {
                 ChatMessageType.CHAT,
                 sender
             ))
-        } else {
+        } else if (majorLegacy >= 11200) {
             receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
                 component.toIChatBaseComponent(),
                 ChatMessageType.CHAT
+            ))
+        } else {
+            receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
+                component.toIChatBaseComponent(),
+                0.toByte()
             ))
         }
     }
@@ -131,10 +136,15 @@ class NMSImpl : NMS() {
                 ChatMessageType.SYSTEM,
                 sender
             ))
-        } else {
+        } else if (majorLegacy >= 11200) {
             receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
                 component.toIChatBaseComponent(),
                 ChatMessageType.SYSTEM
+            ))
+        } else {
+            receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
+                component.toIChatBaseComponent(),
+                1.toByte()
             ))
         }
     }
@@ -156,10 +166,6 @@ class NMSImpl : NMS() {
         }
     }
 
-    private fun Component.toIChatBaseComponent() = if (majorLegacy >= 10900) {
-        classChatSerializer.invokeMethod<IChatBaseComponent>("b", gson(this), isStatic = true)!!
-    } else {
-        classChatSerializer.invokeMethod<IChatBaseComponent>("a", gson(this), isStatic = true)!!
-    }
+    private fun Component.toIChatBaseComponent() = classChatSerializer.invokeMethod<IChatBaseComponent>("a", gson(this), isStatic = true)!!
 
 }

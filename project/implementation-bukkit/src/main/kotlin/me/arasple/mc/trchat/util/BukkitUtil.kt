@@ -39,6 +39,13 @@ fun Condition?.pass(commandSender: CommandSender): Boolean {
     }
 }
 
+fun Player.passPermission(permission: String?): Boolean {
+    return permission == null
+            || permission.equals("null", ignoreCase = true)
+            || permission.equals("none", ignoreCase = true)
+            || hasPermission(permission)
+}
+
 val Player.session get() = ChatSession.getSession(this)
 
 val OfflinePlayer.data get() = PlayerData.getData(this)

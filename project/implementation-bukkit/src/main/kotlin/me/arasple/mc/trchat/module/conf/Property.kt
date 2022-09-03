@@ -17,7 +17,7 @@ enum class Property(val regex: Regex, val group: Int) {
 
     COOLDOWN("\\{cooldown[:=] ?(.+)}");
 
-    constructor(regex: String, group: Int = 1) : this("(?i)$regex".toRegex(), group)
+    constructor(regex: String, group: Int = 1) : this(regex.toRegex(RegexOption.IGNORE_CASE), group)
 
     companion object {
 

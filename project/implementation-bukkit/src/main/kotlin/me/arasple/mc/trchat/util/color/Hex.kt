@@ -1,8 +1,10 @@
 package me.arasple.mc.trchat.util.color
 
 import net.md_5.bungee.api.ChatColor
+import org.bukkit.Bukkit
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.util.unsafeLazy
 import taboolib.common5.mirrorNow
 import taboolib.module.nms.MinecraftVersion
 import java.awt.Color
@@ -39,8 +41,10 @@ object Hex {
                 "\\{#([A-Fa-f\\d]){6}}|" +
                 "&#([A-Fa-f\\d]){6}|" +
                 "#([A-Fa-f\\d]){6}|" +
+                "&\\{#([A-Fa-f\\d]){6}}|" +
                 org.bukkit.ChatColor.COLOR_CHAR
     )
+    private val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
 
     /**
      * Gets a capture group from a regex Matcher if it exists
@@ -203,6 +207,9 @@ object Hex {
     }
 
     internal fun parseHex(message: String): String {
+        if (isDragonCoreHooked) {
+            return message
+        }
         return mirrorNow("Handler:Color:Hex") {
             var parsed = message
             for (pattern: Pattern in HEX_PATTERNS) {
@@ -219,7 +226,7 @@ object Hex {
         }
     }
 
-    private fun parseLegacy(message: String): String {
+    internal fun parseLegacy(message: String): String {
         return ChatColor.translateAlternateColorCodes('&', message)
     }
 
@@ -241,6 +248,8 @@ object Hex {
     private fun cleanHex(hex: String): String {
         return if (hex.startsWith("<") || hex.startsWith("{")) {
             hex.substring(1, hex.length - 1)
+        } else if (hex.startsWith("&{")) {
+            hex.substring(2, hex.length - 1)
         } else if (hex.startsWith("&")) {
             hex.substring(1)
         } else {
@@ -255,7 +264,7 @@ object Hex {
      * @return The closest ChatColor value
      */
     private fun translateHex(hex: String): String {
-        return if (MinecraftVersion.majorLegacy >= 11600) ChatColor.of(hex).toString() else hex
+        return if (MinecraftVersion.majorLegacy >= 11600) ChatColor.of(hex).toString() else translateHex(Color.decode(hex))
     }
 
     private fun translateHex(color: Color): String {
@@ -422,6 +431,7 @@ object Hex {
 }
 
 fun String.colorify() = Hex.colorify(this)
+fun String.parseLegacy() = Hex.parseLegacy(this)
 fun String.parseHex() = Hex.parseHex(this)
 fun String.parseRainbow() = Hex.parseRainbow(this)
 fun String.parseGradients() = Hex.parseGradients(this)

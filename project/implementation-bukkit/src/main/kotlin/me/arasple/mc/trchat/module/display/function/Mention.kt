@@ -1,13 +1,17 @@
 package me.arasple.mc.trchat.module.display.function
 
+import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
+import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.*
 import me.arasple.mc.trchat.util.color.colorify
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.util.asList
 import taboolib.common.util.replaceWithOrder
+import taboolib.common.util.resettableLazy
 import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
@@ -21,8 +25,11 @@ import taboolib.module.configuration.ConfigNodeTransfer
 @PlatformSide([Platform.BUKKIT])
 object Mention : Function("MENTION") {
 
-    override val alias: String
-        get() = "Mention"
+    override val alias = "Mention"
+
+    override val reaction by resettableLazy("functions") {
+        Functions.CONF["General.Mention.Action"]?.let { Reaction(it.asList()) }
+    }
 
     @ConfigNode("General.Mention.Enabled", "function.yml")
     var enabled = true
@@ -50,7 +57,7 @@ object Mention : Function("MENTION") {
                 var result = message
                 var mentioned = false
                 BukkitPlayers.getRegex(sender).forEach { regex ->
-                    if (result.contains(regex) && !sender.isInCooldown(CooldownType.MENTION)) {
+                    if (result.contains(regex)) {
                         result = regex.replace(result, "{{MENTION:\$1}}")
                         mentioned = true
                     }
@@ -73,7 +80,7 @@ object Mention : Function("MENTION") {
     }
 
     override fun canUse(sender: Player): Boolean {
-        return sender.passPermission(permission)
+        return sender.passPermission(permission) && !sender.isInCooldown(CooldownType.MENTION)
     }
 
 }

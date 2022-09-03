@@ -76,7 +76,7 @@ object ChatFilter {
         if (cloud_words.isEmpty()) {
             notify.sendLang("Plugin-Failed-Load-Filter-Cloud")
         } else {
-            Filter.addSensitiveWord(cloud_words)
+            Filter.addSensitiveWord(cloud_words.sortedByDescending { it.length })
         }
     }
 

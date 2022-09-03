@@ -1,6 +1,8 @@
 package me.arasple.mc.trchat.module.display.function
 
+import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
+import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.passPermission
@@ -9,6 +11,8 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.util.asList
+import taboolib.common.util.resettableLazy
 import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
@@ -22,8 +26,11 @@ import taboolib.module.configuration.ConfigNodeTransfer
 @PlatformSide([Platform.BUKKIT])
 object MentionAll : Function("MENTIONALL") {
 
-    override val alias: String
-        get() = "Mention-All"
+    override val alias = "Mention-All"
+
+    override val reaction by resettableLazy("functions") {
+        Functions.CONF["General.Mention-All.Action"]?.let { Reaction(it.asList()) }
+    }
 
     @ConfigNode("General.Mention-All.Enabled", "function.yml")
     var enabled = true

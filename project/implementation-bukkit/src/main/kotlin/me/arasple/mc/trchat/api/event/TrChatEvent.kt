@@ -20,7 +20,7 @@ class TrChatEvent(
 ) : BukkitProxyEvent() {
 
     init {
-        message = message.replace("{{", "\\{{").replace("}}", "\\}}")
+        message = message.replace("{{", "\\{{")
         message = HookPlugin.getItemsAdder().replaceFontImages(session.player, message)
     }
 }

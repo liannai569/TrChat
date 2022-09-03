@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class ChatSession(
     val player: Player,
-    var channel: String
+    var channel: String?
 ) {
 
     var lastMessage = ""
@@ -48,6 +48,7 @@ class ChatSession(
     }
 
     fun getChannel(): Channel? {
+        channel ?: return null
         return Channel.channels[channel]
     }
 

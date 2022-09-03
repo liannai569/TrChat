@@ -140,8 +140,10 @@ object Loader {
         val events = conf.getConfigurationSection("Events")?.let {
             val process = it["Process"]?.asList() ?: emptyList()
             val send = it["Send"]?.asList() ?: emptyList()
-            ChannelEvents(Reaction(process), Reaction(send))
-        } ?: ChannelEvents(null, null)
+            val join = it["Join"]?.asList() ?: emptyList()
+            val quit = it["Quit"]?.asList() ?: emptyList()
+            ChannelEvents(Reaction(process), Reaction(send), Reaction(join), Reaction(quit))
+        } ?: ChannelEvents(null, null, null, null)
 
         if (private) {
             val sender = conf.getMapList("Sender").map { map ->

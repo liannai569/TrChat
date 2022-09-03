@@ -2,7 +2,9 @@ package me.arasple.mc.trchat.module.display.function
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
+import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.hoverItemFixed
 import me.arasple.mc.trchat.util.legacy
@@ -13,7 +15,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.util.asList
 import taboolib.common.util.replaceWithOrder
+import taboolib.common.util.resettableLazy
 import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
@@ -31,8 +35,11 @@ import java.util.concurrent.TimeUnit
 @PlatformSide([Platform.BUKKIT])
 object ItemShow : Function("ITEM") {
 
-    override val alias: String
-        get() = "Item-Show"
+    override val alias = "Item-Show"
+
+    override val reaction by resettableLazy("functions") {
+        Functions.CONF["General.Item-Show.Action"]?.let { Reaction(it.asList()) }
+    }
 
     @ConfigNode("General.Item-Show.Enabled", "function.yml")
     var enabled = true

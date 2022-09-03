@@ -21,7 +21,7 @@ object BukkitPlayers {
 
     fun getRegex(player: Player): List<Regex> {
         return getPlayers().filter { (Mention.selfMention || it != player.name) && !PlayerData.vanishing.contains(it) }.map {
-            Regex("(?i)@? ?($it)")
+            Regex("@? ?($it)", RegexOption.IGNORE_CASE)
         }
     }
 

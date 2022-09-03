@@ -2,6 +2,8 @@ package me.arasple.mc.trchat.module.display.function
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import me.arasple.mc.trchat.module.conf.file.Functions
+import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.passPermission
@@ -13,7 +15,9 @@ import org.bukkit.inventory.ItemStack
 import taboolib.common.io.digest
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.util.asList
 import taboolib.common.util.replaceWithOrder
+import taboolib.common.util.resettableLazy
 import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.library.reflex.Reflex.Companion.invokeMethod
@@ -36,8 +40,11 @@ import java.util.concurrent.TimeUnit
 @PlatformSide([Platform.BUKKIT])
 object InventoryShow : Function("INVENTORY") {
 
-    override val alias: String
-        get() = "Inventory-Show"
+    override val alias = "Inventory-Show"
+
+    override val reaction by resettableLazy("functions") {
+        Functions.CONF["General.Inventory-Show.Action"]?.let { Reaction(it.asList()) }
+    }
 
     @ConfigNode("General.Inventory-Show.Enabled", "function.yml")
     var enabled = true

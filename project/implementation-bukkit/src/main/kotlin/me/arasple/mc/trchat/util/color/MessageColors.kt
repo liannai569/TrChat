@@ -4,7 +4,6 @@ import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.module.chat.colored
 
 /**
  * @author Arasple
@@ -44,11 +43,7 @@ object MessageColors {
         }
 
         if (player.hasPermission("$COLOR_PERMISSION_NODE*")) {
-            string = string.colored()
-        }
-
-        getColors(player).forEach { color ->
-            string = string.replace(color, CustomColor.get(color).color)
+            return string.colorify()
         }
 
         string = if (player.hasPermission(COLOR_PERMISSION_NODE + "rainbow")) {
@@ -67,6 +62,10 @@ object MessageColors {
             string = string.parseHex()
         } else {
             Hex.HEX_PATTERNS.forEach { string = string.replace(it.toRegex(), "") }
+        }
+
+        getColors(player).forEach { color ->
+            string = string.replace(color, CustomColor.get(color).color)
         }
 
         return string

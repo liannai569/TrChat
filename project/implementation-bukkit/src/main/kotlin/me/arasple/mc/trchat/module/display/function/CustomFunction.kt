@@ -36,14 +36,11 @@ class CustomFunction(
     companion object {
 
         fun String.replaceRegex(regex: Regex, replaceRegex: Regex?, replacement: (String) -> String): String {
-            var string = this
-            regex.findAll(string).forEach {
+            return replace(regex) {
                 val str = it.value
                 val result = replaceRegex?.find(str)?.value ?: str
-                val rep = replacement(result)
-                string = string.replaceFirst(str, rep)
+                replacement(result)
             }
-            return string
         }
 
     }

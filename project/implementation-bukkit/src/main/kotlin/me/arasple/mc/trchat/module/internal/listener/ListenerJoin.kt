@@ -30,7 +30,7 @@ object ListenerJoin {
 
         Channel.channels.values.filter { it.settings.autoJoin }.forEach {
             if (it.settings.joinPermission == null || player.hasPermission(it.settings.joinPermission)) {
-                it.listeners.add(player.uniqueId)
+                it.listeners.add(player.name)
             }
         }
         player.session

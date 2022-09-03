@@ -7,6 +7,7 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.util.ResettableLazy
 import taboolib.common5.Baffle
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigNode
@@ -29,6 +30,7 @@ object Functions {
     fun init() {
         CONF.onReload {
             Loader.loadFunctions()
+            ResettableLazy.reset("functions")
         }
     }
 
@@ -51,4 +53,5 @@ object Functions {
     }
 
     class Command(val exact: Boolean, val condition: String?, val baffle: Baffle?, val relocate: List<String>?)
+
 }

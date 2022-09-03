@@ -25,7 +25,6 @@ import taboolib.common.util.subList
 import taboolib.module.lang.sendLang
 import taboolib.platform.util.onlinePlayers
 import taboolib.platform.util.sendLang
-import java.util.*
 
 /**
  * @author wlys
@@ -38,14 +37,14 @@ open class Channel(
     val events: ChannelEvents,
     val formats: List<Format>,
     val console: Format? = null,
-    val listeners: MutableSet<UUID> = mutableSetOf()
+    val listeners: MutableSet<String> = mutableSetOf()
 ) {
 
     init {
         if (settings.autoJoin) {
            onlinePlayers.forEach {
                 if (settings.joinPermission == null || it.hasPermission(settings.joinPermission)) {
-                    listeners.add(it.uniqueId)
+                    listeners.add(it.name)
                 }
             }
         } else {
@@ -154,8 +153,7 @@ open class Channel(
             return component to null
         }
 
-        events.send(player, msg)
-
+        // TODO: 跨服事件传递
         if (settings.proxy && BukkitProxyManager.processor != null) {
             val gson = gson(component)
             if (settings.ports != null) {
@@ -180,30 +178,35 @@ open class Channel(
         }
         when (settings.target.range) {
             Target.Range.ALL -> {
-                listeners.forEach {
+                listeners.filter { events.send(player, it, msg) }.forEach {
                     getProxyPlayer(it)?.sendComponent(player, component)
                 }
             }
             Target.Range.SINGLE_WORLD -> {
-                onlinePlayers.filter { listeners.contains(it.uniqueId) && it.world == player.world }.forEach {
+                onlinePlayers.filter { listeners.contains(it.name)
+                        && it.world == player.world
+                        && events.send(player, it.name, msg) }.forEach {
                     it.sendComponent(player, component)
                 }
             }
             Target.Range.DISTANCE -> {
-                onlinePlayers.filter { listeners.contains(it.uniqueId)
+                onlinePlayers.filter { listeners.contains(it.name)
                         && it.world == player.world
-                        && it.location.distance(player.location) <= settings.target.distance }.forEach {
+                        && it.location.distance(player.location) <= settings.target.distance
+                        && events.send(player, it.name, msg) }.forEach {
                     it.sendComponent(player, component)
                 }
             }
             Target.Range.SELF -> {
-                player.sendComponent(player, component)
+                if (events.send(player, player.name, msg)) {
+                    player.sendComponent(player, component)
+                }
             }
         }
         console().cast<CommandSender>().sendComponent(player, component)
 
-        player.session.lastMessage = message
-        ChatLogs.log(player, message)
+        player.session.lastMessage = msg
+        ChatLogs.log(player, msg)
         Metrics.increase(0)
 
         return component to null
@@ -218,33 +221,40 @@ open class Channel(
 
         val channels = mutableMapOf<String, Channel>()
 
-        fun join(player: Player, channel: String, hint: Boolean = true) {
+        fun join(player: Player, channel: String, hint: Boolean = true): Boolean {
             channels[channel]?.let {
-                join(player, it, hint)
-            } ?: quit(player)
+                return join(player, it, hint)
+            }
+            quit(player)
+            return false
         }
 
-        fun join(player: Player, channel: Channel, hint: Boolean = true) {
+        fun join(player: Player, channel: Channel, hint: Boolean = true): Boolean {
             if (channel.settings.joinPermission?.let { player.hasPermission(it) } == false) {
                 player.sendLang("General-No-Permission")
-                return
+                return false
             }
             player.session.channel = channel.id
-            channel.listeners.add(player.uniqueId)
+            channel.listeners.add(player.name)
+            channel.events.join(player)
 
             if (hint) {
                 player.sendLang("Channel-Join", channel.id)
             }
+            return true
         }
 
         fun quit(player: Player) {
             player.session.getChannel()?.let {
                 if (!it.settings.autoJoin) {
-                    it.listeners.remove(player.uniqueId)
+                    it.listeners.remove(player.name)
                 }
+                it.events.quit(player)
                 player.sendLang("Channel-Quit", it.id)
             }
-            player.session.channel = Settings.defaultChannel
+            if (!join(player, Settings.defaultChannel)) {
+                player.session.channel = null
+            }
         }
     }
 }

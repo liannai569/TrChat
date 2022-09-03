@@ -9,7 +9,9 @@ import org.bukkit.entity.Player
  */
 class ChannelEvents(
     private val process: Reaction?,
-    private val send: Reaction?
+    private val send: Reaction?,
+    private val join: Reaction?,
+    private val quit: Reaction?
 ) {
 
     fun process(sender: Player, message: String): String? {
@@ -22,7 +24,21 @@ class ChannelEvents(
         }
     }
 
-    fun send(sender: Player, message: String) {
-        send?.eval(sender, "message" to message)
+    fun send(sender: Player, receiver: String, message: String): Boolean {
+        send ?: return true
+        return when (val result = send.eval(sender, "receiver" to receiver, "message" to message)) {
+            null -> true
+            is Boolean -> result
+            else -> true
+        }
     }
+
+    fun join(sender: Player) {
+        join?.eval(sender)
+    }
+
+    fun quit(sender: Player) {
+        quit?.eval(sender)
+    }
+
 }

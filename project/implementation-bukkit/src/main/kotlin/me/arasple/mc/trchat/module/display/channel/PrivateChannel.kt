@@ -121,7 +121,9 @@ class PrivateChannel(
             return send to receive
         }
 
-        events.send(player, msg)
+        if (!events.send(player, session.lastPrivateTo, msg)) {
+            return null
+        }
 
         player.sendComponent(player, send)
 
@@ -134,7 +136,7 @@ class PrivateChannel(
             )
             player.sendProxyLang("Private-Message-Receive", player.name)
         } else {
-            getProxyPlayer(player.session.lastPrivateTo)?.let {
+            getProxyPlayer(session.lastPrivateTo)?.let {
                 it.sendComponent(player, receive)
                 it.sendLang("Private-Message-Receive", player.name)
             }

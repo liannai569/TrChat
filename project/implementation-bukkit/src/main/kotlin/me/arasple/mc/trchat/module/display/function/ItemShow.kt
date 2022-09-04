@@ -5,9 +5,7 @@ import com.google.common.cache.CacheBuilder
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.hoverItemFixed
-import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.passPermission
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -16,9 +14,7 @@ import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
-import taboolib.common.util.replaceWithOrder
 import taboolib.common.util.resettableLazy
-import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
@@ -46,9 +42,6 @@ object ItemShow : Function("ITEM") {
 
     @ConfigNode("General.Item-Show.Permission", "function.yml")
     var permission = "none"
-
-    @ConfigNode("General.Item-Show.Format", "function.yml")
-    var format = "&8[&3{0} &bx{1}&8]"
 
     @ConfigNode("General.Item-Show.Compatible", "function.yml")
     var compatible = false
@@ -82,8 +75,8 @@ object ItemShow : Function("ITEM") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
-        return mirrorNow("Function:ItemShow:CreateComponent") {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
+        return mirrorParse {
             val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).run {
                 if (compatible) {
                     buildItem(this) { material = Material.STONE }
@@ -93,9 +86,9 @@ object ItemShow : Function("ITEM") {
             }
             cache.getIfPresent(item) ?: kotlin.run {
                 HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item) ?:
-                legacy(format.replaceWithOrder(item.getDisplayName(sender), item.amount.toString()).colorify())
-                    .hoverItemFixed(item, sender)
-                    .also { cache.put(item, it) }
+                sender.getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
+                    ?.hoverItemFixed(item, sender)
+                    ?.also { cache.put(item, it) }
             }
         }
     }

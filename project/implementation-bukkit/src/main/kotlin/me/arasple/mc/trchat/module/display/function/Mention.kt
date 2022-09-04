@@ -4,13 +4,11 @@ import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.*
-import me.arasple.mc.trchat.util.color.colorify
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
-import taboolib.common.util.replaceWithOrder
 import taboolib.common.util.resettableLazy
 import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
@@ -37,9 +35,6 @@ object Mention : Function("MENTION") {
     @ConfigNode("General.Mention.Permission", "function.yml")
     var permission = "none"
 
-    @ConfigNode("General.Mention.Format", "function.yml")
-    var format = "&8[&3{0} &bx{1}&8]"
-
     @ConfigNode("General.Mention.Notify", "function.yml")
     var notify = true
 
@@ -50,17 +45,16 @@ object Mention : Function("MENTION") {
     val cooldown = ConfigNodeTransfer<String, Long> { parseMillis() }
 
     override fun createVariable(sender: Player, message: String): String {
-        return mirrorNow("Function:Mention:ReplaceMessage") {
+        return mirrorNow("Function:Mention:CreateVariable") {
             if (!enabled) {
                 message
             } else {
                 var result = message
                 var mentioned = false
-                BukkitPlayers.getRegex(sender).forEach { regex ->
-                    if (result.contains(regex)) {
-                        result = regex.replace(result, "{{MENTION:\$1}}")
-                        mentioned = true
-                    }
+                val regex = BukkitPlayers.getRegex(sender)
+                if (result.contains(regex)) {
+                    result = regex.replace(result, "{{MENTION:\$1}}")
+                    mentioned = true
                 }
                 if (mentioned && !sender.hasPermission("trchat.bypass.mentioncd")) {
                     sender.updateCooldown(CooldownType.MENTION, cooldown.get())
@@ -70,12 +64,12 @@ object Mention : Function("MENTION") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
-        return mirrorNow("Function:Mention:CreateCompoennt") {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
+        return mirrorParse {
             if (notify && forward) {
-                sender.sendProxyLang(arg, "Mentions-Notify", sender.name)
+                sender.sendProxyLang(arg, "Function-Mention-Notify", sender.name)
             }
-            legacy(format.replaceWithOrder(arg).colorify())
+            sender.getComponentFromLang("Function-Mention-Format", arg, sender.name)
         }
     }
 

@@ -1,5 +1,6 @@
 package me.arasple.mc.trchat.module.internal.data
 
+import me.arasple.mc.trchat.api.event.CustomDatabaseEvent
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.internal.database.Database
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQL
@@ -23,10 +24,14 @@ object Databases {
     lateinit var database: Database
 
     fun init() {
-        database = when (val type = Settings.CONF.getString("Database.Method")!!.uppercase()) {
-            "SQLITE" -> DatabaseSQLite()
+        database = when (val type = Settings.CONF.getString("Database.Method")?.uppercase()) {
+            "LOCAL", "SQLITE", null -> DatabaseSQLite()
             "SQL" -> DatabaseSQL()
-            else -> error("Unsupported database type: $type")
+            else -> {
+                val event = CustomDatabaseEvent(type)
+                event.call()
+                event.database ?: error("Unsupported database type: $type")
+            }
         }
     }
 

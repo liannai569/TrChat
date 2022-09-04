@@ -87,7 +87,7 @@ open class Channel(
         console?.let { format ->
             format.prefix.forEach { prefix ->
                 builder.append(prefix.value.first().content.toTextComponent(sender)) }
-            builder.append(format.msg.serialize(sender, message, settings.disabledFunctions, true))
+            builder.append(format.msg.createComponent(sender, message, settings.disabledFunctions, true))
             format.suffix.forEach { suffix ->
                 builder.append(suffix.value.first().content.toTextComponent(sender)) }
         } ?: return
@@ -143,7 +143,7 @@ open class Channel(
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
             format.prefix.forEach { prefix ->
                 builder.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
-            builder.append(format.msg.serialize(player, msg, settings.disabledFunctions, forward))
+            builder.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
             format.suffix.forEach { suffix ->
                 builder.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
         } ?: return null

@@ -19,10 +19,11 @@ object BukkitPlayers {
 
     private var players = listOf<String>()
 
-    fun getRegex(player: Player): List<Regex> {
-        return getPlayers().filter { (Mention.selfMention || it != player.name) && !PlayerData.vanishing.contains(it) }.map {
-            Regex("@? ?($it)", RegexOption.IGNORE_CASE)
-        }
+    fun getRegex(player: Player): Regex {
+        val names = getPlayers()
+            .filter { (Mention.selfMention || it != player.name) && !PlayerData.vanishing.contains(it) }
+            .joinToString("|") { Regex.escape(it) }
+        return Regex("@? ?($names)", RegexOption.IGNORE_CASE)
     }
 
     fun isPlayerOnline(target: String): Boolean {

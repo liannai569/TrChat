@@ -10,7 +10,6 @@ General:
     Enabled: true
     Permission: 'none'
     Cooldown: '30s'
-    Format: '&8[&3{0} &bx{1}&8]'
     Origin-Name: false
     Compatible: false
     Keys:
@@ -24,13 +23,11 @@ General:
     Enabled: true
     Self-Mention: false
     Permission: 'none'
-    Format: '&r &a@&2{0}&r '
     Cooldown: '30s'
     Notify: true
   Mention-All:
     Enabled: true
     Permission: 'trchat.function.mentionall'
-    Format: '&r &a@&2所有人&r '
     Cooldown: '5m'
     Notify: true
     Keys:
@@ -43,7 +40,6 @@ General:
     Enabled: true
     Permission: 'none'
     Cooldown: '30s'
-    Format: "&8[&3{0}'s Inventory&8]"
     Keys:
       - '[inv]'
       - '[inventory]'
@@ -51,7 +47,6 @@ General:
     Enabled: true
     Permission: 'none'
     Cooldown: '30s'
-    Format: "&8[&3{0}'s Ender Chest&8]"
     Keys:
       - '[ender]'
       - '[enderchest]'

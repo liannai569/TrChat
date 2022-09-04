@@ -4,11 +4,8 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.color.colorify
-import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.passPermission
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -16,9 +13,7 @@ import taboolib.common.io.digest
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
-import taboolib.common.util.replaceWithOrder
 import taboolib.common.util.resettableLazy
-import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.ConfigNode
@@ -51,9 +46,6 @@ object EnderChestShow : Function("ENDERCHEST") {
     @ConfigNode("General.EnderChest-Show.Permission", "function.yml")
     var permission = "none"
 
-    @ConfigNode("General.EnderChest-Show.Format", "function.yml")
-    var format = "&8[&3{0}'s Inventory&8]"
-
     @ConfigNode("General.EnderChest-Show.Cooldown", "function.yml")
     val cooldown = ConfigNodeTransfer<String, Long> { parseMillis() }
 
@@ -70,14 +62,14 @@ object EnderChestShow : Function("ENDERCHEST") {
         } else {
             var result = message
             keys.forEach {
-                result = result.replaceFirst(it, "{{ENDERCHEST:SELF}}", ignoreCase = true)
+                result = result.replaceFirst(it, "{{ENDERCHEST:${sender.name}}}", ignoreCase = true)
             }
             return result
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
-        return mirrorNow("Function:EnderChestShow:CreateComponent") {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
+        return mirrorParse {
             val menu = buildMenu<Linked<ItemStack>>("${sender.name}'s Ender Chest") {
                 rows(3)
                 slots(inventorySlots)
@@ -90,7 +82,7 @@ object EnderChestShow : Function("ENDERCHEST") {
             }
             val sha1 = Base64.getEncoder().encodeToString(sender.inventory.serializeToByteArray()).digest("sha-1")
             cache.put(sha1, menu)
-            legacy(format.replaceWithOrder(sender.name).colorify()).clickEvent(ClickEvent.runCommand("/view-enderchest $sha1"))
+            sender.getComponentFromLang("Function-EnderChest-Show-Format", sender.name, sha1)
         }
     }
 

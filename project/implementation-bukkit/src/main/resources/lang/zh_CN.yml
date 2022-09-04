@@ -93,16 +93,41 @@ Command-Controller-Cooldown: '&c&l该命令冷却中...({0})'
 Command-Not-Player: '&8[&3Tr&bChat&8] &c你必须是一个玩家才能执行此操作.'
 Command-Player-Not-Exist: '&8[&3Tr&bChat&8] &7目标玩家未在线或不存在.'
 
-Mentions-Notify:
+Function-Mention-Format:
+  - type: json
+    text: ' [&a@&2{0}] '
+    args:
+      - hover: '&7点击私聊!'
+        suggest: '/tell {1}'
+Function-Mention-Notify:
   - type: actionbar
     text: '&d&l&k|&r &3&l玩家 &a&l{0} &3&l在聊天中At了你 &d&l&k|'
   - type: sound
     sound: 'BLOCK_ANVIL_LAND'
     volume: 1
     pitch: 2
-
-Inventory-Show-Unavailable: '&c&l该背包已过期或不存在...'
-EnderChest-Show-Unavailable: '&c&l该末影箱已过期或不存在...'
+Function-Item-Show-Format:
+  - type: json
+    text: '[&8\[&3{0} &bx{1}&8\]]'
+    args: [ ]
+Function-Inventory-Show-Format:
+  - type: json
+    text: '[&8\[&3{0}的背包&8\]]'
+    args:
+      - hover: '&7点击查看{0}的背包'
+        command: '/view-inventory {1}'
+Function-Inventory-Show-Unavailable: '&c&l该背包已过期或不存在...'
+Function-EnderChest-Show-Format:
+  - type: json
+    text: '[&8\[&3{0}的末影箱&8\]]'
+    args:
+      - hover: '&7点击查看{0}的末影箱'
+        command: '/view-enderchest {1}'
+Function-EnderChest-Show-Unavailable: '&c&l该末影箱已过期或不存在...'
+Function-Mention-All-Format:
+  - type: json
+    text: ' [&a@&2所有人] '
+    args: [ ]
 
 Private-Message-Spy-Format: '&8[&3监听&8] &6{0} &2-> &3{1}&f: &7{2}'
 Private-Message-Spy-On:

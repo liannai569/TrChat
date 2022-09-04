@@ -25,7 +25,6 @@ taboolib {
         "module-chat",
         "module-configuration",
         "module-database",
-//        "module-database-mongodb",
         "module-kether",
         "module-lang",
         "module-metrics",

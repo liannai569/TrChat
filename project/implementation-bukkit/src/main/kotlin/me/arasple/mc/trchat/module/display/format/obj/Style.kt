@@ -96,11 +96,11 @@ sealed interface Style {
                 }
                 is Hover.Text -> {
                     contents.filter { it.second.pass(sender) }.joinToString("\n") { it.first }
-                        .setPlaceholders(sender).replace("\$message", message).replaceWithOrder(*vars).colorify()
+                        .replace("\$message", message).replaceWithOrder(*vars).setPlaceholders(sender).colorify()
                 }
                 else -> {
                     contents.first { it.second.pass(sender) }.first
-                        .setPlaceholders(sender).replace("\$message", message).replaceWithOrder(*vars)
+                        .replace("\$message", message).replaceWithOrder(*vars).setPlaceholders(sender)
                 }
             }
             process(builder, content)

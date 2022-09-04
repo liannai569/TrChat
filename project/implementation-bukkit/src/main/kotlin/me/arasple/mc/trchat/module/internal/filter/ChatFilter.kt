@@ -26,8 +26,8 @@ import java.nio.charset.StandardCharsets
 object ChatFilter {
 
     private val custom_replacements = mutableMapOf<String, String>()
-    private val cloud_words = mutableListOf<String>()
     private val white_words = mutableListOf<String>()
+    private val cloud_words = mutableListOf<String>()
     private val cloud_last_update = mutableMapOf<String, String>()
     private var cloud_url = listOf<String>()
 
@@ -46,7 +46,7 @@ object ChatFilter {
         // 初始化本地配置
         Filter.setSensitiveWord(Filters.CONF.getStringList("Local"))
         Filter.setPunctuations(Filters.CONF.getStringList("Ignored-Punctuations"))
-        Filter.setReplacement(Filters.CONF.getString("Replacement")!![0])
+        Filter.setReplacement(Filters.CONF.getString("Replacement", "*")!![0])
 
         notify.sendLang("Plugin-Loaded-Filter-Local", Filters.CONF.getStringList("Local").size)
 

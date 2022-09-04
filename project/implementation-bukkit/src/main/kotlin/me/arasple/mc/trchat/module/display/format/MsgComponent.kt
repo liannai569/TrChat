@@ -22,8 +22,8 @@ import taboolib.common5.mirrorNow
  */
 class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style: List<Style>) : JsonComponent(null, style) {
 
-    fun serialize(sender: CommandSender, msg: String, disabledFunctions: List<String>, forward: Boolean): TextComponent {
-        val component = Component.text()
+    fun createComponent(sender: CommandSender, msg: String, disabledFunctions: List<String>, forward: Boolean): TextComponent {
+        val builder = Component.text()
         var message = msg
 
         if (sender !is Player) {
@@ -41,14 +41,14 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
                 val args = part.text.split(":", limit = 2)
                 val function = Function.functions.firstOrNull { it.id == args[0] }
                 if (function != null) {
-                    component.append(function.parseVariable(sender, forward, args[1]))
+                    function.parseVariable(sender, forward, args[1])?.let { builder.append(it) }
                     function.reaction?.eval(sender, "message" to message)
                 }
                 continue
             }
-            component.append(toTextComponent(sender, MessageColors.defaultColored(defaultColor, sender, part.text)))
+            builder.append(toTextComponent(sender, MessageColors.defaultColored(defaultColor, sender, part.text)))
         }
-        return component.build()
+        return builder.build()
     }
 
     override fun toTextComponent(sender: CommandSender, vararg vars: String): TextComponent {

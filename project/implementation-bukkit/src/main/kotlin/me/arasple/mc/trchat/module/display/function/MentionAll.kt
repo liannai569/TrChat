@@ -3,8 +3,6 @@ package me.arasple.mc.trchat.module.display.function
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.color.colorify
-import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.passPermission
 import me.arasple.mc.trchat.util.sendProxyLang
 import net.kyori.adventure.text.Component
@@ -13,7 +11,6 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
 import taboolib.common.util.resettableLazy
-import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
@@ -56,20 +53,20 @@ object MentionAll : Function("MENTIONALL") {
         } else {
             var result = message
             keys.forEach {
-                result = result.replace(it, "{{MENTIONALL}}")
+                result = result.replace(it, "{{MENTIONALL:${sender.name}}}")
             }
             result
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component {
-        return mirrorNow("Function:Mention:CreateCompoennt") {
+    override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
+        return mirrorParse {
             if (notify && forward) {
-                BukkitPlayers.getPlayers().forEach {
-                    sender.sendProxyLang(it, "Mentions-Notify", sender.name)
+                BukkitPlayers.getPlayers().filter { it != arg }.forEach {
+                    sender.sendProxyLang(it, "Function-Mention-Notify", sender.name)
                 }
             }
-            legacy(format.colorify())
+            sender.getComponentFromLang("Function-Mention-All-Format", sender.name)
         }
     }
 

@@ -29,7 +29,7 @@ object CommandViewEnderChest {
                     EnderChestShow.cache.getIfPresent(argument)?.let {
                         sender.openInventory(it)
                     } ?: kotlin.run {
-                        sender.sendLang("EnderChest-Show-Unavailable")
+                        sender.sendLang("Function-EnderChest-Show-Unavailable")
                     }
                 }
             }

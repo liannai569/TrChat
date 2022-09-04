@@ -39,11 +39,12 @@ object DefaultTrChatAPI : TrChatAPI {
     override fun eval(sender: ProxyCommandSender, script: String, vararg vars: Pair<String, Any?>): CompletableFuture<Any?> {
         return mirrorNow("Handler:Script:Evaluation") {
             return@mirrorNow try {
-                KetherShell.eval(script, namespace = listOf("trchat", "trmenu", "trhologram"), sender = sender) {
-                    vars.forEach {
-                        set(it.first, it.second)
-                    }
-                }
+                KetherShell.eval(
+                    script,
+                    namespace = listOf("trchat", "trmenu", "trhologram"),
+                    sender = sender,
+                    vars = KetherShell.VariableMap(vars.toMap())
+                )
             } catch (e: LocalizedException) {
                 println("§c[TrChat] §8Unexpected exception while parsing kether shell:")
                 e.localizedMessage.split("\n").forEach {

@@ -85,6 +85,7 @@ open class Channel(
     open fun execute(sender: CommandSender, message: String) {
         if (sender is Player) {
             execute(sender, message)
+            return
         }
         val builder = Component.text()
         console?.let { format ->
@@ -116,12 +117,12 @@ open class Channel(
                     settings.doubleTransfer.toString()
                 )
             }
-            return
+        } else {
+            listeners.forEach {
+                getProxyPlayer(it)?.sendComponent(it, component)
+            }
+            sender.sendComponent(null, component)
         }
-        listeners.forEach {
-            getProxyPlayer(it)?.sendComponent(it, component)
-        }
-        sender.sendComponent(null, component)
     }
 
     open fun execute(player: Player, message: String, forward: Boolean = true): Pair<Component, Component?>? {

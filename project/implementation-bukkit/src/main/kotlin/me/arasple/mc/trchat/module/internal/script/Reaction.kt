@@ -20,7 +20,7 @@ value class Reaction(private val script: List<String>) {
     companion object {
 
         fun eval(player: Player, script: List<String>, vararg additions: Pair<String, Any>): Any? {
-            val (isJavaScript, js) = JavaScriptAgent.serialize(script.first())
+            val (isJavaScript, js) = JavaScriptAgent.serialize(script[0])
             return if (isJavaScript) JavaScriptAgent.eval(player, js!!, *additions).get()
             else TrChat.api().eval(adaptPlayer(player), script, *additions).get()
         }

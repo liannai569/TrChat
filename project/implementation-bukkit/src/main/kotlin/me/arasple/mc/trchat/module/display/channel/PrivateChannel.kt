@@ -99,21 +99,25 @@ class PrivateChannel(
 
         val builderSender = Component.text()
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->
-            format.prefix.forEach { prefix ->
-                builderSender.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
+            format.prefix
+                .mapNotNull { prefix -> prefix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
+                .forEach { prefix -> builderSender.append(prefix) }
             builderSender.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
-            format.suffix.forEach { suffix ->
-                builderSender.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
+            format.suffix
+                .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
+                .forEach { suffix -> builderSender.append(suffix) }
         } ?: return null
         val send = builderSender.build()
 
         val builderReceiver = Component.text()
         receiver.firstOrNull { it.condition.pass(player) }?.let { format ->
-            format.prefix.forEach { prefix ->
-                builderReceiver.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
+            format.prefix
+                .mapNotNull { prefix -> prefix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
+                .forEach { prefix -> builderReceiver.append(prefix) }
             builderReceiver.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
-            format.suffix.forEach { suffix ->
-                builderReceiver.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
+            format.suffix
+                .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
+                .forEach { suffix -> builderReceiver.append(suffix) }
         } ?: return null
         val receive = builderReceiver.build()
 

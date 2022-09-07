@@ -92,18 +92,20 @@ sealed interface Style {
         fun Style.applyTo(builder: TextComponent.Builder, sender: CommandSender, vararg vars: String, message: String = "") {
             val content = when (this) {
                 is Font -> {
-                    contents.first { it.second.pass(sender) }.first
+                    contents.firstOrNull { it.second.pass(sender) }?.first
                 }
                 is Hover.Text -> {
                     contents.filter { it.second.pass(sender) }.joinToString("\n") { it.first }
                         .replace("\$message", message).replaceWithOrder(*vars).setPlaceholders(sender).colorify()
                 }
                 else -> {
-                    contents.first { it.second.pass(sender) }.first
-                        .replace("\$message", message).replaceWithOrder(*vars).setPlaceholders(sender)
+                    contents.firstOrNull { it.second.pass(sender) }?.first
+                        ?.replace("\$message", message)?.replaceWithOrder(*vars)?.setPlaceholders(sender)
                 }
             }
-            process(builder, content)
+            if (content != null) {
+                process(builder, content)
+            }
         }
 
     }

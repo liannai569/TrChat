@@ -19,10 +19,12 @@ object BukkitPlayers {
 
     private var players = listOf<String>()
 
-    fun getRegex(player: Player): Regex {
+    fun getRegex(player: Player): Regex? {
         val names = getPlayers()
             .filter { (Mention.selfMention || it != player.name) && !PlayerData.vanishing.contains(it) }
-            .joinToString("|") { Regex.escape(it) }
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString("|") { Regex.escape(it) }
+            ?: return null
         return Regex("@? ?($names)", RegexOption.IGNORE_CASE)
     }
 
@@ -46,4 +48,5 @@ object BukkitPlayers {
     fun setPlayers(players: List<String>) {
         BukkitPlayers.players = players
     }
+
 }

@@ -33,7 +33,7 @@ class ChatSession(
 
     val receivedMessages = mutableListOf<ChatMessage>()
 
-    fun getColor(default: CustomColor): CustomColor {
+    fun getColor(default: CustomColor?): CustomColor {
         val forces = MessageColors.getForceColors(player)
         return if (forces.isNotEmpty()) {
             CustomColor.get(forces[0])
@@ -42,7 +42,7 @@ class ChatSession(
             if (selectedColor != null && player.hasPermission(MessageColors.COLOR_PERMISSION_NODE + selectedColor)) {
                 CustomColor.get(selectedColor)
             } else {
-                default
+                default ?: CustomColor(CustomColor.ColorType.NORMAL, "§r")
             }
         }
     }

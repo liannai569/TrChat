@@ -10,7 +10,6 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
 import taboolib.common.util.resettableLazy
-import taboolib.common5.mirrorNow
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
@@ -45,22 +44,19 @@ object Mention : Function("MENTION") {
     val cooldown = ConfigNodeTransfer<String, Long> { parseMillis() }
 
     override fun createVariable(sender: Player, message: String): String {
-        return mirrorNow("Function:Mention:CreateVariable") {
-            if (!enabled) {
-                message
-            } else {
-                var result = message
-                var mentioned = false
-                val regex = BukkitPlayers.getRegex(sender)
-                if (result.contains(regex)) {
-                    result = regex.replace(result, "{{MENTION:\$1}}")
-                    mentioned = true
-                }
-                if (mentioned && !sender.hasPermission("trchat.bypass.mentioncd")) {
-                    sender.updateCooldown(CooldownType.MENTION, cooldown.get())
-                }
-                result
+        return if (!enabled) {
+            message
+        } else {
+            var result = message
+            val regex = BukkitPlayers.getRegex(sender) ?: return message
+            val mentioned = result.contains(regex)
+            if (mentioned) {
+                result = regex.replace(result, "{{MENTION:\$1}}")
             }
+            if (mentioned && !sender.hasPermission("trchat.bypass.mentioncd")) {
+                sender.updateCooldown(CooldownType.MENTION, cooldown.get())
+            }
+            result
         }
     }
 

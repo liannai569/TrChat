@@ -18,7 +18,7 @@ class ChannelEvents(
         process ?: return message
         return when (val result = process.eval(sender, "message" to message)) {
             null -> message
-            is Boolean -> if (result) message else null
+            is Boolean -> message.takeIf { result }
             is String -> result
             else -> message
         }

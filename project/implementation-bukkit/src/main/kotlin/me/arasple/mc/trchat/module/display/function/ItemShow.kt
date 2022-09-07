@@ -77,16 +77,16 @@ object ItemShow : Function("ITEM") {
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
         return mirrorParse {
-            val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).run {
+            val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).let {
                 if (compatible) {
-                    buildItem(this) { material = Material.STONE }
+                    buildItem(it) { material = Material.STONE }
                 } else {
-                    clone()
+                    it.clone()
                 }
             }
             cache.getIfPresent(item) ?: kotlin.run {
                 HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item) ?:
-                sender.getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
+                sender.getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender).also { println(it) }, item.amount)
                     ?.hoverItemFixed(item, sender)
                     ?.also { cache.put(item, it) }
             }

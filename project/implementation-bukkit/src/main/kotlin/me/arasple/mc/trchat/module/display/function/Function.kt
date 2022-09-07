@@ -55,14 +55,17 @@ abstract class Function(val id: String) {
         fun Player.getComponentFromLang(node: String, vararg args: Any): TextComponent? {
             val sender = adaptPlayer(this)
             val file = sender.getLocaleFile() ?: return null
-            val type = file.nodes[node].let { if (it is TypeList) it.list.first() else it }
+            val type = file.nodes[node].let { if (it is TypeList) it.list[0] else it }
             return when (type) {
                 is TypeJson -> {
                     var i = 0
                     val builder = Component.text()
                     parser.readToFlatten(type.text!!.joinToString()).forEach { part ->
-                        builder.append(Component.text().run {
-                            content(part.text.replace("\\[", "[").replace("\\]", "]").translate(sender).replaceWithOrder(*args))
+                        builder.append(legacy(
+                            part.text
+                            .replace("\\[", "[").replace("\\]", "]")
+                            .translate(sender).replaceWithOrder(*args)
+                        ).toBuilder().run {
                             if (part.isVariable) {
                                 val arg = type.jsonArgs.getOrNull(i++)
                                 if (arg != null) {

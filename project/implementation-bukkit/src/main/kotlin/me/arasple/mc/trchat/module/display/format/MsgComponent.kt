@@ -34,7 +34,7 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
             message = it.createVariable(sender, message)
         }
 
-        val defaultColor = sender.session.getColor(defaultColor.first { it.second.pass(sender) }.first)
+        val defaultColor = sender.session.getColor(defaultColor.firstOrNull { it.second.pass(sender) }?.first)
 
         for (part in parser.readToFlatten(message)) {
             if (part.isVariable) {

@@ -83,13 +83,16 @@ open class Channel(
     }
 
     open fun execute(sender: CommandSender, message: String) {
+        if (sender is Player) {
+            execute(sender, message)
+        }
         val builder = Component.text()
         console?.let { format ->
             format.prefix.forEach { prefix ->
-                builder.append(prefix.value.first().content.toTextComponent(sender)) }
+                builder.append(prefix.value[0].content.toTextComponent(sender)) }
             builder.append(format.msg.createComponent(sender, message, settings.disabledFunctions, true))
             format.suffix.forEach { suffix ->
-                builder.append(suffix.value.first().content.toTextComponent(sender)) }
+                builder.append(suffix.value[0].content.toTextComponent(sender)) }
         } ?: return
         val component = builder.build()
 
@@ -141,11 +144,13 @@ open class Channel(
 
         val builder = Component.text()
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
-            format.prefix.forEach { prefix ->
-                builder.append(prefix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
+            format.prefix
+                .mapNotNull { prefix -> prefix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
+                .forEach { prefix -> builder.append(prefix) }
             builder.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
-            format.suffix.forEach { suffix ->
-                builder.append(suffix.value.first { it.condition.pass(player) }.content.toTextComponent(player)) }
+            format.suffix
+                .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
+                .forEach { suffix -> builder.append(suffix) }
         } ?: return null
         val component = builder.build()
 

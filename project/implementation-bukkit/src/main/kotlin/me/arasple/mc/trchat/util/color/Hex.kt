@@ -22,11 +22,11 @@ import kotlin.math.*
 object Hex {
 
     private const val CHARS_UNTIL_LOOP = 30
-    internal val RAINBOW_PATTERN =
+    val RAINBOW_PATTERN =
         Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>")
-    internal val GRADIENT_PATTERN =
+    val GRADIENT_PATTERN =
         Pattern.compile("<(?<type>gradient|g)(#(?<speed>\\d+))?(?<hex>(:#([A-Fa-f\\d]{6}|[A-Fa-f\\d]{3})){2,})(:(?<loop>l|L|loop))?>")
-    internal val HEX_PATTERNS = listOf(
+    val HEX_PATTERNS = listOf(
         Pattern.compile("<#([A-Fa-f\\d]){6}>"),  // <#FFFFFF>
         Pattern.compile("\\{#([A-Fa-f\\d]){6}}"),  // {#FFFFFF}
         Pattern.compile("&#([A-Fa-f\\d]){6}"),  // &#FFFFFF
@@ -78,7 +78,7 @@ object Hex {
         return parsed
     }
 
-    internal fun parseRainbow(message: String): String {
+    fun parseRainbow(message: String): String {
         return mirrorNow("Handler:Color:Rainbow") {
             var parsed = message
             var matcher = RAINBOW_PATTERN.matcher(parsed)
@@ -148,7 +148,7 @@ object Hex {
         }
     }
 
-    internal fun parseGradients(message: String): String {
+    fun parseGradients(message: String): String {
         return mirrorNow("Handler:Color:Gradients") {
             var parsed = message
             var matcher = GRADIENT_PATTERN.matcher(parsed)
@@ -206,7 +206,7 @@ object Hex {
         }
     }
 
-    internal fun parseHex(message: String): String {
+    fun parseHex(message: String): String {
         if (isDragonCoreHooked) {
             return message
         }
@@ -226,7 +226,7 @@ object Hex {
         }
     }
 
-    internal fun parseLegacy(message: String): String {
+    fun parseLegacy(message: String): String {
         return ChatColor.translateAlternateColorCodes('&', message)
     }
 

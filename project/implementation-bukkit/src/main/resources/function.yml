@@ -19,12 +19,14 @@ General:
       - "%item"
       - "[i]"
       - "[item]"
+    Actions: [ ]
   Mention:
     Enabled: true
     Self-Mention: false
     Permission: 'none'
     Cooldown: '30s'
     Notify: true
+    Actions: [ ]
   Mention-All:
     Enabled: true
     Permission: 'trchat.function.mentionall'
@@ -36,6 +38,7 @@ General:
       - "@everybody"
       - "@所有人"
       - "@全体成员"
+    Actions: [ ]
   Inventory-Show:
     Enabled: true
     Permission: 'none'
@@ -43,6 +46,7 @@ General:
     Keys:
       - '[inv]'
       - '[inventory]'
+    Actions: [ ]
   EnderChest-Show:
     Enabled: true
     Permission: 'none'
@@ -50,6 +54,7 @@ General:
     Keys:
       - '[ender]'
       - '[enderchest]'
+    Actions: [ ]
 
 Custom:
   # 示例 —— 网站分享

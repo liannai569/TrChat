@@ -21,42 +21,44 @@ body:
         - label: '我已查阅 Wiki 对于该问题的相关内容, 并确定该问题是存在的.'
           required: true
 
-  - type: markdown
+  - type: textarea
+    id: description
     attributes:
-      value: |
-        
-        **详细描述**
-        
-        能够重现的动作及前提:
-      
+      label: '详细描述'
+      description: '能够重现的动作及前提'
+      placeholder: |
         1. ...
         2. ...
         3. ...
-      
-        **配置文件**
-      
-        发生错误的频道文件或settings.yml
-        ```yaml
-        
-        ```
-      
-        **控制台日志**
-      
-        若发生错误时后台出现信息/报错, 请提供
-        ```
-        
-        ```
-      
-        **服务器环境**
-      
-        在此处粘贴`/version`和`/plugins`的返回结果
-      
-        服务器版本：
-        ```
-        
-        ```
-      
-        插件列表：
-        ```
-        
-        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: '配置文件'
+      description: '发生错误的频道文件或settings.yml'
+      render: 'YAML'
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: '日志'
+      description: '若发生错误时服务端/客户端后台出现信息/报错, 请提供'
+    validations:
+      required: false
+
+  - type: textarea
+    id: environments
+    attributes:
+      label: '服务器环境'
+      description: '在此处粘贴 /version 和 /plugins 的返回结果'
+      value: |
+        服务器版本:
+        ...
+        插件列表:
+        ...
+    validations:
+      required: true

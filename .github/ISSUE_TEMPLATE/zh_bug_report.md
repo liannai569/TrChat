@@ -1,13 +1,10 @@
----
 name: 错误报告
 about: '注意: 未正确根据提示进行反馈错误会被关闭.'
 title: "[问题]: "
 labels: Bug | 漏洞
 assignees: ''
-
----
-
-- type: checkboxes
+body:
+  - type: checkboxes
     id: latests
     attributes:
       label: '是否已尝试最新的版本'
@@ -16,7 +13,7 @@ assignees: ''
         - label: '我已更新 TrChat 至最新的版本, 并且同样复现该问题.'
           required: true
 
-- type: checkboxes
+  - type: checkboxes
     id: wikis
     attributes:
       label: '是否已查阅 Wiki'
@@ -25,31 +22,38 @@ assignees: ''
         - label: '我已查阅 Wiki 对于该问题的相关内容, 并确定该问题是存在的.'
           required: true
 
-**详细描述**
-能够重现的动作及前提:
-1. ...
-2. ...
-3. ...
+  **详细描述**
+  
+  能够重现的动作及前提:
 
-**配置文件**
-发生错误的频道文件或settings.yml
-```yaml
+  1. ...
+  2. ...
+  3. ...
 
-```
+  **配置文件**
 
-**控制台日志**
-若发生错误时后台出现信息/报错, 请提供
-```
+  发生错误的频道文件或settings.yml
+  ```yaml
+  
+  ```
 
-```
+  **控制台日志**
 
-**服务器环境**
-在此处粘贴/version和/plugins的返回结果
-服务器版本：
-```
+  若发生错误时后台出现信息/报错, 请提供
+  ```
+  
+  ```
 
-```
-插件列表：
-```
+  **服务器环境**
 
-```
+  在此处粘贴`/version`和`/plugins`的返回结果
+
+  服务器版本：
+  ```
+  
+  ```
+
+  插件列表：
+  ```
+  
+  ```

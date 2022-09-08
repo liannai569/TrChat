@@ -4,7 +4,7 @@ title: "[问题]: "
 labels: ['Bug | 漏洞']
 body:
   - type: checkboxes
-    id: latest
+    id: latests
     attributes:
       label: '是否已尝试最新的版本'
       description: '你的问题也许已经被发现并被修复于[最新版](https://github.com/TrPlugins/TrChat/actions)'
@@ -13,7 +13,7 @@ body:
           required: true
 
   - type: checkboxes
-    id: wiki
+    id: wikis
     attributes:
       label: '是否已查阅 Wiki'
       description: '往往很多问题都是因为没有详细查阅 Wiki, 或是Wiki已经有解决方案, 你是否已阅读 [Wiki](https://trchat.plugindoc.cn/wen-ti/known)?'

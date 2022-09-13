@@ -1,7 +1,7 @@
 name: Error Report
-description: 'Note: Failure to properly follow the prompts for feedback errors will be closed.'
+description: 'Warning: Failure to properly follow the prompts for feedback errors will be closed.'
 title: "[issue]: "
-labels: ['Bug | vulnerability']
+labels: ['Bug | 漏洞']
 body:
   - type: checkboxes
     id: latests

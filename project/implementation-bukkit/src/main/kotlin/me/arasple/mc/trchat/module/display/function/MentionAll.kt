@@ -35,9 +35,6 @@ object MentionAll : Function("MENTIONALL") {
     @ConfigNode("General.Mention-All.Permission", "function.yml")
     var permission = "trchat.function.mentionall"
 
-    @ConfigNode("General.Mention-All.Format", "function.yml")
-    var format = "&8[&3{0} &bx{1}&8]"
-
     @ConfigNode("General.Mention-All.Notify", "function.yml")
     var notify = true
 

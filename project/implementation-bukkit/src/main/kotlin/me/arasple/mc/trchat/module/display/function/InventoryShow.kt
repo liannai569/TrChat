@@ -82,17 +82,17 @@ object InventoryShow : Function("INVENTORY") {
                 onGenerate { _, element, _, _ ->
                     element
                 }
-                onBuild {
-                    it.setItem(0, PLACEHOLDER_ITEM)
-                    it.setItem(1, sender.inventory.invokeMethod<ItemStack>("getItemInOffHand").replaceAir())
-                    it.setItem(2, buildItem(XMaterial.PLAYER_HEAD) { name = "§e${sender.name}" })
-                    it.setItem(3, sender.inventory.itemInHand.replaceAir())
-                    it.setItem(4, PLACEHOLDER_ITEM)
-                    it.setItem(5, sender.inventory.helmet.replaceAir())
-                    it.setItem(6, sender.inventory.chestplate.replaceAir())
-                    it.setItem(7, sender.inventory.leggings.replaceAir())
-                    it.setItem(8, sender.inventory.boots.replaceAir())
-                    (9..17).forEach { slot -> it.setItem(slot, PLACEHOLDER_ITEM) }
+                onBuild { _, inv ->
+                    inv.setItem(0, PLACEHOLDER_ITEM)
+                    inv.setItem(1, sender.inventory.invokeMethod<ItemStack>("getItemInOffHand").replaceAir())
+                    inv.setItem(2, buildItem(XMaterial.PLAYER_HEAD) { name = "§e${sender.name}" })
+                    inv.setItem(3, sender.inventory.itemInHand.replaceAir())
+                    inv.setItem(4, PLACEHOLDER_ITEM)
+                    inv.setItem(5, sender.inventory.helmet.replaceAir())
+                    inv.setItem(6, sender.inventory.chestplate.replaceAir())
+                    inv.setItem(7, sender.inventory.leggings.replaceAir())
+                    inv.setItem(8, sender.inventory.boots.replaceAir())
+                    (9..17).forEach { slot -> inv.setItem(slot, PLACEHOLDER_ITEM) }
                 }
             }
             val sha1 = Base64.getEncoder().encodeToString(sender.inventory.serializeToByteArray()).digest("sha-1")

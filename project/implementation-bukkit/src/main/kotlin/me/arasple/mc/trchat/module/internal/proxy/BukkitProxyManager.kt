@@ -1,5 +1,6 @@
 package me.arasple.mc.trchat.module.internal.proxy
 
+import com.google.common.base.Enums
 import me.arasple.mc.trchat.ProxyManager
 import me.arasple.mc.trchat.module.conf.file.Settings
 import org.bukkit.Bukkit
@@ -12,6 +13,7 @@ import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.unsafeLazy
 import taboolib.module.lang.sendLang
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author wlys
@@ -24,32 +26,43 @@ object BukkitProxyManager : ProxyManager {
         PlatformFactory.registerAPI<ProxyManager>(this)
     }
 
-    var processor: BukkitProxyProcessor? = null
-
-    val platform by unsafeLazy {
-        val force = Settings.CONF.getString("Options.Proxy")?.uppercase()
-        if (Bukkit.getServer().spigot().config.getBoolean("settings.bungeecord") || force == "BUNGEE") {
-            processor = BukkitProxyProcessor.BungeeSide.also { it.init() }
-            console().sendLang("Plugin-Proxy-Supported", "Bungee")
-            Platform.BUNGEE
-        } else if (kotlin.runCatching { Bukkit.getServer().spigot().paperConfig.getBoolean("settings.velocity-support.enabled") }.getOrDefault(false) || force == "VELOCITY") {
-            processor = BukkitProxyProcessor.VelocitySide.also { it.init() }
-            console().sendLang("Plugin-Proxy-Supported", "Velocity")
-            Platform.VELOCITY
-        } else {
-            console().sendLang("Plugin-Proxy-None")
-            Platform.UNKNOWN
+    val processor by unsafeLazy {
+        when (platform) {
+            Platform.BUNGEE -> BukkitProxyProcessor.BungeeSide.also { it.init() }
+            Platform.VELOCITY -> BukkitProxyProcessor.VelocitySide.also { it.init() }
+            else -> null
         }
     }
 
-    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
-        if (recipient !is PluginMessageRecipient) return false
-        return processor?.sendCommonMessage(recipient, *args, async = async) ?: false
+    val platform: Platform by unsafeLazy {
+        val force = Enums.getIfPresent(Platform::class.java, Settings.CONF.getString("Options.Proxy")?.uppercase() ?: "AUTO")
+        if (force.isPresent) {
+            force.get()
+        } else {
+            if (Bukkit.getServer().spigot().config.getBoolean("settings.bungeecord")) {
+                console().sendLang("Plugin-Proxy-Supported", "Bungee")
+                Platform.BUNGEE
+            } else if (kotlin.runCatching {
+                    Bukkit.spigot().paperConfig.getBoolean("proxies.velocity.enabled", false) ||
+                    Bukkit.spigot().paperConfig.getBoolean("settings.velocity-support.enabled", false)
+            }.getOrDefault(false)) {
+                console().sendLang("Plugin-Proxy-Supported", "Velocity")
+                Platform.VELOCITY
+            } else {
+                console().sendLang("Plugin-Proxy-None")
+                Platform.UNKNOWN
+            }
+        }
     }
 
-    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
-        if (recipient !is PluginMessageRecipient) return false
-        return processor?.sendTrChatMessage(recipient, *args, async = async) ?: false
+    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
+        if (processor == null || recipient !is PluginMessageRecipient) return CompletableFuture.completedFuture(false)
+        return processor!!.sendCommonMessage(recipient, *args, async = async)
+    }
+
+    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
+        if (processor == null || recipient !is PluginMessageRecipient) return CompletableFuture.completedFuture(false)
+        return processor!!.sendTrChatMessage(recipient, *args, async = async)
     }
 
     fun sendProxyLang(player: Player, target: String, node: String, vararg args: String) {

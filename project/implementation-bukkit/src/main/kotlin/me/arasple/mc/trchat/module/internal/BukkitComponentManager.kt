@@ -75,7 +75,7 @@ object BukkitComponentManager : ComponentManager {
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, newComponent)) {
             return
         }
-        if (TrChatBukkit.paperEnv) {
+        if (TrChatBukkit.isPaperEnv) {
             commandSender.sendMessage(identity, newComponent, MessageType.SYSTEM)
         } else {
             if (commandSender is Player) {
@@ -113,7 +113,7 @@ object BukkitComponentManager : ComponentManager {
         if (HookPlugin.getInteractiveChat().sendMessage(commandSender, newComponent)) {
             return
         }
-        if (TrChatBukkit.paperEnv) {
+        if (TrChatBukkit.isPaperEnv) {
             commandSender.sendMessage(identity, newComponent, MessageType.CHAT)
         } else {
             if (commandSender is Player) {

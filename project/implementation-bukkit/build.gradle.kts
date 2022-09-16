@@ -50,7 +50,7 @@ repositories {
 dependencies {
     api(project(":project:common"))
 
-    compileOnly("net.kyori:adventure-platform-bukkit:4.1.1")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.1.2")
 
     compileOnly("ink.ptms.core:v11902:11902:mapped")
 //    compileOnly("ink.ptms.core:v11900:11900:mapped")

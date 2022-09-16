@@ -12,6 +12,7 @@ import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.onlinePlayers
 import taboolib.common.platform.function.submitAsync
 import java.io.IOException
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author wlys
@@ -31,34 +32,39 @@ object VelocityProxyManager : ProxyManager {
 
     @Schedule(async = true, period = 60)
     fun sendPlayerList() {
+        val players = onlinePlayers().joinToString(", ") { it.name }
         TrChatVelocity.plugin.server.allServers.forEach { server ->
-            sendTrChatMessage(server, "PlayerList", onlinePlayers().joinToString(", ") { it.name }, async = false)
+            sendTrChatMessage(
+                server,
+                "PlayerList",
+                players,
+                async = false
+            )
         }
     }
 
-    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
+    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
         error("Not supported.")
     }
 
-    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
+    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
         if (recipient !is ChannelMessageSink) {
-            return false
+            return CompletableFuture.completedFuture(false)
         }
-        var success = true
+        val success = CompletableFuture<Boolean>()
         fun send() {
             try {
                 for (bytes in buildMessage(*args)) {
                     recipient.sendPluginMessage(outgoing, bytes)
                 }
+                success.complete(true)
             } catch (e: IOException) {
                 e.print("Failed to send proxy trchat message!")
-                success = false
+                success.complete(false)
             }
         }
         if (async) {
-            submitAsync {
-                send()
-            }
+            submitAsync { send() }
         } else {
             send()
         }

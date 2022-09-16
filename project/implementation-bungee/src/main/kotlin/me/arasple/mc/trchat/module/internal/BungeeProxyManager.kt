@@ -11,6 +11,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.server
 import taboolib.common.platform.function.submitAsync
 import java.io.IOException
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author wlys
@@ -24,29 +25,28 @@ object BungeeProxyManager : ProxyManager {
         server<ProxyServer>().registerChannel(TrChatBungee.TRCHAT_CHANNEL)
     }
 
-    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
+    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
         error("Not supported.")
     }
 
-    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): Boolean {
+    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
         if (recipient !is ServerInfo) {
-            return false
+            return CompletableFuture.completedFuture(false)
         }
-        var success = true
+        val success = CompletableFuture<Boolean>()
         fun send() {
             try {
                 for (bytes in buildMessage(*args)) {
                     recipient.sendData(TrChatBungee.TRCHAT_CHANNEL, bytes)
                 }
+                success.complete(true)
             } catch (e: IOException) {
                 e.print("Failed to send proxy trchat message!")
-                success = false
+                success.complete(false)
             }
         }
         if (async) {
-            submitAsync {
-                send()
-            }
+            submitAsync { send() }
         } else {
             send()
         }

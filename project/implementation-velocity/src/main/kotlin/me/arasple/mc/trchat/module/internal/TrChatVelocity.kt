@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.module.conf.VelocityChannelManager
-import me.arasple.mc.trchat.module.internal.service.Metrics
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Plugin
@@ -28,8 +27,6 @@ object TrChatVelocity : Plugin() {
     override fun onLoad() {
         console().sendLang("Plugin-Loading", plugin.server.version.version)
         console().sendLang("Plugin-Proxy-Supported", "Velocity")
-
-        Metrics.init(12541)
     }
 
     override fun onEnable() {
@@ -52,4 +49,5 @@ object TrChatVelocity : Plugin() {
 
         console().sendLang("Plugin-Enabled", pluginVersion)
     }
+
 }

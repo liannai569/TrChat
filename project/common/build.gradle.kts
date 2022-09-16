@@ -14,5 +14,5 @@ taboolib {
 
 dependencies {
     compileOnly("com.eatthepath:fast-uuid:0.2.0")
-    compileOnly("net.kyori:adventure-platform-api:4.1.1")
+    compileOnly("net.kyori:adventure-platform-api:4.1.2")
 }

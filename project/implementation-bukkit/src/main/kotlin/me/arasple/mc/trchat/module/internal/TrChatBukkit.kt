@@ -12,14 +12,15 @@ import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.filter.ChatFilter
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
-import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.color.parseGradients
 import me.arasple.mc.trchat.util.color.parseRainbow
 import org.bukkit.Bukkit
 import taboolib.common.env.RuntimeEnv
 import taboolib.common.platform.*
 import taboolib.common.platform.function.console
+import taboolib.common.platform.function.disablePlugin
 import taboolib.common.platform.function.pluginVersion
+import taboolib.common.platform.function.severe
 import taboolib.module.kether.Kether
 import taboolib.module.lang.Language
 import taboolib.module.lang.TextTransfer
@@ -32,7 +33,10 @@ import taboolib.module.nms.MinecraftVersion.majorLegacy
 @PlatformSide([Platform.BUKKIT])
 object TrChatBukkit : Plugin() {
 
-    var paperEnv = false
+    var isPaperEnv = false
+        private set
+
+    var isShadedVersion = false
         private set
 
     var isGlobalMuting = false
@@ -40,32 +44,46 @@ object TrChatBukkit : Plugin() {
     val reportedErrors = mutableListOf<String>()
 
     @Awake
-    fun loadDependency() {
+    internal fun loadDependency() {
+        try {
+            // Shaded
+            Class.forName("me.arasple.mc.trchat.library.adventure.platform.bukkit.BukkitAudiences")
+            isShadedVersion = true
+        } catch (_: ClassNotFoundException) {
+        }
         try {
             // Paper 1.16.5+
             Class.forName("com.destroystokyo.paper.PaperConfig")
             if (majorLegacy >= 11604) {
-                paperEnv = true
+                isPaperEnv = true
+                if (isShadedVersion) {
+                    severe(
+                        "*************************",
+                        "* You should use common version of TrChat on your server.",
+                        "* Plugin is disabled now.",
+                        "*************************"
+                    )
+                    disablePlugin()
+                    return
+                }
             }
         } catch (_: ClassNotFoundException) {
         }
-        if (!paperEnv) {
+        if (!isPaperEnv && !isShadedVersion) {
             RuntimeEnv.ENV.loadDependency(BukkitEnv::class.java, true)
         }
     }
 
     override fun onLoad() {
         console().sendLang("Plugin-Loading", Bukkit.getBukkitVersion())
-
-        Metrics.init(5802)
     }
 
     override fun onEnable() {
-        Databases.init()
-        if (!paperEnv) {
+        Databases.database
+        if (!isPaperEnv) {
             BukkitComponentManager.init()
         }
-        BukkitProxyManager.platform
+        BukkitProxyManager.processor
 
         Kether.isAllowToleranceParser = Settings.CONF.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
         Language.textTransfer += object : TextTransfer {
@@ -83,7 +101,7 @@ object TrChatBukkit : Plugin() {
     }
 
     override fun onDisable() {
-        if (!paperEnv) {
+        if (!isPaperEnv) {
             BukkitComponentManager.release()
         }
         BukkitProxyManager.processor?.close()

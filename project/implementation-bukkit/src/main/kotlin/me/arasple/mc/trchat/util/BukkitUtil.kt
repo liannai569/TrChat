@@ -18,6 +18,7 @@ import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.nmsClass
 import taboolib.module.nms.obcClass
 import taboolib.platform.util.sendLang
+import java.text.SimpleDateFormat
 
 /**
  * @author wlys
@@ -28,6 +29,8 @@ val classCraftItemStack = obcClass("inventory.CraftItemStack")
 val classChatSerializer by unsafeLazy {
     nmsClass("IChatBaseComponent\$ChatSerializer")
 }
+
+val muteDateFormat = SimpleDateFormat()
 
 fun String.toCondition() = Condition(this)
 

@@ -86,7 +86,7 @@ object ItemShow : Function("ITEM") {
             }
             cache.getIfPresent(item) ?: kotlin.run {
                 HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item) ?:
-                sender.getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender).also { println(it) }, item.amount)
+                sender.getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
                     ?.hoverItemFixed(item, sender)
                     ?.also { cache.put(item, it) }
             }

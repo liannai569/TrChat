@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.internal.data
 
 import me.arasple.mc.trchat.api.event.CustomDatabaseEvent
 import me.arasple.mc.trchat.module.conf.file.Settings
-import me.arasple.mc.trchat.module.internal.database.Database
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQL
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQLite
 import me.arasple.mc.trchat.util.Internal
@@ -11,6 +10,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Schedule
+import taboolib.common.util.unsafeLazy
 import taboolib.platform.util.onlinePlayers
 
 /**
@@ -21,10 +21,8 @@ import taboolib.platform.util.onlinePlayers
 @PlatformSide([Platform.BUKKIT])
 object Databases {
 
-    lateinit var database: Database
-
-    fun init() {
-        database = when (val type = Settings.CONF.getString("Database.Method")?.uppercase()) {
+    val database by unsafeLazy {
+        when (val type = Settings.CONF.getString("Database.Method")?.uppercase()) {
             "LOCAL", "SQLITE", null -> DatabaseSQLite()
             "SQL" -> DatabaseSQL()
             else -> {
@@ -40,4 +38,5 @@ object Databases {
     fun save() {
         onlinePlayers.forEach { database.push(it) }
     }
+
 }

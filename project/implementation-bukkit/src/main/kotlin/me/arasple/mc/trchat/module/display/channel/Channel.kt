@@ -102,7 +102,7 @@ open class Channel(
             if (settings.ports != null) {
                 Bukkit.getServer().sendTrChatMessage(
                     "ForwardRaw",
-                    Identity.nil().uuid().string(),
+                    Identity.nil().uuid().parseString(),
                     gson,
                     settings.joinPermission ?: "null",
                     settings.ports.joinToString(";"),
@@ -111,7 +111,7 @@ open class Channel(
             } else {
                 Bukkit.getServer().sendTrChatMessage(
                     "BroadcastRaw",
-                    Identity.nil().uuid().string(),
+                    Identity.nil().uuid().parseString(),
                     gson,
                     settings.joinPermission ?: "null",
                     settings.doubleTransfer.toString()
@@ -165,7 +165,7 @@ open class Channel(
             if (settings.ports != null) {
                 player.sendTrChatMessage(
                     "ForwardRaw",
-                    player.uniqueId.string(),
+                    player.uniqueId.parseString(),
                     gson,
                     settings.joinPermission ?: "null",
                     settings.ports.joinToString(";"),
@@ -174,7 +174,7 @@ open class Channel(
             } else {
                 player.sendTrChatMessage(
                     "BroadcastRaw",
-                    player.uniqueId.string(),
+                    player.uniqueId.parseString(),
                     gson,
                     settings.joinPermission ?: "null",
                     settings.doubleTransfer.toString()

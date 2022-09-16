@@ -12,8 +12,8 @@ dependencies {
     implementation(project(":project:implementation-velocity"))
     implementation("com.eatthepath:fast-uuid:0.2.0")
     implementation("net.kyori:adventure-api:4.11.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.1.1")
-    implementation("net.kyori:adventure-platform-bungeecord:4.1.1")
+    implementation("net.kyori:adventure-platform-bukkit:4.1.2")
+    implementation("net.kyori:adventure-platform-bungeecord:4.1.2")
 }
 
 tasks {

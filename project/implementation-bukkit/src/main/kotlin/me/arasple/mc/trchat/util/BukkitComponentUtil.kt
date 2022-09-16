@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.util
 
-import io.papermc.paper.text.PaperComponents
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
@@ -35,8 +34,8 @@ import taboolib.platform.util.modifyMeta
 private val classNBTTagCompound by unsafeLazy { nmsClass("NBTTagCompound") }
 
 private val LEGACY_SERIALIZER by unsafeLazy {
-    if (TrChatBukkit.paperEnv) {
-        PaperComponents.legacySectionSerializer()
+    if (TrChatBukkit.isPaperEnv) {
+        LegacyComponentSerializer.legacySection()
     } else {
         LegacyComponentSerializer.builder()
             .hexColors()
@@ -46,8 +45,8 @@ private val LEGACY_SERIALIZER by unsafeLazy {
 }
 
 private val GSON_SERIALIZER by unsafeLazy {
-    if (TrChatBukkit.paperEnv) {
-        PaperComponents.gsonSerializer()
+    if (TrChatBukkit.isPaperEnv) {
+        GsonComponentSerializer.gson()
     } else {
         GsonComponentSerializer.builder()
             .legacyHoverEventSerializer(
@@ -79,7 +78,7 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     return hoverEvent(HoverEvent.showItem(Key.key(id), newItem.amount, BinaryTagHolder.binaryTagHolder(tag)))
 }
 
-@Suppress("Deprecation", "USELESS_ELVIS")
+@Suppress("Deprecation")
 private fun ItemStack.optimizeShulkerBox(): ItemStack {
     try {
         if (!type.name.endsWith("SHULKER_BOX")) {

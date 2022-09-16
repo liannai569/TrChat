@@ -5,7 +5,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import me.arasple.mc.trchat.util.proxy.common.MessageBuilder
 import taboolib.common.platform.function.console
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -15,9 +14,7 @@ import java.util.*
  * @author wlys
  * @since 2021/9/12 18:11
  */
-val jsonParser = JsonParser()
-
-val muteDateFormat = SimpleDateFormat()
+private val jsonParser = JsonParser()
 
 fun Throwable.print(title: String, printStackTrace: Boolean = true) {
     console().sendMessage("§c[TrChat] §8$title")
@@ -32,9 +29,9 @@ fun Throwable.print(title: String, printStackTrace: Boolean = true) {
 fun String.parseJson(): JsonElement = jsonParser.parse(this)!!
 
 fun buildMessage(vararg messages: String): List<ByteArray> {
-    return MessageBuilder.create(arrayOf(UUID.randomUUID().toString(), *messages))
+    return MessageBuilder.create(arrayOf(UUID.randomUUID().parseString(), *messages))
 }
 
 fun String.toUUID(): UUID = FastUUID.parseUUID(this)
 
-fun UUID.string(): String = FastUUID.toString(this)
+fun UUID.parseString(): String = FastUUID.toString(this)

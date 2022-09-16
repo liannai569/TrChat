@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.BungeeEnv
 import me.arasple.mc.trchat.module.conf.BungeeChannelManager
-import me.arasple.mc.trchat.module.internal.service.Metrics
 import net.md_5.bungee.api.ProxyServer
 import taboolib.common.env.RuntimeEnv
 import taboolib.common.platform.*
@@ -19,18 +18,27 @@ import taboolib.module.lang.sendLang
 @PlatformSide([Platform.BUNGEE])
 object TrChatBungee : Plugin() {
 
+    var isShadedVersion = false
+        private set
+
     const val TRCHAT_CHANNEL = "trchat:main"
 
     @Awake
-    fun loadDependency() {
-        RuntimeEnv.ENV.loadDependency(BungeeEnv::class.java, true)
+    internal fun loadDependency() {
+        try {
+            // Shaded
+            Class.forName("me.arasple.mc.trchat.library.adventure.platform.bungeecord.BungeeAudiences")
+            isShadedVersion = true
+        } catch (_: ClassNotFoundException) {
+        }
+        if (!isShadedVersion) {
+            RuntimeEnv.ENV.loadDependency(BungeeEnv::class.java, true)
+        }
     }
 
     override fun onLoad() {
         console().sendLang("Plugin-Loading", server<ProxyServer>().version)
         console().sendLang("Plugin-Proxy-Supported", "Bungee")
-
-        Metrics.init(5803)
     }
 
     override fun onEnable() {

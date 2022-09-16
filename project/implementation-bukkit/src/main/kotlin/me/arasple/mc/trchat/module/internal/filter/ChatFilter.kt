@@ -11,7 +11,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.console
-import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.decodeUnicode
 import taboolib.module.lang.sendLang
 import java.io.BufferedInputStream
@@ -53,7 +53,7 @@ object ChatFilter {
         // 更新云端词库
         if (updateCloud && Filters.cloud_enabled) {
             cloud_url = Filters.CONF.getStringList("Cloud-Thesaurus.Urls")
-            submit(async = true) {
+            submitAsync {
                 loadCloudFilter(notify)
             }
         }

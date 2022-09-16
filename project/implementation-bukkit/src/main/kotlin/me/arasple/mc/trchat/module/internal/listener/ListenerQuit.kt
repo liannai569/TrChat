@@ -4,14 +4,14 @@ import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.util.Internal
+import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import taboolib.common.platform.Ghost
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 
 /**
  * @author wlys
@@ -21,32 +21,24 @@ import taboolib.common.platform.function.submit
 @PlatformSide([Platform.BUKKIT])
 object ListenerQuit {
 
-    @Ghost
-    @SubscribeEvent(EventPriority.HIGHEST)
-    fun onQuit(e: PlayerQuitEvent) {
-        val player = e.player
-
+    private fun quit(player: Player) {
         Channel.channels.values.forEach { it.listeners.remove(player.name) }
 
         ChatSession.removeSession(player)
 
-        submit(async = true) {
+        submitAsync {
             Databases.database.push(player)
             Databases.database.release(player)
         }
     }
 
+    @SubscribeEvent(EventPriority.HIGHEST)
+    fun onQuit(e: PlayerQuitEvent) {
+        quit(e.player)
+    }
+
     @SubscribeEvent(EventPriority.HIGHEST, ignoreCancelled = true)
     fun onKick(e: PlayerKickEvent) {
-        val player = e.player
-
-        Channel.channels.values.forEach { it.listeners.remove(player.name) }
-
-        ChatSession.removeSession(player)
-
-        submit(async = true) {
-            Databases.database.push(player)
-            Databases.database.release(player)
-        }
+        quit(e.player)
     }
 }

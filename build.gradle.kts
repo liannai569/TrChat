@@ -1,7 +1,7 @@
 plugins {
     id("org.gradle.java")
     id("org.gradle.maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "1.5.10" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.5.31" apply false
 }
 
 subprojects {
@@ -10,6 +10,7 @@ subprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
     }
     dependencies {
         compileOnly("com.google.code.gson:gson:2.8.5")
@@ -27,6 +28,9 @@ subprojects {
 }
 
 tasks.build {
+    doFirst {
+        buildDir.deleteRecursively()
+    }
     doLast {
         val plugin = project(":plugin")
         val file = file("${plugin.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }

@@ -7,4 +7,5 @@ class CustomDatabaseEvent(val name: String, var database: Database? = null) : Bu
 
     override val allowCancelled: Boolean
         get() = false
+
 }

@@ -40,14 +40,25 @@ Plugin-Debug-Off:
 Plugin-Done: '&8[&3Tr&bChat&8] &fOperación correcta.'
 Plugin-Failed: '&8[&3Tr&bChat&8] &cOperación fallida.'
 
-Error-Version: '&8[&3Tr&bChat&8] &cERROR &8| &7La versión del plugin tiene un error. Vuelve a descargar el plugin desde la pagina.'
-
 General-Too-Long: '&8[&3Tr&bChat&8] &7El mensaje enviado es muy largo. &8[&6{0}&8/&2{1}&8]'
 General-Too-Similar: '&8[&3Tr&bChat&8] &7Porfavor no repitas el mismo mensaje.'
 General-No-Permission: '&8[&3Tr&bChat&8] &7No tienes permisos para realizar esto.'
 General-Muted: '&8[&3Tr&bChat&8] &cFuiste silenciado por {0}! Razón: {1}'
 General-Cancel-Muted: '&8[&3Tr&bChat&8] &aYa puedes escribir.'
 General-Global-Muting: '&8[&3Tr&bChat&8] &cTodos los usuarios fueron silenciados.'
+General-Expansions-Header:
+  - '&8[&3Tr&bChat&8] &7You have to install the &f{0} &7expansion for PlaceholderAPI to chat.'
+  - type: JSON
+    text: '&7Also don''t forget to [&3&nreload]'
+    args:
+      - hover: '&7Click to reload expansions of PAPI'
+        command: '/papi reload'
+General-Expansions-Format:
+  - type: JSON
+    text: '&8- [&a{0}]&r'
+    args:
+      - hover: '&7Click to download'
+        command: '/papi ecloud download {0}'
 
 Cooldowns-Chat:
   - type: actionbar
@@ -194,3 +205,7 @@ Mute-Muted-Player: '&8[&3Tr&bChat&8] &7Fuiste silenciado por {0}, el tiempo de {
 Mute-Cancel-Muted-Player: '&8[&3Tr&bChat&8] &7El silencio fue cancelado {0}.'
 Mute-Muted-All: '&8[&3Tr&bChat&8] &7Todos fueron silenciados.'
 Mute-Cancel-Muted-All: '&8[&3Tr&bChat&8] &7Ya todos pueden hablar.'
+
+Ignore-Ignored-Player: '&8[&3Tr&bChat&8] &7Ignored &f{0}''s &7messages.'
+Ignore-Cancel-Player: '&8[&3Tr&bChat&8] &7Restore receiving &f{0}''s &7messages.'
+Ignore-List: '&8[&3Tr&bChat&8] &7You hava ignored these players'' messages: &f{0}.'

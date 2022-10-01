@@ -253,7 +253,7 @@ open class Channel(
         fun quit(player: Player) {
             player.session.getChannel()?.let {
                 if (!it.settings.autoJoin) {
-                    it.listeners.remove(player.name)
+                    it.listeners -= player.name
                 }
                 it.events.quit(player)
                 player.sendLang("Channel-Quit", it.id)

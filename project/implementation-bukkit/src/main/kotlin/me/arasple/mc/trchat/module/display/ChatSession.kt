@@ -82,7 +82,7 @@ class ChatSession(
         }
 
         fun removeSession(player: Player) {
-            SESSIONS.remove(player.uniqueId)
+            SESSIONS -= player.uniqueId
         }
 
         private fun Packet.toMessage(): String? {

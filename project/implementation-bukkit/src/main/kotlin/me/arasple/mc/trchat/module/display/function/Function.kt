@@ -43,20 +43,18 @@ abstract class Function(val id: String) {
 
         fun reload(customFunctions: List<CustomFunction>) {
             functions.clear()
-            if (TrChatReloadEvent.Function(customFunctions).call()) {
-                functions.addAll(runningClassesWithoutLibrary
-                    .filter { it.isAnnotationPresent(StandardFunction::class.java) }
-                    .mapNotNull { it.getInstance()?.get() as? Function }
-                )
-                functions.addAll(customFunctions)
-            }
+            functions.addAll(runningClassesWithoutLibrary
+                .filter { it.isAnnotationPresent(StandardFunction::class.java) }
+                .mapNotNull { it.getInstance()?.get() as? Function }
+            )
+            functions.addAll(customFunctions)
+            TrChatReloadEvent.Function(functions).call()
         }
 
         fun Player.getComponentFromLang(node: String, vararg args: Any): TextComponent? {
             val sender = adaptPlayer(this)
             val file = sender.getLocaleFile() ?: return null
-            val type = file.nodes[node].let { if (it is TypeList) it.list[0] else it }
-            return when (type) {
+            return when (val type = file.nodes[node].let { if (it is TypeList) it.list[0] else it }) {
                 is TypeJson -> {
                     var i = 0
                     val builder = Component.text()

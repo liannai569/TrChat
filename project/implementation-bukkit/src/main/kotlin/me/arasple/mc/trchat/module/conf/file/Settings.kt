@@ -30,4 +30,5 @@ object Settings {
 
     @ConfigNode("Chat.Length-Limit", "settings.yml")
     var chatLengthLimit = 100
+
 }

@@ -1,7 +1,7 @@
 Options:
   Log-Normal: '[{0}] {1}: {2}'
   Log-Private: '[{0}] {1} -> {2}: {3}'
-  Depend-Expansions: ['player', 'vault', 'multiverse']
+  Depend-Expansions: ['player', 'server', 'vault', 'multiverse']
   Prevent-Tab-Complete: false
   Kether-Allow-Tolerance-Parser: true
   ChatEvent-Hooks: ['PlayMoreSounds', 'ChatBubbles', 'QuestCreator']

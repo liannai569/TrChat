@@ -4,6 +4,7 @@ import me.arasple.mc.trchat.module.conf.BungeeChannelManager
 import me.arasple.mc.trchat.module.internal.BungeeComponentManager
 import me.arasple.mc.trchat.module.internal.BungeeProxyManager
 import me.arasple.mc.trchat.module.internal.TrChatBungee
+import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.audience.MessageType
@@ -32,8 +33,11 @@ import java.io.IOException
 @PlatformSide([Platform.BUNGEE])
 object ListenerBungeeTransfer {
 
-    @SubscribeEvent(ignoreCancelled = true)
+    @SubscribeEvent(level = 0)
     fun onTransfer(e: PluginMessageEvent) {
+        if (e.isCancelled) {
+            return
+        }
         if (e.tag == TrChatBungee.TRCHAT_CHANNEL) {
             try {
                 val message = MessageReader.read(e.data)
@@ -41,7 +45,8 @@ object ListenerBungeeTransfer {
                     val data = message.build()
                     execute(data, e.sender)
                 }
-            } catch (_: IOException) {
+            } catch (e: IOException) {
+                e.print("Error occurred while reading plugin message.")
             }
         }
     }

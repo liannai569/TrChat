@@ -21,7 +21,6 @@ import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.nms.getI18nName
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.isAir
-import java.util.concurrent.TimeUnit
 
 /**
  * @author wlys
@@ -56,7 +55,7 @@ object ItemShow : Function("ITEM") {
     var keys = emptyList<String>()
 
     private val cache: Cache<ItemStack, Component> = CacheBuilder.newBuilder()
-        .expireAfterWrite(10L, TimeUnit.MINUTES)
+        .maximumSize(50)
         .build()
 
     override fun createVariable(sender: Player, message: String): String {
@@ -84,11 +83,12 @@ object ItemShow : Function("ITEM") {
                     it.clone()
                 }
             }
-            cache.getIfPresent(item) ?: kotlin.run {
-                HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item) ?:
-                sender.getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
-                    ?.hoverItemFixed(item, sender)
-                    ?.also { cache.put(item, it) }
+            cache.get(item) {
+                HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item)
+                    ?: sender
+                        .getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
+                        ?.hoverItemFixed(item, sender)
+                    ?: Component.empty()
             }
         }
     }

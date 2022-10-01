@@ -22,7 +22,7 @@ import taboolib.common.platform.function.submitAsync
 object ListenerQuit {
 
     private fun quit(player: Player) {
-        Channel.channels.values.forEach { it.listeners.remove(player.name) }
+        Channel.channels.values.forEach { it.listeners -= player.name }
 
         ChatSession.removeSession(player)
 

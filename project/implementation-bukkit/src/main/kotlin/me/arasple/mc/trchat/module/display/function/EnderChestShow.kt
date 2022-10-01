@@ -24,7 +24,6 @@ import taboolib.platform.util.buildItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.serializeToByteArray
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * @author wlys
@@ -53,7 +52,7 @@ object EnderChestShow : Function("ENDERCHEST") {
     var keys = listOf<String>()
 
     val cache: Cache<String, Inventory> = CacheBuilder.newBuilder()
-        .expireAfterWrite(10L, TimeUnit.MINUTES)
+        .maximumSize(10)
         .build()
 
     override fun createVariable(sender: Player, message: String): String {

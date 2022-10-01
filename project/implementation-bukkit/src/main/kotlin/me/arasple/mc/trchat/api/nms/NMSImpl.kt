@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.api.nms
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
-import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.text.Component
 import net.minecraft.network.protocol.game.ClientboundChatPreviewPacket
@@ -37,10 +36,7 @@ class NMSImpl : NMS() {
             val component = BukkitComponentManager.filterComponent(gson(json), 32000)
             component.toIChatBaseComponent()
         } catch (t: Throwable) {
-            if (!TrChatBukkit.reportedErrors.contains("filterIChatComponent")) {
-                t.print("Error occurred while filtering chat component.")
-                TrChatBukkit.reportedErrors.add("filterIChatComponent")
-            }
+            t.reportOnce("Error occurred while filtering chat component.")
             iChat
         }
     }

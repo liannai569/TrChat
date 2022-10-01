@@ -37,7 +37,7 @@ object ChatLogs {
                 logFile.appendText(line + "\n")
             }
         } catch (t: Throwable) {
-            t.print("保存聊天日志失败!")
+            t.print("Failed to save chat log!")
             return
         }
         waveList.clear()

@@ -75,10 +75,6 @@ object Loader {
         Channel.channels.values.forEach { it.unregister() }
         Channel.channels.clear()
 
-        if (!TrChatReloadEvent.Channel().call()) {
-            return 0
-        }
-
         if (onlinePlayers.isNotEmpty()) {
             BukkitProxyManager.sendTrChatMessage(onlinePlayers.iterator().next(), "FetchProxyChannels")
         }
@@ -105,13 +101,14 @@ object Loader {
             }
         }
 
+        TrChatReloadEvent.Channel(Channel.channels).call()
         return Channel.channels.size
     }
 
     fun loadChannel(id: String, conf: YamlConfiguration): Channel {
         Channel.channels[id]?.let {
             it.unregister()
-            Channel.channels.remove(it.id)
+            Channel.channels -= it.id
         }
 
         val settings = conf.getConfigurationSection("Options")!!.let { section ->

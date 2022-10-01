@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.conf.file.Settings
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageRecipient
+import org.spigotmc.SpigotConfig
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.PlatformSide
@@ -35,11 +36,14 @@ object BukkitProxyManager : ProxyManager {
     }
 
     val platform: Platform by unsafeLazy {
-        val force = Enums.getIfPresent(Platform::class.java, Settings.CONF.getString("Options.Proxy")?.uppercase() ?: "AUTO")
+        val force = Enums.getIfPresent(
+            Platform::class.java,
+            Settings.CONF.getString("Options.Proxy")?.uppercase() ?: "AUTO"
+        )
         if (force.isPresent) {
             force.get()
         } else {
-            if (Bukkit.getServer().spigot().config.getBoolean("settings.bungeecord")) {
+            if (SpigotConfig.bungee) {
                 console().sendLang("Plugin-Proxy-Supported", "Bungee")
                 Platform.BUNGEE
             } else if (kotlin.runCatching {

@@ -22,9 +22,8 @@ import taboolib.platform.util.sendLang
 @PlatformSide([Platform.BUKKIT])
 object CommandIgnore {
 
-    @Suppress("Deprecation")
     @Awake(LifeCycle.ENABLE)
-    fun c() {
+    fun ignore() {
         command("ignore", permission = "trchat.command.ignore") {
             dynamic("player") {
                 suggestPlayers()
@@ -33,7 +32,11 @@ object CommandIgnore {
                     if (!player.hasPlayedBefore()) {
                         return@execute sender.sendLang("Command-Player-Not-Exist")
                     }
-                    sender.data.switchIgnored(player.uniqueId)
+                    if (sender.data.switchIgnored(player.uniqueId)) {
+                        sender.sendLang("Ignore-Ignored-Player", player.name!!)
+                    } else {
+                        sender.sendLang("Ignore-Cancel-Player", player.name!!)
+                    }
                 }
             }
             incorrectSender { sender, _ ->
@@ -41,6 +44,21 @@ object CommandIgnore {
             }
             incorrectCommand { _, _, _, _ ->
                 createHelper()
+            }
+        }
+    }
+
+    @Awake(LifeCycle.ENABLE)
+    fun ignoreList() {
+        command("ignorelist", permission = "trchat.command.ignore") {
+            execute<Player> { sender, _, _ ->
+                sender.sendLang(
+                    "Ignore-List",
+                    sender.data.ignored.map { Bukkit.getOfflinePlayer(it).name ?: it }.joinToString(", ")
+                )
+            }
+            incorrectSender { sender, _ ->
+                sender.sendLang("Command-Not-Player")
             }
         }
     }

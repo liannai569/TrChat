@@ -43,14 +43,25 @@ Plugin-Debug-Off:
 Plugin-Done: '&8[&3Tr&bChat&8] &f操作成功.'
 Plugin-Failed: '&8[&3Tr&bChat&8] &c操作失败.'
 
-Error-Version: '&8[&3Tr&bChat&8] &c错误 &8| &7检测版本号时发生异常... 请重新下载插件!'
-
 General-Too-Long: '&8[&3Tr&bChat&8] &7你的聊天内容过长. &8[&6{0}&8/&2{1}&8]'
 General-Too-Similar: '&8[&3Tr&bChat&8] &7你的两次聊天内容过于相似, 请勿复读.'
 General-No-Permission: '&8[&3Tr&bChat&8] &7你没有足够的权限执行此操作.'
 General-Muted: '&8[&3Tr&bChat&8] &c你被禁言了!解除时间: {0} 原因: {1}'
 General-Cancel-Muted: '&8[&3Tr&bChat&8] &a你的禁言已被解除.'
 General-Global-Muting: '&8[&3Tr&bChat&8] &c全员禁言中.'
+General-Expansions-Header:
+  - '&8[&3Tr&bChat&8] &7你必须安装 PAPI &f{0} &7拓展以聊天.'
+  - type: JSON
+    text: '&7请在安装后 [&3&n点击重载] &7拓展'
+    args:
+      - hover: '&7点击重载 PAPI 拓展'
+        command: '/papi reload'
+General-Expansions-Format:
+  - type: JSON
+    text: '&8- [&a{0}]&r'
+    args:
+      - hover: '&7点击下载'
+        command: '/papi ecloud download {0}'
 
 Cooldowns-Chat:
   - type: actionbar
@@ -204,3 +215,7 @@ Mute-Muted-Player: '&8[&3Tr&bChat&8] &7你已禁言 {0} {1}.原因: {2}'
 Mute-Cancel-Muted-Player: '&8[&3Tr&bChat&8] &7你已取消禁言 {0}.'
 Mute-Muted-All: '&8[&3Tr&bChat&8] &7全员禁言已开启.'
 Mute-Cancel-Muted-All: '&8[&3Tr&bChat&8] &7全员禁言已关闭.'
+
+Ignore-Ignored-Player: '&8[&3Tr&bChat&8] &7你已屏蔽 &f{0} &7的聊天.'
+Ignore-Cancel-Player: '&8[&3Tr&bChat&8] &7你已取消屏蔽 &f{0} &7的聊天.'
+Ignore-List: '&8[&3Tr&bChat&8] &7你已屏蔽这些玩家的聊天: &f{0}.'

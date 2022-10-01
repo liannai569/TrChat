@@ -23,4 +23,5 @@ class TrChatEvent(
         message = message.replace("{{", "\\{{")
         message = HookPlugin.getItemsAdder().replaceFontImages(session.player, message)
     }
+
 }

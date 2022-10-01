@@ -16,6 +16,8 @@ import java.util.*
  */
 private val jsonParser = JsonParser()
 
+private val reportedErrors = mutableListOf<String>()
+
 fun Throwable.print(title: String, printStackTrace: Boolean = true) {
     console().sendMessage("§c[TrChat] §8$title")
     console().sendMessage("         §8${localizedMessage}")
@@ -23,6 +25,13 @@ fun Throwable.print(title: String, printStackTrace: Boolean = true) {
         stackTrace.forEach {
             console().sendMessage("         §8$it")
         }
+    }
+}
+
+fun Throwable.reportOnce(title: String, printStackTrace: Boolean = true) {
+    if (title !in reportedErrors) {
+        print(title, printStackTrace)
+        reportedErrors += title
     }
 }
 

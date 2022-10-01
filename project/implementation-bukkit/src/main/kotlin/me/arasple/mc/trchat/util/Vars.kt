@@ -1,11 +1,13 @@
 package me.arasple.mc.trchat.util
 
 import me.arasple.mc.trchat.module.conf.file.Settings
+import me.clip.placeholderapi.PlaceholderAPI
 import me.clip.placeholderapi.PlaceholderAPIPlugin
+import org.bukkit.command.CommandSender
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.submit
+import taboolib.platform.util.sendLang
 
 /**
  * @author Arasple
@@ -15,16 +17,25 @@ import taboolib.common.platform.function.submit
 @PlatformSide([Platform.BUKKIT])
 object Vars {
 
-    @Schedule(async = true)
-    fun downloadExpansions() {
-        downloadExpansions(Settings.CONF.getStringList("Options.Depend-Expansions"))
+    fun checkExpansions(sender: CommandSender): Boolean {
+        val registered = PlaceholderAPI.getRegisteredIdentifiers()
+        val depends = Settings.CONF.getStringList("Options.Depend-Expansions") - "multiverse"
+        val uninstalled = depends.filter { ex -> registered.none { it.equals(ex, true) } }.toTypedArray()
+        return if (uninstalled.isEmpty()) {
+            true
+        } else {
+            sender.sendLang("General-Expansions-Header", uninstalled.size)
+            uninstalled.forEach { sender.sendLang("General-Expansions-Format", it) }
+            false
+        }
     }
 
     /**
-     * 自动下载 PlaceholderAPI 拓展变量并注册
+     * 下载 PlaceholderAPI 拓展变量并注册
      *
      * @param expansions 拓展
      */
+    @Deprecated("works badly")
     private fun downloadExpansions(expansions: List<String>) {
         kotlin.runCatching {
             if (expansions.isNotEmpty()) {
@@ -54,4 +65,5 @@ object Vars {
             it.print("PlaceholderAPI expansion(s) $expansions installed failed!Please install manually.")
         }
     }
+
 }

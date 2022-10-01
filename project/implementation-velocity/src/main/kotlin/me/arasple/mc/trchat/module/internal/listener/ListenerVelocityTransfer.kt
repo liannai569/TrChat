@@ -29,7 +29,7 @@ import java.io.IOException
 @PlatformSide([Platform.VELOCITY])
 object ListenerVelocityTransfer {
 
-    @SubscribeEvent(ignoreCancelled = true)
+    @SubscribeEvent
     fun onTransfer(e: PluginMessageEvent) {
         if (e.identifier.id == VelocityProxyManager.incoming.id) {
             try {

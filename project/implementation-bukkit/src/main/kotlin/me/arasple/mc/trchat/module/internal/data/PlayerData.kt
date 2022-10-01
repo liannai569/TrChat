@@ -56,7 +56,7 @@ class PlayerData(val player: OfflinePlayer) {
     fun switchVanish(): Boolean {
         player.getDataContainer()["vanish"] = !isVanishing
         return isVanishing.also {
-            if (it) vanishing.add(player.name!!) else vanishing.remove(player.name!!)
+            if (it) vanishing += player.name!! else vanishing -= player.name!!
         }
     }
 
@@ -68,11 +68,13 @@ class PlayerData(val player: OfflinePlayer) {
         player.getDataContainer()["ignored"] = player.getDataContainer().getStringList("ignored") - uuid.toString()
     }
 
-    fun switchIgnored(uuid: UUID) {
-        if (ignored.contains(uuid)) {
+    fun switchIgnored(uuid: UUID): Boolean {
+        return if (ignored.contains(uuid)) {
             removeIgnored(uuid)
+            false
         } else {
             addIgnored(uuid)
+            true
         }
     }
 

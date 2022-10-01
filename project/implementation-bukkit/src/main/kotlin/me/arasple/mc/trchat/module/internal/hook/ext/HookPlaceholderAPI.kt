@@ -1,12 +1,15 @@
 package me.arasple.mc.trchat.module.internal.hook.ext
 
+import me.arasple.mc.trchat.api.event.TrChatEvent
 import me.arasple.mc.trchat.util.Internal
+import me.arasple.mc.trchat.util.Vars
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.session
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.event.SubscribeEvent
 import taboolib.platform.compat.PlaceholderExpansion
 
 /**
@@ -38,7 +41,7 @@ object HookPlaceholderAPI : PlaceholderExpansion {
                 "filter" -> data.isFilterEnabled
                 "mute" -> data.isMuted
                 "vanish" -> data.isVanishing
-                else -> "ERROR"
+                else -> "out of case"
             }.toString()
         }
         return "ERROR"
@@ -57,9 +60,17 @@ object HookPlaceholderAPI : PlaceholderExpansion {
                 "filter" -> data.isFilterEnabled
                 "mute" -> data.isMuted
                 "vanish" -> data.isVanishing
-                else -> "ERROR"
+                else -> "out of case"
             }.toString()
         }
         return "ERROR"
     }
+
+    @SubscribeEvent
+    fun onChat(e: TrChatEvent) {
+        if (e.forward && !Vars.checkExpansions(e.session.player)) {
+            e.isCancelled = true
+        }
+    }
+
 }

@@ -6,7 +6,7 @@ plugins {
 
 taboolib {
     install("common", "common-5")
-    install("module-kether")
+    install("module-kether", "module-lang")
     options("skip-minimize", "keep-kotlin-module", "skip-plugin-file")
     classifier = null
     version = taboolibVersion

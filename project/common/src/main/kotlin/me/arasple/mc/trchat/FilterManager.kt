@@ -1,9 +1,30 @@
 package me.arasple.mc.trchat
 
 import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
+import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.ProxyPlayer
+import taboolib.common.platform.function.console
 
 interface FilterManager {
+
+    /**
+     * 加载聊天过滤器
+     *
+     * @param updateCloud 是否更新云端词库
+     * @param notify      接受通知反馈
+     */
+    fun loadFilter(
+        localWords: List<String>,
+        punctuations: List<String>,
+        replacement: Char,
+        isCloudEnabled: Boolean,
+        cloudUrls: List<String>,
+        ignoredCloudWords: List<String>,
+        updateCloud: Boolean = true,
+        notify: ProxyCommandSender? = console()
+    )
+
+    fun loadCloudThesaurus(notify: ProxyCommandSender? = console())
 
     /**
      * 根据玩家的权限 (trchat.bypass.filter)，过滤一个字符串

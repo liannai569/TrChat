@@ -9,7 +9,6 @@ import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
-import me.arasple.mc.trchat.module.internal.filter.ChatFilter
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.util.color.parseGradients
@@ -40,8 +39,6 @@ object TrChatBukkit : Plugin() {
         private set
 
     var isGlobalMuting = false
-
-    val reportedErrors = mutableListOf<String>()
 
     @Awake
     internal fun loadDependency() {
@@ -80,10 +77,10 @@ object TrChatBukkit : Plugin() {
 
     override fun onEnable() {
         Databases.database
+        BukkitProxyManager.processor
         if (!isPaperEnv) {
             BukkitComponentManager.init()
         }
-        BukkitProxyManager.processor
 
         Kether.isAllowToleranceParser = Settings.CONF.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
         Language.textTransfer += object : TextTransfer {
@@ -95,7 +92,6 @@ object TrChatBukkit : Plugin() {
         HookPlugin.printInfo()
         TrChat.api().getChannelManager().loadChannels(console())
         Loader.loadFunctions(console())
-        ChatFilter.loadFilter(true, console())
 
         console().sendLang("Plugin-Enabled", pluginVersion)
     }

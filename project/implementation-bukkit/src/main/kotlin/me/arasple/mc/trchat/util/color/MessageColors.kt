@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.util.color
 
-import org.bukkit.entity.HumanEntity
-import org.bukkit.entity.Player
+import org.bukkit.command.CommandSender
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 
@@ -25,68 +24,57 @@ object MessageColors {
         "book"
     )
 
-    fun replaceWithPermission(player: HumanEntity, strings: List<String>, type: Type = Type.DEFAULT): List<String> {
-        return strings.map { replaceWithPermission(player, it, type) }
+    @JvmOverloads
+    fun replaceWithPermission(sender: CommandSender, strings: List<String>, type: Type = Type.DEFAULT): List<String> {
+        return strings.map { replaceWithPermission(sender, it, type) }
     }
 
-    fun replaceWithPermission(player: HumanEntity, s: String, type: Type = Type.DEFAULT): String {
+    @JvmOverloads
+    fun replaceWithPermission(sender: CommandSender, s: String, type: Type = Type.DEFAULT): String {
         var string = s
 
-        if (type == Type.ANVIL && player.hasPermission("trchat.color.anvil.*")) {
+        if (type == Type.ANVIL && sender.hasPermission("trchat.color.anvil.*")) {
             return string.colorify()
         }
-        if (type == Type.SIGN && player.hasPermission("trchat.color.sign.*")) {
+        if (type == Type.SIGN && sender.hasPermission("trchat.color.sign.*")) {
             return string.colorify()
         }
-        if (type == Type.BOOK && player.hasPermission("trchat.color.book.*")) {
-            return string.colorify()
-        }
-
-        if (player.hasPermission("$COLOR_PERMISSION_NODE*")) {
+        if (type == Type.BOOK && sender.hasPermission("trchat.color.book.*")) {
             return string.colorify()
         }
 
-        string = if (player.hasPermission(COLOR_PERMISSION_NODE + "rainbow")) {
+        if (sender.hasPermission("$COLOR_PERMISSION_NODE*")) {
+            return string.colorify()
+        }
+
+        string = if (sender.hasPermission(COLOR_PERMISSION_NODE + "rainbow")) {
             string.parseRainbow()
         } else {
             string.replace(Hex.RAINBOW_PATTERN.toRegex(), "")
         }
 
-        string = if (player.hasPermission(COLOR_PERMISSION_NODE + "gradients")) {
+        string = if (sender.hasPermission(COLOR_PERMISSION_NODE + "gradients")) {
             string.parseGradients()
         } else {
             string.replace(Hex.GRADIENT_PATTERN.toRegex(), "")
         }
 
-        if (player.hasPermission(COLOR_PERMISSION_NODE + "hex")) {
+        if (sender.hasPermission(COLOR_PERMISSION_NODE + "hex")) {
             string = string.parseHex()
         } else {
             Hex.HEX_PATTERNS.forEach { string = string.replace(it.toRegex(), "") }
         }
 
-        getColors(player).forEach { color ->
+        getColors(sender).forEach { color ->
             string = string.replace(color, CustomColor.get(color).color)
         }
 
         return string
     }
 
-    fun defaultColored(color: CustomColor, player: Player, msg: String): String {
-        var message = msg
-
-        message = replaceWithPermission(player, message)
-
-        message = when (color.type) {
-            CustomColor.ColorType.NORMAL -> color.color + message
-            CustomColor.ColorType.SPECIAL -> (color.color + message).parseRainbow().parseGradients()
-        }
-
-        return message
-    }
-
-    private fun getColorsFromPermissions(player: HumanEntity, prefix: String): List<String> {
-        player.recalculatePermissions()
-        return player.effectivePermissions.mapNotNull {
+    private fun getColorsFromPermissions(sender: CommandSender, prefix: String): List<String> {
+        sender.recalculatePermissions()
+        return sender.effectivePermissions.mapNotNull {
             val permission = it.permission
             if (permission.startsWith(prefix)) {
                 permission.removePrefix(prefix).let { color -> if (color.length == 1) "&$color" else color }
@@ -96,12 +84,12 @@ object MessageColors {
         }.filterNot { it in specialColors }
     }
 
-    fun getColors(player: HumanEntity): List<String> {
-        return getColorsFromPermissions(player, COLOR_PERMISSION_NODE)
+    fun getColors(sender: CommandSender): List<String> {
+        return getColorsFromPermissions(sender, COLOR_PERMISSION_NODE)
     }
 
-    fun getForceColors(player: HumanEntity): List<String> {
-        return getColorsFromPermissions(player, FORCE_CHAT_COLOR_PERMISSION_NODE)
+    fun getForceColors(sender: CommandSender): List<String> {
+        return getColorsFromPermissions(sender, FORCE_CHAT_COLOR_PERMISSION_NODE)
     }
 
     enum class Type {

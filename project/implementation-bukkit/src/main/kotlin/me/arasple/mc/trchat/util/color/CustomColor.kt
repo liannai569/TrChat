@@ -1,5 +1,7 @@
 package me.arasple.mc.trchat.util.color
 
+import org.bukkit.command.CommandSender
+
 /**
  * @author wlys
  * @since 2021/12/12 12:30
@@ -9,6 +11,19 @@ class CustomColor(val type: ColorType, val color: String) {
     enum class ColorType {
 
         NORMAL, SPECIAL
+    }
+
+    fun colored(sender: CommandSender, msg: String): String {
+        var message = msg
+
+        message = MessageColors.replaceWithPermission(sender, message)
+
+        message = when (type) {
+            ColorType.NORMAL -> color + message
+            ColorType.SPECIAL -> (color + message).parseRainbow().parseGradients()
+        }
+
+        return message
     }
 
     companion object {

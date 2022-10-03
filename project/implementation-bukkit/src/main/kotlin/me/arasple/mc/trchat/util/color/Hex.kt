@@ -1,10 +1,9 @@
 package me.arasple.mc.trchat.util.color
 
+import me.arasple.mc.trchat.util.isDragonCoreHooked
 import net.md_5.bungee.api.ChatColor
-import org.bukkit.Bukkit
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.common.util.unsafeLazy
 import taboolib.common5.mirrorNow
 import taboolib.module.nms.MinecraftVersion
 import java.awt.Color
@@ -30,7 +29,6 @@ object Hex {
         Pattern.compile("<#([A-Fa-f\\d]){6}>"),  // <#FFFFFF>
         Pattern.compile("\\{#([A-Fa-f\\d]){6}}"),  // {#FFFFFF}
         Pattern.compile("&#([A-Fa-f\\d]){6}"),  // &#FFFFFF
-        Pattern.compile("#([A-Fa-f\\d]){6}"), // #FFFFFF
         Pattern.compile("&\\{#([A-Fa-f\\d]){6}}") // &{#FFFFFF}
     )
     private val STOP = Pattern.compile(
@@ -44,7 +42,6 @@ object Hex {
                 "&\\{#([A-Fa-f\\d]){6}}|" +
                 org.bukkit.ChatColor.COLOR_CHAR
     )
-    private val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
 
     /**
      * Gets a capture group from a regex Matcher if it exists
@@ -207,15 +204,16 @@ object Hex {
     }
 
     fun parseHex(message: String): String {
-        if (isDragonCoreHooked) {
-            return message
-        }
         return mirrorNow("Handler:Color:Hex") {
             var parsed = message
             for (pattern: Pattern in HEX_PATTERNS) {
                 var matcher = pattern.matcher(parsed)
                 while (matcher.find()) {
-                    val color = translateHex(cleanHex(matcher.group()))
+                    val color = if (isDragonCoreHooked) {
+                        "{{DRAGONCORE:${cleanHex(matcher.group()).substring(1)}}}"
+                    } else {
+                        translateHex(cleanHex(matcher.group()))
+                    }
                     val before = parsed.substring(0, matcher.start())
                     val after = parsed.substring(matcher.end())
                     parsed = before + color + after

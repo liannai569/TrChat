@@ -41,7 +41,7 @@ object BukkitPlayers {
     fun getPlayers(): List<String> {
         val players = mutableSetOf<String>()
         players += BukkitPlayers.players
-        players += onlinePlayers().map { it.name }
+        players += onlinePlayers().map { it.displayName ?: it.name }
         return players.filter { it.isNotBlank() }
     }
 

@@ -9,6 +9,7 @@ import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Condition
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -25,11 +26,8 @@ import java.text.SimpleDateFormat
  * @since 2022/6/8 12:48
  */
 val classCraftItemStack = obcClass("inventory.CraftItemStack")
-
-val classChatSerializer by unsafeLazy {
-    nmsClass("IChatBaseComponent\$ChatSerializer")
-}
-
+val classChatSerializer by unsafeLazy { nmsClass("IChatBaseComponent\$ChatSerializer") }
+val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
 val muteDateFormat = SimpleDateFormat()
 
 fun String.toCondition() = Condition(this)

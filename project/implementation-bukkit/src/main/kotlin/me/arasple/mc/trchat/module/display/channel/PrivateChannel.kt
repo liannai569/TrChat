@@ -47,7 +47,7 @@ class PrivateChannel(
         if (bindings.command.isNullOrEmpty()) {
             return
         }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission ?: "") {
             execute<Player> { sender, _, _ ->
                 if (sender.session.channel == this@PrivateChannel.id) {
                     quit(sender)

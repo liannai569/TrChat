@@ -93,6 +93,7 @@ object InventoryShow : Function("INVENTORY") {
                     inv.setItem(8, sender.inventory.boots.replaceAir())
                     (9..17).forEach { slot -> inv.setItem(slot, PLACEHOLDER_ITEM) }
                 }
+                onClick(true)
             }
             val sha1 = Base64.getEncoder().encodeToString(sender.inventory.serializeToByteArray()).digest("sha-1")
             cache.put(sha1, menu)

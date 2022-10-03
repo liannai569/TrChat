@@ -78,6 +78,7 @@ object EnderChestShow : Function("ENDERCHEST") {
                 onGenerate { _, element, _, _ ->
                     element
                 }
+                onClick(true)
             }
             val sha1 = Base64.getEncoder().encodeToString(sender.inventory.serializeToByteArray()).digest("sha-1")
             cache.put(sha1, menu)

@@ -59,7 +59,7 @@ open class Channel(
         if (bindings.command.isNullOrEmpty()) {
             return
         }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id speak command", permission = settings.joinPermission ?: "") {
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission ?: "") {
             execute<Player> { sender, _, _ ->
                 if (sender.session.channel == this@Channel.id) {
                     quit(sender)
@@ -118,9 +118,7 @@ open class Channel(
                 )
             }
         } else {
-            listeners.forEach {
-                getProxyPlayer(it)?.sendComponent(it, component)
-            }
+            listeners.forEach { getProxyPlayer(it)?.sendComponent(null, component) }
             sender.sendComponent(null, component)
         }
     }

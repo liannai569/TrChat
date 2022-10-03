@@ -5,7 +5,6 @@ import me.arasple.mc.trchat.module.display.format.obj.Style.Companion.applyTo
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.script.Condition
 import me.arasple.mc.trchat.util.color.CustomColor
-import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.pass
 import me.arasple.mc.trchat.util.session
@@ -27,7 +26,8 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
         var message = msg
 
         if (sender !is Player) {
-            return toTextComponent(sender, message)
+            val defaultColor = defaultColor[0].first
+            return toTextComponent(sender, defaultColor.colored(sender, message))
         }
 
         Function.functions.filter { it.alias !in disabledFunctions && it.canUse(sender) }.forEach {
@@ -46,7 +46,7 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
                 }
                 continue
             }
-            builder.append(toTextComponent(sender, MessageColors.defaultColored(defaultColor, sender, part.text)))
+            builder.append(toTextComponent(sender, defaultColor.colored(sender, part.text)))
         }
         return builder.build()
     }
@@ -54,7 +54,19 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
     override fun toTextComponent(sender: CommandSender, vararg vars: String): TextComponent {
         return mirrorNow("Chat:Format:Msg") {
             val message = vars[0]
-            val builder = legacy(message).toBuilder()
+            val builder = Component.text()
+            parser.readToFlatten(message).forEach {
+                builder.append(if (it.isVariable) {
+                    val args = it.text.split(":", limit = 2)
+                    if (args[0] == "DRAGONCORE") {
+                        Component.text("§r§#${args[1]}")
+                    } else {
+                        legacy(args[1])
+                    }
+                } else {
+                    legacy(it.text)
+                })
+            }
             val originMessage = builder.content()
 
             style.forEach {

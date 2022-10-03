@@ -162,6 +162,7 @@ class NMSImpl : NMS() {
         }
     }
 
-    private fun Component.toIChatBaseComponent() = classChatSerializer.invokeMethod<IChatBaseComponent>("a", gson(this), isStatic = true)!!
+    private fun Component.toIChatBaseComponent() =
+        classChatSerializer.invokeMethod<IChatBaseComponent>("a", gson(this), isStatic = true)!!
 
 }

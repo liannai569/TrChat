@@ -7,7 +7,7 @@ package me.arasple.mc.trchat.util
 @Internal
 object Regexs {
 
-    private val PLACEHOLDER_API = "(%)(.+?)(%)|(?!\\{\")((\\{)(.+?)(}))".toRegex()
+    private val PLACEHOLDER_API = "(%)(.+?)(%)|(:)(.+?)(:)|(?!\\{\")((\\{)(.+?)(}))".toRegex()
 
     private val TRUE = "true|yes|on".toRegex()
     val FALSE = "false|no|off".toRegex()

@@ -225,30 +225,30 @@ object Loader {
     }
 
     private fun parseJSON(content: Map<*, *>): JsonComponent {
-        val text = Property.serialize(content["text"] ?: "null").map { Text(it.first, it.second[Property.CONDITION]?.toCondition()) }
+        val text = Property.serialize(content["text"] ?: "null").map { Text(it.first, it.second.getCondition()) }
         val style = mutableListOf<Style?>()
-        style += content["hover"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Hover.Text(it) }
-        style += content["suggest"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Suggest(it) }
-        style += content["command"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Command(it) }
-        style += content["url"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Url(it) }
-        style += content["copy"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Copy(it) }
-        style += content["file"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.File(it) }
-        style += content["insertion"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Insertion(it) }
-        style += content["font"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Font(it) }
+        style += content["hover"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Hover.Text(it) }
+        style += content["suggest"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Suggest(it) }
+        style += content["command"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Command(it) }
+        style += content["url"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Url(it) }
+        style += content["copy"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Copy(it) }
+        style += content["file"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.File(it) }
+        style += content["insertion"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Insertion(it) }
+        style += content["font"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Font(it) }
         return JsonComponent(text, style.filterNotNull())
     }
 
     private fun parseMsg(content: Map<*, *>): MsgComponent {
-        val defaultColor = content["default-color"]!!.serialize().map { CustomColor.get(it.first) to it.second[Property.CONDITION]?.toCondition() }
+        val defaultColor = content["default-color"]!!.serialize().map { CustomColor.get(it.first) to it.second.getCondition() }
         val style = mutableListOf<Style?>()
-        style += content["hover"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Hover.Text(it) }
-        style += content["suggest"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Suggest(it) }
-        style += content["command"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Command(it) }
-        style += content["url"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Url(it) }
-        style += content["copy"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.Copy(it) }
-        style += content["file"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Click.File(it) }
-        style += content["insertion"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Insertion(it) }
-        style += content["font"]?.serialize()?.map { it.first to it.second[Property.CONDITION]?.toCondition() }?.let { Style.Font(it) }
+        style += content["hover"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Hover.Text(it) }
+        style += content["suggest"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Suggest(it) }
+        style += content["command"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Command(it) }
+        style += content["url"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Url(it) }
+        style += content["copy"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.Copy(it) }
+        style += content["file"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Click.File(it) }
+        style += content["insertion"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Insertion(it) }
+        style += content["font"]?.serialize()?.map { it.first to it.second.getCondition() }?.let { Style.Font(it) }
         return MsgComponent(defaultColor, style.filterNotNull())
     }
 
@@ -267,4 +267,7 @@ object Loader {
     private fun Any.serialize(): List<Pair<String, Map<Property, String>>> {
         return Property.serialize(this)
     }
+
+    private fun Map<Property, String>.getCondition() = this[Property.CONDITION]?.toCondition()
+
 }

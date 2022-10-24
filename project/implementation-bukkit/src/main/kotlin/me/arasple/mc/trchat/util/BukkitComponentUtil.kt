@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.util
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
+import me.arasple.mc.trchat.module.internal.hook.type.HookDisplayItem
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.api.BinaryTagHolder
 import net.kyori.adventure.text.Component
@@ -71,6 +72,10 @@ fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent
     var newItem = item.optimizeShulkerBox()
     newItem = NMS.INSTANCE.optimizeNBT(newItem)
     newItem = HookPlugin.getEcoEnchants().displayItem(newItem, player)
+    HookPlugin.registry.filter { HookDisplayItem::class.java.isAssignableFrom(it.javaClass) }.forEach { element ->
+        val itemDisplay = element as HookDisplayItem
+        newItem = itemDisplay.displayItem(item, player)
+    }
     val nmsItemStack = classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, isStatic = true)!!
     val nmsNBTTabCompound = classNBTTagCompound.invokeConstructor()
     val itemJson = nmsItemStack.invokeMethod<Any>("save", nmsNBTTabCompound)!!

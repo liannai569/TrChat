@@ -23,7 +23,7 @@ object HookPlugin {
         }
     }
 
-    private val registry: Array<HookAbstract> = arrayOf(
+    val registry = arrayListOf(
         HookEcoEnchants(),
         HookItemsAdder(),
         HookInteractiveChat()
@@ -39,6 +39,11 @@ object HookPlugin {
 
     fun getInteractiveChat(): HookInteractiveChat {
         return registry[2] as HookInteractiveChat
+    }
+
+    fun addHook(element: HookAbstract) {
+        registry.add(element)
+        console().sendLang("Plugin-Dependency-Hooked", element.name)
     }
 
 }

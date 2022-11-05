@@ -1,7 +1,7 @@
 val taboolibVersion: String by project
 
 plugins {
-    id("io.izzel.taboolib") version "1.42"
+    id("io.izzel.taboolib") version "1.50"
 }
 
 taboolib {

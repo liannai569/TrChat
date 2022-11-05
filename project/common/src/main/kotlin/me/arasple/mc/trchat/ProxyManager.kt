@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat
 
-import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 
 /**
  * @author wlys
@@ -8,8 +9,13 @@ import java.util.concurrent.CompletableFuture
  */
 interface ProxyManager {
 
-    fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean = true): CompletableFuture<Boolean>
+    val executor: ExecutorService
 
-    fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean = true): CompletableFuture<Boolean>
+    fun sendCommonMessage(recipient: Any, vararg args: String): Future<*>
+
+    fun sendTrChatMessage(recipient: Any, vararg args: String): Future<*>
+
+    fun close() {
+    }
 
 }

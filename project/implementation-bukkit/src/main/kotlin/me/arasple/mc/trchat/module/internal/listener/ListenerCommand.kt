@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.module.conf.file.Functions
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.toCondition
 import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
@@ -17,7 +16,6 @@ import taboolib.platform.util.sendLang
  * @author Arasple, wlys
  * @date 2020/1/16 21:41
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object ListenerCommand {
 

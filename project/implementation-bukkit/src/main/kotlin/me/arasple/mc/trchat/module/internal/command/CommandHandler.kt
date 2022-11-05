@@ -7,8 +7,7 @@ import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.menu.MenuControlPanel
 import me.arasple.mc.trchat.module.display.menu.MenuFilterControl
 import me.arasple.mc.trchat.module.internal.command.sub.CommandColor
-import me.arasple.mc.trchat.module.internal.command.sub.CommandRemoveMessage
-import me.arasple.mc.trchat.util.Internal
+import me.arasple.mc.trchat.module.internal.command.sub.CommandRecallMessage
 import me.arasple.mc.trchat.util.data
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -31,7 +30,6 @@ import taboolib.platform.util.sendLang
  * @author wlys
  * @since 2021/8/21 12:23
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 @CommandHeader("trchat", ["trc"], "TrChat main command", permission = "trchat.access")
 object CommandHandler {
@@ -88,8 +86,8 @@ object CommandHandler {
         }
     }
 
-    @CommandBody(permission = "trchat.command.removemessage", optional = true)
-    val removeMessage = CommandRemoveMessage.command
+    @CommandBody(permission = "trchat.command.recallmessage", optional = true)
+    val recallMessage = CommandRecallMessage.command
 
     @CommandBody(permission = "trchat.command.color", optional = true)
     val color = CommandColor.command

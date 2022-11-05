@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.conf
 
 import me.arasple.mc.trchat.ChannelManager
 import me.arasple.mc.trchat.module.display.channel.Channel
-import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.*
 
 /**
@@ -10,7 +9,6 @@ import taboolib.common.platform.*
  * @since 2022/6/19 19:57
  */
 @Awake
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object BukkitChannelManager : ChannelManager {
 

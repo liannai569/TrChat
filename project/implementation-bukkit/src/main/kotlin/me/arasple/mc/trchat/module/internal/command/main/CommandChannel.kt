@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.command.main
 
 import me.arasple.mc.trchat.module.display.channel.Channel
-import me.arasple.mc.trchat.util.Internal
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -15,7 +14,6 @@ import taboolib.module.lang.sendLang
  * @author wlys
  * @since 2021/7/21 11:24
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object CommandChannel {
 

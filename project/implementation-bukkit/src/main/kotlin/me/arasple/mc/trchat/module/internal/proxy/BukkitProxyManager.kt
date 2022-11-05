@@ -1,6 +1,6 @@
 package me.arasple.mc.trchat.module.internal.proxy
 
-import com.google.common.base.Enums
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import me.arasple.mc.trchat.ProxyManager
 import me.arasple.mc.trchat.module.conf.file.Settings
 import org.bukkit.Bukkit
@@ -15,6 +15,9 @@ import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.unsafeLazy
 import taboolib.module.lang.sendLang
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 /**
  * @author wlys
@@ -27,21 +30,30 @@ object BukkitProxyManager : ProxyManager {
         PlatformFactory.registerAPI<ProxyManager>(this)
     }
 
+    override val executor: ExecutorService by unsafeLazy {
+        val factory = ThreadFactoryBuilder().setNameFormat("TrChat PluginMessage Processing Thread #%d").build()
+        Executors.newFixedThreadPool(2, factory)
+    }
+
     val processor by unsafeLazy {
+        executor
         when (platform) {
-            Platform.BUNGEE -> BukkitProxyProcessor.BungeeSide.also { it.init() }
-            Platform.VELOCITY -> BukkitProxyProcessor.VelocitySide.also { it.init() }
+            Platform.BUNGEE -> {
+                BukkitProxyProcessor.BungeeSide()
+            }
+            Platform.VELOCITY -> {
+                BukkitProxyProcessor.VelocitySide()
+            }
             else -> null
         }
     }
 
     val platform: Platform by unsafeLazy {
-        val force = Enums.getIfPresent(
-            Platform::class.java,
-            Settings.CONF.getString("Options.Proxy")?.uppercase() ?: "AUTO"
-        )
-        if (force.isPresent) {
-            force.get()
+        val force = kotlin.runCatching {
+            Platform.valueOf(Settings.CONF.getString("Options.Proxy")?.uppercase() ?: "AUTO")
+        }
+        if (force.isSuccess) {
+            force.getOrThrow()
         } else {
             if (SpigotConfig.bungee) {
                 console().sendLang("Plugin-Proxy-Supported", "Bungee")
@@ -59,14 +71,14 @@ object BukkitProxyManager : ProxyManager {
         }
     }
 
-    override fun sendCommonMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
+    override fun sendCommonMessage(recipient: Any, vararg args: String): Future<*> {
         if (processor == null || recipient !is PluginMessageRecipient) return CompletableFuture.completedFuture(false)
-        return processor!!.sendCommonMessage(recipient, *args, async = async)
+        return processor!!.sendCommonMessage(recipient, executor, *args)
     }
 
-    override fun sendTrChatMessage(recipient: Any, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
+    override fun sendTrChatMessage(recipient: Any, vararg args: String): Future<*> {
         if (processor == null || recipient !is PluginMessageRecipient) return CompletableFuture.completedFuture(false)
-        return processor!!.sendTrChatMessage(recipient, *args, async = async)
+        return processor!!.sendTrChatMessage(recipient, executor, *args)
     }
 
     fun sendProxyLang(player: Player, target: String, node: String, vararg args: String) {
@@ -75,6 +87,11 @@ object BukkitProxyManager : ProxyManager {
         } else {
             sendTrChatMessage(player, "SendLang", target, node, *args)
         }
+    }
+
+    override fun close() {
+        processor?.close()
+        executor.shutdownNow()
     }
 
 }

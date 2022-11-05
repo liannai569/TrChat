@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.conf
 
+import com.velocitypowered.api.proxy.ProxyServer
 import me.arasple.mc.trchat.ChannelManager
-import me.arasple.mc.trchat.module.internal.TrChatVelocity
 import me.arasple.mc.trchat.module.internal.VelocityProxyManager
 import me.arasple.mc.trchat.util.print
 import taboolib.common.io.newFile
@@ -11,6 +11,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
+import taboolib.common.platform.function.server
 import taboolib.common.util.unsafeLazy
 import taboolib.common5.FileWatcher
 import taboolib.module.lang.sendLang
@@ -32,9 +33,7 @@ object VelocityChannelManager : ChannelManager {
         val folder = File(getDataFolder(), "channels")
 
         if (!folder.exists()) {
-            arrayOf(
-                "Velocity.yml",
-            ).forEach { releaseResourceFile("channels/$it", replace = true) }
+            releaseResourceFile("channels/Velocity.yml", replace = true)
             newFile(File(getDataFolder(), "data"), folder = true)
         }
 
@@ -42,7 +41,6 @@ object VelocityChannelManager : ChannelManager {
     }
 
     val channels = mutableMapOf<String, String>()
-
     val loadedServers = mutableMapOf<String, ArrayList<Int>>()
 
     override fun loadChannels(sender: ProxyCommandSender) {
@@ -83,7 +81,7 @@ object VelocityChannelManager : ChannelManager {
     }
 
     fun sendProxyChannel(id: String, channel: String, all: Boolean = false) {
-        TrChatVelocity.plugin.server.allServers.filter {
+        server<ProxyServer>().allServers.filter {
             all || !loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
         }.forEach {
             VelocityProxyManager.sendTrChatMessage(it, "SendProxyChannel", id, channel)
@@ -91,7 +89,7 @@ object VelocityChannelManager : ChannelManager {
     }
 
     fun sendAllProxyChannels(port: Int) {
-        val server = TrChatVelocity.plugin.server.allServers.firstOrNull { it.serverInfo.address.port == port } ?: return
+        val server = server<ProxyServer>().allServers.firstOrNull { it.serverInfo.address.port == port } ?: return
         channels.forEach {
             VelocityProxyManager.sendTrChatMessage(server, "SendProxyChannel", it.key, it.value)
         }

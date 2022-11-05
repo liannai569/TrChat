@@ -11,6 +11,7 @@ import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
+import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import me.arasple.mc.trchat.util.color.parseGradients
 import me.arasple.mc.trchat.util.color.parseRainbow
 import org.bukkit.Bukkit
@@ -78,6 +79,7 @@ object TrChatBukkit : Plugin() {
     override fun onEnable() {
         Databases.database
         BukkitProxyManager.processor
+        RedisManager()
         if (!isPaperEnv) {
             BukkitComponentManager.init()
         }
@@ -100,7 +102,7 @@ object TrChatBukkit : Plugin() {
         if (!isPaperEnv) {
             BukkitComponentManager.release()
         }
-        BukkitProxyManager.processor?.close()
+        BukkitProxyManager.close()
 
         ChatSession.SESSIONS.clear()
         PlayerData.DATA.clear()

@@ -37,6 +37,7 @@ enum class CooldownType(val alias: String) {
     MENTION("Mention"),
     MENTION_ALL("MentionAll"),
     INVENTORY_SHOW("InventoryShow"),
-    ENDERCHEST_SHOW("EnderChestShow")
+    ENDERCHEST_SHOW("EnderChestShow"),
+    IMAGE_SHOW("ImageShow")
 
 }

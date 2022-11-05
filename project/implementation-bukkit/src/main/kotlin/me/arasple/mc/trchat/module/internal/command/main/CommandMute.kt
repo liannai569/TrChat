@@ -1,9 +1,7 @@
 package me.arasple.mc.trchat.module.internal.command.main
 
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.data
-import me.arasple.mc.trchat.util.muteDateFormat
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -17,6 +15,7 @@ import taboolib.common5.Demand
 import taboolib.common5.util.parseMillis
 import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
+import java.text.SimpleDateFormat
 
 /**
  * CommandPrivateMessage
@@ -25,11 +24,11 @@ import taboolib.platform.util.sendLang
  * @author wlys
  * @since 2021/7/21 10:40
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object CommandMute {
 
-    @Suppress("Deprecation")
+    val muteDateFormat = SimpleDateFormat()
+
     @Awake(LifeCycle.ENABLE)
     fun c() {
         command("mute", description = "Mute", permission = "trchat.command.mute") {

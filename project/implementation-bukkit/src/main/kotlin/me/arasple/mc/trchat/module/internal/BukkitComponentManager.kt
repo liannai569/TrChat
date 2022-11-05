@@ -5,7 +5,10 @@ import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
-import me.arasple.mc.trchat.util.*
+import me.arasple.mc.trchat.util.data
+import me.arasple.mc.trchat.util.gson
+import me.arasple.mc.trchat.util.legacy
+import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
@@ -21,7 +24,6 @@ import java.util.*
  * @author wlys
  * @since 2022/6/8 12:56
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object BukkitComponentManager : ComponentManager {
 

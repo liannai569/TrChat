@@ -6,20 +6,6 @@ General:
       - 'ver(sion)?(s)?{condition: perm *trchat.admin}'
       - 'help(s)?{condition: perm *trchat.admin}'
       - 'shout{cooldown: 3}'
-  Item-Show:
-    Enabled: true
-    Permission: 'none'
-    Cooldown: '30s'
-    Origin-Name: false
-    Compatible: false
-    Keys:
-      - "%i%"
-      - "%i"
-      - "%item%"
-      - "%item"
-      - "[i]"
-      - "[item]"
-    Actions: [ ]
   Mention:
     Enabled: true
     Self-Mention: false
@@ -39,9 +25,24 @@ General:
       - "@所有人"
       - "@全体成员"
     Actions: [ ]
-  Inventory-Show:
+  Item-Show:
     Enabled: true
     Permission: 'none'
+    Cooldown: '30s'
+    Origin-Name: false
+    Compatible: false
+    Type: TRANSLATABLE
+    Keys:
+      - "%i%"
+      - "%i"
+      - "%item%"
+      - "%item"
+      - "[i]"
+      - "[item]"
+    Actions: [ ]
+  Inventory-Show:
+    Enabled: true
+    Permission: 'trchat.function.inventoryshow'
     Cooldown: '30s'
     Keys:
       - '[inv]'
@@ -49,13 +50,18 @@ General:
     Actions: [ ]
   EnderChest-Show:
     Enabled: true
-    Permission: 'none'
+    Permission: 'trchat.function.enderchestshow'
     Cooldown: '30s'
     Keys:
       - '[ender]'
       - '[enderchest]'
     Actions: [ ]
-
+  Image-Show:
+    Enabled: true
+    Permission: 'trchat.function.imageshow'
+    Cooldown: '1m'
+    Key: '!\[([^;]*)\]\(([a-zA-Z]+://[^\s]*)\)'
+    Actions: [ ]
 Custom:
   # 示例 —— 网站分享
   shareUrl:

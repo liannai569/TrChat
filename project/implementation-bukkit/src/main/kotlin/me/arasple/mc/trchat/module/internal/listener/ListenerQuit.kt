@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.internal.listener
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.internal.data.Databases
-import me.arasple.mc.trchat.util.Internal
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -17,7 +16,6 @@ import taboolib.common.platform.function.submitAsync
  * @author wlys
  * @since 2021/12/11 23:19
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object ListenerQuit {
 

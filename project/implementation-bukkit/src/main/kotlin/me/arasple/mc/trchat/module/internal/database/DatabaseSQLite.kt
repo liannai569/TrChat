@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.database
 
 import me.arasple.mc.trchat.module.conf.file.Settings
-import me.arasple.mc.trchat.util.Internal
 import org.bukkit.OfflinePlayer
 import taboolib.common.io.newFile
 import taboolib.common.platform.function.getDataFolder
@@ -18,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap
  * @author sky
  * @since 2020-08-14 14:46
  */
-@Internal
 class DatabaseSQLite : Database() {
 
     val host = newFile(Settings.CONF.getString("Database.SQLite.file")!!.replace("{plugin_folder}", getDataFolder().absolutePath)).getHost()

@@ -1,6 +1,8 @@
-package me.arasple.mc.trchat.module.display.function
+package me.arasple.mc.trchat.module.display.function.standard
 
 import me.arasple.mc.trchat.module.conf.file.Functions
+import me.arasple.mc.trchat.module.display.function.Function
+import me.arasple.mc.trchat.module.display.function.StandardFunction
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.passPermission

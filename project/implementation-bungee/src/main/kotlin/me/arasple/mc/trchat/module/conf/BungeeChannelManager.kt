@@ -33,9 +33,7 @@ object BungeeChannelManager : ChannelManager {
         val folder = File(getDataFolder(), "channels")
 
         if (!folder.exists()) {
-            arrayOf(
-                "Bungee.yml",
-            ).forEach { releaseResourceFile("channels/$it", replace = true) }
+            releaseResourceFile("channels/Bungee.yml", replace = true)
             newFile(File(getDataFolder(), "data"), folder = true)
         }
 
@@ -43,7 +41,6 @@ object BungeeChannelManager : ChannelManager {
     }
 
     val channels = mutableMapOf<String, String>()
-
     val loadedServers = mutableMapOf<String, ArrayList<Int>>()
 
     override fun loadChannels(sender: ProxyCommandSender) {

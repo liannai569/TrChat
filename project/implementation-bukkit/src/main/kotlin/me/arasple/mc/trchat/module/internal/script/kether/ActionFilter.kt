@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.script.kether
 
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.library.kether.ArgTypes
@@ -39,7 +38,6 @@ class ActionFilter {
 
     }
 
-    @Internal
     @PlatformSide([Platform.BUKKIT])
     companion object {
 

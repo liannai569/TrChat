@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.script.kether
 
 import me.arasple.mc.trchat.module.display.channel.Channel
-import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.module.kether.*
@@ -30,7 +29,6 @@ class ActionChannel(val symbol: Symbol, val channel: String?): ScriptAction<Void
         return CompletableFuture.completedFuture(null)
     }
 
-    @Internal
     @PlatformSide([Platform.BUKKIT])
     companion object {
 

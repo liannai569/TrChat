@@ -13,7 +13,6 @@ import taboolib.platform.util.sendLang
  * @author Arasple
  * @date 2019/11/29 21:29
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object Vars {
 

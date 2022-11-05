@@ -3,12 +3,11 @@ package me.arasple.mc.trchat.module.internal.proxy
 import com.google.common.io.ByteStreams
 import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.channel.Channel
+import me.arasple.mc.trchat.module.display.function.standard.EnderChestShow
+import me.arasple.mc.trchat.module.display.function.standard.InventoryShow
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
-import me.arasple.mc.trchat.util.buildMessage
-import me.arasple.mc.trchat.util.print
+import me.arasple.mc.trchat.util.*
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
-import me.arasple.mc.trchat.util.sendComponent
-import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -17,10 +16,14 @@ import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageRecipient
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.submitAsync
+import taboolib.common5.util.decodeBase64
+import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.util.bukkitPlugin
+import taboolib.platform.util.deserializeToInventory
 import taboolib.platform.util.onlinePlayers
 import java.io.IOException
-import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 
 /**
  * @author wlys
@@ -28,21 +31,45 @@ import java.util.concurrent.CompletableFuture
  */
 sealed interface BukkitProxyProcessor : PluginMessageListener {
 
-    fun init()
+    operator fun invoke(): BukkitProxyProcessor {
+        submitAsync(delay = 100, period = 60) {
+            if (onlinePlayers.isNotEmpty()) {
+                BukkitProxyManager.sendCommonMessage(onlinePlayers.iterator().next(), "PlayerList", "ALL")
+            }
+        }
+        return this
+    }
 
     fun close() {
         Bukkit.getMessenger().unregisterIncomingPluginChannel(bukkitPlugin)
     }
 
-    fun sendCommonMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean = true): CompletableFuture<Boolean>
+    fun sendCommonMessage(
+        recipient: PluginMessageRecipient,
+        executor: ExecutorService,
+        vararg args: String
+    ): Future<*> {
+        return executor.submit {
+            val out = ByteStreams.newDataOutput()
+            try {
+                for (arg in args) {
+                    out.writeUTF(arg)
+                }
+                recipient.sendPluginMessage(bukkitPlugin, BUNGEE_CHANNEL, out.toByteArray())
+            } catch (e: IOException) {
+                e.print("Failed to send proxy common message!")
+            }
+        }
+    }
 
-    fun sendTrChatMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean = true): CompletableFuture<Boolean>
+    fun sendTrChatMessage(
+        recipient: PluginMessageRecipient,
+        executor: ExecutorService,
+        vararg args: String
+    ): Future<*>
 
     fun execute(data: Array<String>) {
         when (data[0]) {
-            "PlayerList" -> {
-                BukkitPlayers.setPlayers(data[1].split(", "))
-            }
             "GlobalMute" -> {
                 when (data[1]) {
                     "on" -> TrChatBukkit.isGlobalMuting = true
@@ -55,7 +82,7 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                 val permission = data[3]
                 val message = GsonComponentSerializer.gson().deserialize(raw)
 
-                if (permission == "null") {
+                if (permission == "") {
                     onlinePlayers.forEach { it.sendComponent(uuid, message) }
                 } else {
                     onlinePlayers.filter { it.hasPermission(permission) }.forEach { it.sendComponent(uuid, message) }
@@ -72,80 +99,55 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                     BukkitProxyManager.sendTrChatMessage(onlinePlayers.iterator().next(), "LoadedProxyChannel", id)
                 }
             }
+            "InventoryShow" -> {
+                if (data[1] == MinecraftVersion.minecraftVersion) {
+                    val name = data[2]
+                    val sha1 = data[3]
+                    if (InventoryShow.cache.getIfPresent(sha1) == null) {
+                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickInventory(54, "$name's Inventory"))
+                        InventoryShow.cache.put(sha1, inventory)
+                    }
+                }
+            }
+            "EnderChestShow" -> {
+                if (data[1] == MinecraftVersion.minecraftVersion) {
+                    val name = data[2]
+                    val sha1 = data[3]
+                    if (EnderChestShow.cache.getIfPresent(sha1) == null) {
+                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickInventory(27, "$name's Ender Chest"))
+                        EnderChestShow.cache.put(sha1, inventory)
+                    }
+                }
+            }
         }
     }
 
     object BungeeSide : BukkitProxyProcessor {
 
         private const val TRCHAT_CHANNEL = "trchat:main"
-        private const val BUNGEE_CHANNEL = "BungeeCord"
 
-        override fun init() {
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, BUNGEE_CHANNEL)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, BUNGEE_CHANNEL)
-            }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, BUNGEE_CHANNEL)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, BUNGEE_CHANNEL, BungeeSide)
-            }
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, TRCHAT_CHANNEL)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, TRCHAT_CHANNEL)
-            }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, TRCHAT_CHANNEL)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, TRCHAT_CHANNEL, BungeeSide)
-            }
-            submitAsync(period = 60) {
-                if (onlinePlayers.isNotEmpty()) {
-                    sendCommonMessage(onlinePlayers.iterator().next(), "PlayerList", "ALL", async = false)
-                }
-            }
+        override operator fun invoke(): BukkitProxyProcessor {
+            BUNGEE_CHANNEL.registerOutgoing()
+            BUNGEE_CHANNEL.registerIncoming(this)
+            TRCHAT_CHANNEL.registerOutgoing()
+            TRCHAT_CHANNEL.registerIncoming(this)
+            return super.invoke()
         }
 
-        override fun sendCommonMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
-            val success = CompletableFuture<Boolean>()
-            fun send() {
-                val out = ByteStreams.newDataOutput()
-
-                try {
-                    for (arg in args) {
-                        out.writeUTF(arg)
-                    }
-                    success.complete(true)
-                } catch (e: IOException) {
-                    e.print("Failed to send proxy common message!")
-                    success.complete(false)
-                }
-
-                recipient.sendPluginMessage(bukkitPlugin, BUNGEE_CHANNEL, out.toByteArray())
-            }
-            if (async) {
-                submitAsync { send() }
-            } else {
-                send()
-            }
-
-            return success
-        }
-
-        override fun sendTrChatMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
-            val success = CompletableFuture<Boolean>()
-            fun send() {
+        override fun sendTrChatMessage(
+            recipient: PluginMessageRecipient,
+            executor: ExecutorService,
+            vararg args: String
+        ): Future<*> {
+            return executor.submit {
                 try {
                     for (bytes in buildMessage(*args)) {
                         recipient.sendPluginMessage(bukkitPlugin, TRCHAT_CHANNEL, bytes)
                     }
-                    success.complete(true)
                 } catch (e: IOException) {
                     e.print("Failed to send proxy trchat message!")
-                    success.complete(false)
                 }
             }
-            if (async) {
-                submitAsync { send() }
-            } else {
-                send()
-            }
-
-            return success
         }
 
         override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
@@ -157,7 +159,8 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                         data.readUTF() // server
                         BukkitPlayers.setPlayers(data.readUTF().split(", "))
                     }
-                } catch (_: IOException) {
+                } catch (e: IOException) {
+                    e.print("Failed to read proxy common message!")
                 }
             }
             if (channel == TRCHAT_CHANNEL) {
@@ -166,7 +169,8 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                     if (data.isCompleted) {
                         execute(data.build())
                     }
-                } catch (_: IOException) {
+                } catch (e: IOException) {
+                    e.print("Failed to read proxy trchat message!")
                 }
             }
         }
@@ -174,56 +178,75 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
 
     object VelocitySide : BukkitProxyProcessor {
 
-        private const val incoming = "trchat:server"
-        private const val outgoing = "trchat:proxy"
+        private const val TRCHAT_INCOMING = "trchat:server"
+        private const val TRCHAT_OUTGOING = "trchat:proxy"
 
-        override fun init() {
-            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, outgoing)) {
-                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, outgoing)
-            }
-            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, incoming)) {
-                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, incoming, VelocitySide)
-            }
+        override operator fun invoke(): BukkitProxyProcessor {
+            BUNGEE_CHANNEL.registerOutgoing()
+            BUNGEE_CHANNEL.registerIncoming(this)
+            TRCHAT_OUTGOING.registerOutgoing()
+            TRCHAT_INCOMING.registerIncoming(this)
+            return super.invoke()
         }
 
-        override fun sendCommonMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
-            error("Not supported.")
-        }
-
-        override fun sendTrChatMessage(recipient: PluginMessageRecipient, vararg args: String, async: Boolean): CompletableFuture<Boolean> {
-            val success = CompletableFuture<Boolean>()
-            fun send() {
+        override fun sendTrChatMessage(
+            recipient: PluginMessageRecipient,
+            executor: ExecutorService,
+            vararg args: String
+        ): Future<*> {
+            return executor.submit {
                 try {
                     for (bytes in buildMessage(*args)) {
-                        recipient.sendPluginMessage(bukkitPlugin, outgoing, bytes)
+                        recipient.sendPluginMessage(bukkitPlugin, TRCHAT_OUTGOING, bytes)
                     }
-                    success.complete(true)
                 } catch (e: IOException) {
                     e.print("Failed to send proxy trchat message!")
-                    success.complete(false)
                 }
             }
-            if (async) {
-                submitAsync { send() }
-            } else {
-                send()
-            }
-
-            return success
         }
 
         override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-            if (channel != incoming) {
-                return
-            }
-            try {
-                val data = MessageReader.read(message)
-                if (data.isCompleted) {
-                    execute(data.build())
+            if (channel == BUNGEE_CHANNEL) {
+                try {
+                    val data = ByteStreams.newDataInput(message)
+                    val subChannel = data.readUTF()
+                    if (subChannel == "PlayerList") {
+                        data.readUTF() // server
+                        BukkitPlayers.setPlayers(data.readUTF().split(", "))
+                    }
+                } catch (e: IOException) {
+                    e.print("Failed to read proxy common message!")
                 }
-            } catch (_: IOException) {
+            }
+            if (channel == TRCHAT_INCOMING) {
+                try {
+                    val data = MessageReader.read(message)
+                    if (data.isCompleted) {
+                        execute(data.build())
+                    }
+                } catch (e: IOException) {
+                    e.print("Failed to read proxy trchat message!")
+                }
             }
         }
+    }
+
+    companion object {
+
+        protected const val BUNGEE_CHANNEL = "BungeeCord"
+
+        protected fun String.registerOutgoing() {
+            if (!Bukkit.getMessenger().isOutgoingChannelRegistered(bukkitPlugin, this)) {
+                Bukkit.getMessenger().registerOutgoingPluginChannel(bukkitPlugin, this)
+            }
+        }
+
+        protected fun String.registerIncoming(listener: PluginMessageListener) {
+            if (!Bukkit.getMessenger().isIncomingChannelRegistered(bukkitPlugin, this)) {
+                Bukkit.getMessenger().registerIncomingPluginChannel(bukkitPlugin, this, listener)
+            }
+        }
+
     }
 
 }

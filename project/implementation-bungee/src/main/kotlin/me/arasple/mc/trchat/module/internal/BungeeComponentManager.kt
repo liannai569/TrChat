@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.ComponentManager
-import me.arasple.mc.trchat.util.Internal
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences
 import net.kyori.adventure.text.Component
 import taboolib.common.platform.Platform
@@ -13,7 +12,6 @@ import taboolib.platform.util.bungeePlugin
  * @author wlys
  * @since 2022/6/8 13:05
  */
-@Internal
 @PlatformSide([Platform.BUNGEE])
 object BungeeComponentManager : ComponentManager {
 

@@ -1,8 +1,7 @@
 package me.arasple.mc.trchat.module.internal.hook.impl
 
 import com.willfp.eco.core.display.Display
-import me.arasple.mc.trchat.module.internal.hook.HookAbstract
-import me.arasple.mc.trchat.util.Internal
+import me.arasple.mc.trchat.module.internal.hook.type.HookDisplayItem
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.platform.util.isAir
@@ -11,10 +10,9 @@ import taboolib.platform.util.isAir
  * @author wlys
  * @since 2022/2/5 22:30
  */
-@Internal
-class HookEcoEnchants : HookAbstract() {
+class HookEcoEnchants : HookDisplayItem() {
 
-    fun displayItem(item: ItemStack, player: Player? = null): ItemStack {
+    override fun displayItem(item: ItemStack, player: Player?): ItemStack {
         if (!isHooked || item.isAir()) {
             return item
         }

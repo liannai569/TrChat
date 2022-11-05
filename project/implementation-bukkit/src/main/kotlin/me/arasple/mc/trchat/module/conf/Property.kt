@@ -1,12 +1,9 @@
 package me.arasple.mc.trchat.module.conf
 
-import me.arasple.mc.trchat.util.Internal
-
 /**
  * @author Arasple
  * @date 2021/2/11 17:26
  */
-@Internal
 enum class Property(val regex: Regex, val group: Int) {
 
     CONDITION("\\{condition[:=] ?(.+)}"),

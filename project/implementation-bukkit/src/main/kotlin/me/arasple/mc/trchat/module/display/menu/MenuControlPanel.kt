@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.display.menu
 
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
@@ -20,7 +19,6 @@ import taboolib.platform.util.*
  * @author wlys
  * @since 2021/8/20 20:47
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object MenuControlPanel {
 

@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.command.main
 
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.data
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -18,7 +17,6 @@ import taboolib.platform.util.sendLang
  * @author wlys
  * @since 2022/2/6 15:01
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object CommandIgnore {
 

@@ -4,6 +4,7 @@ import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
+import me.arasple.mc.trchat.module.internal.command.main.CommandMute
 import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
@@ -18,8 +19,9 @@ import taboolib.common.util.unsafeLazy
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.nmsClass
 import taboolib.module.nms.obcClass
+import taboolib.module.ui.MenuHolder
+import taboolib.module.ui.type.Basic
 import taboolib.platform.util.sendLang
-import java.text.SimpleDateFormat
 
 /**
  * @author wlys
@@ -28,9 +30,18 @@ import java.text.SimpleDateFormat
 val classCraftItemStack = obcClass("inventory.CraftItemStack")
 val classChatSerializer by unsafeLazy { nmsClass("IChatBaseComponent\$ChatSerializer") }
 val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
-val muteDateFormat = SimpleDateFormat()
+private val noClickBasic = object : Basic() {
+    init {
+        rows(6)
+        onClick(lock = true)
+    }
+}
 
-fun String.toCondition() = Condition(this)
+@Suppress("Deprecation")
+fun createNoClickInventory(size: Int, title: String) =
+    Bukkit.createInventory(MenuHolder(noClickBasic), size, title)
+
+fun String?.toCondition() = if (this == null) Condition.EMPTY else Condition(this)
 
 fun Condition?.pass(commandSender: CommandSender): Boolean {
     return if (commandSender is Player) {
@@ -41,7 +52,7 @@ fun Condition?.pass(commandSender: CommandSender): Boolean {
 }
 
 fun Player.passPermission(permission: String?): Boolean {
-    return permission == null
+    return permission.isNullOrEmpty()
             || permission.equals("null", ignoreCase = true)
             || permission.equals("none", ignoreCase = true)
             || hasPermission(permission)
@@ -58,7 +69,7 @@ fun Player.checkMute(): Boolean {
     }
     val data = data
     if (data.isMuted) {
-        sendLang("General-Muted", muteDateFormat.format(data.muteTime), data.muteReason)
+        sendLang("General-Muted", CommandMute.muteDateFormat.format(data.muteTime), data.muteReason)
         return false
     }
     return true

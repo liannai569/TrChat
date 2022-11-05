@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.hook.ext
 
 import me.arasple.mc.trchat.api.event.TrChatEvent
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.Vars
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.session
@@ -19,7 +18,6 @@ import taboolib.platform.compat.PlaceholderExpansion
  * @author Arasple
  * @since 2021/8/9 23:09
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object HookPlaceholderAPI : PlaceholderExpansion {
 

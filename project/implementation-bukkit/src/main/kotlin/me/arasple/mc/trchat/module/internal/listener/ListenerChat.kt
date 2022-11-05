@@ -4,10 +4,7 @@ package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
-import me.arasple.mc.trchat.module.display.function.EnderChestShow
-import me.arasple.mc.trchat.module.display.function.InventoryShow
-import me.arasple.mc.trchat.module.display.function.ItemShow
-import me.arasple.mc.trchat.module.display.function.MentionAll
+import me.arasple.mc.trchat.module.display.function.standard.*
 import me.arasple.mc.trchat.util.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -123,6 +120,15 @@ object ListenerChat {
                 return false
             } else {
                 player.updateCooldown(CooldownType.ENDERCHEST_SHOW, EnderChestShow.cooldown.get())
+            }
+        }
+        if (message.contains(ImageShow.key.get()) && !player.hasPermission("trchat.bypass.imagecd")) {
+            val imageCooldown = player.getCooldownLeft(CooldownType.IMAGE_SHOW)
+            if (imageCooldown > 0) {
+                player.sendLang("Cooldowns-Image-Show", imageCooldown / 1000)
+                return false
+            } else {
+                player.updateCooldown(CooldownType.IMAGE_SHOW, ImageShow.cooldown.get())
             }
         }
         player.updateCooldown(CooldownType.CHAT, Settings.chatCooldown.get())

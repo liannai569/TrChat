@@ -7,7 +7,6 @@ import me.arasple.mc.trchat.module.internal.hook.type.HookDisplayItem
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.api.BinaryTagHolder
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.gson.LegacyHoverEventSerializer
@@ -68,13 +67,11 @@ fun gson(component: Component) = GSON_SERIALIZER.serialize(component)
 fun gson(string: String) = GSON_SERIALIZER.deserialize(string)
 
 @Suppress("Deprecation")
-fun TextComponent.hoverItemFixed(item: ItemStack, player: Player): TextComponent {
+fun Component.hoverItemFixed(item: ItemStack, player: Player): Component {
     var newItem = item.optimizeShulkerBox()
     newItem = NMS.INSTANCE.optimizeNBT(newItem)
-    newItem = HookPlugin.getEcoEnchants().displayItem(newItem, player)
-    HookPlugin.registry.filter { HookDisplayItem::class.java.isAssignableFrom(it.javaClass) }.forEach { element ->
-        val itemDisplay = element as HookDisplayItem
-        newItem = itemDisplay.displayItem(item, player)
+    HookPlugin.registry.filterIsInstance(HookDisplayItem::class.java).forEach { element ->
+        newItem = element.displayItem(item, player)
     }
     val nmsItemStack = classCraftItemStack.invokeMethod<Any>("asNMSCopy", newItem, isStatic = true)!!
     val nmsNBTTabCompound = classNBTTagCompound.invokeConstructor()

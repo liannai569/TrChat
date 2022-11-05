@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.internal.database
 
 import me.arasple.mc.trchat.module.conf.file.Settings
-import me.arasple.mc.trchat.util.Internal
 import org.bukkit.OfflinePlayer
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.Configuration
@@ -12,7 +11,6 @@ import taboolib.module.database.Table
 import taboolib.module.database.getHost
 import java.util.concurrent.ConcurrentHashMap
 
-@Internal
 class DatabaseSQL : Database() {
 
     val host = Settings.CONF.getHost("Database.SQL")

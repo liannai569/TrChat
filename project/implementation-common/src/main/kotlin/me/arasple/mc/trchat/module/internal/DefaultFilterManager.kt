@@ -63,10 +63,7 @@ object DefaultFilterManager : FilterManager {
                 loadCloudThesaurus(notify)
             }
             initialized = true
-        }
-
-        // 更新云端词库
-        if (updateCloud) {
+        } else if (updateCloud) {
             submitAsync {
                 loadCloudThesaurus(notify)
             }

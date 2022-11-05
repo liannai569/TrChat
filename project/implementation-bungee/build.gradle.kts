@@ -1,7 +1,7 @@
 val taboolibVersion: String by project
 
 plugins {
-    id("io.izzel.taboolib") version "1.42"
+    id("io.izzel.taboolib") version "1.50"
 }
 
 taboolib {
@@ -27,8 +27,6 @@ taboolib {
 }
 
 repositories {
-    maven("https://repo.codemc.io/repository/maven-public/")
-    maven("https://jitpack.io")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 

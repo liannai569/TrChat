@@ -1,11 +1,14 @@
-package me.arasple.mc.trchat.module.display.function
+package me.arasple.mc.trchat.module.display.function.standard
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import me.arasple.mc.trchat.module.conf.file.Functions
+import me.arasple.mc.trchat.module.display.function.Function
+import me.arasple.mc.trchat.module.display.function.StandardFunction
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.hoverItemFixed
+import me.arasple.mc.trchat.util.legacy
 import me.arasple.mc.trchat.util.passPermission
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -14,13 +17,15 @@ import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
+import taboolib.common.util.replaceWithOrder
 import taboolib.common.util.resettableLazy
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
+import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.getI18nName
+import taboolib.module.nms.getInternalName
 import taboolib.platform.util.buildItem
-import taboolib.platform.util.isAir
 
 /**
  * @author wlys
@@ -48,6 +53,9 @@ object ItemShow : Function("ITEM") {
     @ConfigNode("General.Item-Show.Origin-Name", "function.yml")
     var originName = false
 
+    @ConfigNode("General.Item-Show.Type", "function.yml")
+    var type = ConfigNodeTransfer<String, Type> { kotlin.runCatching { Type.valueOf(this.uppercase()) }.getOrDefault(Type.NAME) }
+
     @ConfigNode("General.Item-Show.Cooldown", "function.yml")
     val cooldown = ConfigNodeTransfer<String, Long> { parseMillis() }
 
@@ -70,7 +78,7 @@ object ItemShow : Function("ITEM") {
                 }
                 result = result.replace(key, "{{ITEM:${sender.inventory.heldItemSlot + 1}}}", ignoreCase = true)
             }
-            return result
+            result
         }
     }
 
@@ -84,11 +92,28 @@ object ItemShow : Function("ITEM") {
                 }
             }
             cache.get(item) {
-                HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item)
-                    ?: sender
+                if (HookPlugin.getInteractiveChat().isHooked) {
+                    HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item)
+                } else if (type.get() == Type.NAME || MinecraftVersion.major < 7) {
+                    sender
                         .getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
                         ?.hoverItemFixed(item, sender)
-                    ?: Component.empty()
+                } else {
+                    sender
+                        .getComponentFromLang("Function-Item-Show-Format-Translatable", item.amount) { type, i, part, sender ->
+                            val component = if (i == 1) {
+                                Component.translatable(item.getInternalName())
+                            } else {
+                                legacy(
+                                    part.text
+                                        .replace("\\[", "[").replace("\\]", "]")
+                                        .translate(sender).replaceWithOrder(item.amount)
+                                )
+                            }
+                            component.toBuilder().applyStyle(type, part, 0, sender, item.amount)
+                        }
+                        ?.hoverItemFixed(item, sender)
+                }
             }
         }
     }
@@ -99,14 +124,13 @@ object ItemShow : Function("ITEM") {
 
     @Suppress("Deprecation")
     private fun ItemStack.getDisplayName(player: Player): String {
-        if (isAir()) {
-            return "空气"
-        }
         return if (originName || itemMeta?.hasDisplayName() != true) {
             getI18nName(player)
         } else {
             itemMeta!!.displayName
         }
     }
+
+    enum class Type { NAME, TRANSLATABLE }
 
 }

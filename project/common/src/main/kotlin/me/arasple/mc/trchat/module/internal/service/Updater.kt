@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.service
 
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.parseJson
 import taboolib.common.LifeCycle
 import taboolib.common.env.DependencyDownloader.readFully
@@ -19,7 +18,6 @@ import java.util.*
  * @author Arasple
  * @date 2019/11/29 21:04
  */
-@Internal
 @SkipTo(LifeCycle.LOAD)
 object Updater {
 

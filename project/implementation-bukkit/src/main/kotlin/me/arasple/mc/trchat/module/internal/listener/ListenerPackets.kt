@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.internal.listener
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.conf.file.Settings
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.session
 import taboolib.common.platform.Platform
@@ -18,7 +17,6 @@ import taboolib.module.nms.PacketSendEvent
  * @author Arasple
  * @date 2019/11/30 10:16
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object ListenerPackets {
 

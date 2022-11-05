@@ -7,7 +7,7 @@ import me.arasple.mc.trchat.module.display.channel.PrivateChannel
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
-import me.arasple.mc.trchat.module.display.channel.obj.Target
+import me.arasple.mc.trchat.module.display.channel.obj.Range
 import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.display.format.Group
 import me.arasple.mc.trchat.module.display.format.JsonComponent
@@ -18,7 +18,6 @@ import me.arasple.mc.trchat.module.display.function.CustomFunction
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.toCondition
@@ -45,7 +44,6 @@ import kotlin.system.measureTimeMillis
  * @author wlys
  * @since 2021/12/12 13:45
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object Loader {
 
@@ -112,24 +110,25 @@ object Loader {
         }
 
         val settings = conf.getConfigurationSection("Options")!!.let { section ->
-            val joinPermission = section.getString("Join-Permission")
-            val speakCondition = section.getString("Speak-Condition")?.toCondition()
-            val target = section.getString("Target", "ALL")!!.uppercase().split(";").let {
-                val distance = it.getOrNull(1)?.toInt() ?: -1
-                Target(Target.Range.valueOf(it[0]), distance)
-            }
+            val joinPermission = section.getString("Join-Permission", "")!!
+            val speakCondition = section.getString("Speak-Condition").toCondition()
             val autoJoin = section.getBoolean("Auto-Join", true)
+            val isPrivate = section.getBoolean("Private", false)
+            val range = section.getString("Target", "ALL")!!.uppercase().split(";").let {
+                val distance = it.getOrNull(1)?.toInt() ?: -1
+                Range(Range.Type.valueOf(it[0]), distance)
+            }
             val proxy = section.getBoolean("Proxy", false)
             val doubleTransfer = section.getBoolean("Double-Transfer", true)
-            val ports = section.getString("Ports")?.split(";")?.map { it.toInt() }
+            val ports = section.getString("Ports")?.split(";")?.map { it.toInt() } ?: emptyList()
+            val redis = section.getString("Redis", "")!!
             val disabledFunctions = section.getStringList("Disabled-Functions")
             val filterBeforeSending = section.getBoolean("Filter-Before-Sending", false)
-            ChannelSettings(joinPermission, speakCondition, target, autoJoin, proxy, doubleTransfer, ports, disabledFunctions, filterBeforeSending)
+            ChannelSettings(joinPermission, speakCondition, autoJoin, isPrivate, range, proxy, doubleTransfer, ports, redis, disabledFunctions, filterBeforeSending)
         }
-        val private = conf.getBoolean("Options.Private", false)
 
         val bindings = conf.getConfigurationSection("Bindings")?.let {
-            val prefix = if (!private) it.getStringList("Prefix") else null
+            val prefix = if (!settings.isPrivate) it.getStringList("Prefix") else null
             val command = it.getStringList("Command")
             ChannelBindings(prefix, command)
         } ?: ChannelBindings(null, null)
@@ -142,7 +141,7 @@ object Loader {
             ChannelEvents(Reaction(process), Reaction(send), Reaction(join), Reaction(quit))
         } ?: ChannelEvents(null, null, null, null)
 
-        if (private) {
+        if (settings.isPrivate) {
             val sender = conf.getMapList("Sender").map { map ->
                 val condition = map["condition"]?.toString()?.toCondition()
                 val priority = Coerce.asInteger(map["priority"]).orNull() ?: 100

@@ -11,6 +11,8 @@ import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
+import me.arasple.mc.trchat.module.internal.redis.RedisChatMessage
+import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.text.Component
@@ -47,7 +49,7 @@ class PrivateChannel(
         if (bindings.command.isNullOrEmpty()) {
             return
         }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission ?: "") {
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission) {
             execute<Player> { sender, _, _ ->
                 if (sender.session.channel == this@PrivateChannel.id) {
                     quit(sender)
@@ -56,7 +58,7 @@ class PrivateChannel(
                 }
             }
             dynamic("player", optional = true) {
-                suggestion<Player> { _, _ ->
+                suggestion<Player>(uncheck = (settings.redis.isNotEmpty())) { _, _ ->
                     BukkitPlayers.getPlayers().filter { !PlayerData.vanishing.contains(it) }
                 }
                 execute<Player> { sender, _, argument ->
@@ -121,10 +123,12 @@ class PrivateChannel(
         } ?: return null
         val receive = builderReceiver.build()
 
+        // Chat preview
         if (!forward) {
             return send to receive
         }
 
+        // Channel event
         if (!events.send(player, session.lastPrivateTo, msg)) {
             return null
         }
@@ -143,6 +147,10 @@ class PrivateChannel(
             getProxyPlayer(session.lastPrivateTo)?.let {
                 it.sendComponent(player, receive)
                 it.sendLang("Private-Message-Receive", player.name)
+            } ?: kotlin.run {
+                if (settings.redis.isNotEmpty()) {
+                    RedisManager.sendMessage(settings.redis, RedisChatMessage(receive, player.uniqueId, target = session.lastPrivateTo))
+                }
             }
         }
 

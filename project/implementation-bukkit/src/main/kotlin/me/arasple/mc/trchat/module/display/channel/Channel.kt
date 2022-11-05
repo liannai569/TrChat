@@ -6,10 +6,12 @@ import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
-import me.arasple.mc.trchat.module.display.channel.obj.Target
+import me.arasple.mc.trchat.module.display.channel.obj.Range
 import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
+import me.arasple.mc.trchat.module.internal.redis.RedisChatMessage
+import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.identity.Identity
@@ -43,7 +45,7 @@ open class Channel(
     init {
         if (settings.autoJoin) {
            onlinePlayers.forEach {
-                if (settings.joinPermission == null || it.hasPermission(settings.joinPermission)) {
+                if (it.passPermission(settings.joinPermission)) {
                     listeners.add(it.name)
                 }
             }
@@ -59,7 +61,7 @@ open class Channel(
         if (bindings.command.isNullOrEmpty()) {
             return
         }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission ?: "") {
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission) {
             execute<Player> { sender, _, _ ->
                 if (sender.session.channel == this@Channel.id) {
                     quit(sender)
@@ -99,12 +101,12 @@ open class Channel(
 
         if (settings.proxy && BukkitProxyManager.processor != null) {
             val gson = gson(component)
-            if (settings.ports != null) {
+            if (settings.ports.isNotEmpty()) {
                 Bukkit.getServer().sendTrChatMessage(
                     "ForwardRaw",
                     Identity.nil().uuid().parseString(),
                     gson,
-                    settings.joinPermission ?: "null",
+                    settings.joinPermission,
                     settings.ports.joinToString(";"),
                     settings.doubleTransfer.toString()
                 )
@@ -113,7 +115,7 @@ open class Channel(
                     "BroadcastRaw",
                     Identity.nil().uuid().parseString(),
                     gson,
-                    settings.joinPermission ?: "null",
+                    settings.joinPermission,
                     settings.doubleTransfer.toString()
                 )
             }
@@ -153,6 +155,7 @@ open class Channel(
         } ?: return null
         val component = builder.build()
 
+        // Chat preview
         if (!forward) {
             return component to null
         }
@@ -160,12 +163,12 @@ open class Channel(
         // TODO: 跨服事件传递
         if (settings.proxy && BukkitProxyManager.processor != null) {
             val gson = gson(component)
-            if (settings.ports != null) {
+            if (settings.ports.isNotEmpty()) {
                 player.sendTrChatMessage(
                     "ForwardRaw",
                     player.uniqueId.parseString(),
                     gson,
-                    settings.joinPermission ?: "null",
+                    settings.joinPermission,
                     settings.ports.joinToString(";"),
                     settings.doubleTransfer.toString()
                 )
@@ -174,34 +177,39 @@ open class Channel(
                     "BroadcastRaw",
                     player.uniqueId.parseString(),
                     gson,
-                    settings.joinPermission ?: "null",
+                    settings.joinPermission,
                     settings.doubleTransfer.toString()
                 )
             }
             return component to null
         }
-        when (settings.target.range) {
-            Target.Range.ALL -> {
+        // Redis
+        if (settings.redis.isNotEmpty()) {
+            RedisManager.sendMessage(settings.redis, RedisChatMessage(component, player.uniqueId, permission = settings.joinPermission))
+        }
+        // Local
+        when (settings.range.type) {
+            Range.Type.ALL -> {
                 listeners.filter { events.send(player, it, msg) }.forEach {
                     getProxyPlayer(it)?.sendComponent(player, component)
                 }
             }
-            Target.Range.SINGLE_WORLD -> {
+            Range.Type.SINGLE_WORLD -> {
                 onlinePlayers.filter { listeners.contains(it.name)
                         && it.world == player.world
                         && events.send(player, it.name, msg) }.forEach {
                     it.sendComponent(player, component)
                 }
             }
-            Target.Range.DISTANCE -> {
+            Range.Type.DISTANCE -> {
                 onlinePlayers.filter { listeners.contains(it.name)
                         && it.world == player.world
-                        && it.location.distance(player.location) <= settings.target.distance
+                        && it.location.distance(player.location) <= settings.range.distance
                         && events.send(player, it.name, msg) }.forEach {
                     it.sendComponent(player, component)
                 }
             }
-            Target.Range.SELF -> {
+            Range.Type.SELF -> {
                 if (events.send(player, player.name, msg)) {
                     player.sendComponent(player, component)
                 }
@@ -234,7 +242,7 @@ open class Channel(
         }
 
         fun join(player: Player, channel: Channel, hint: Boolean = true): Boolean {
-            if (channel.settings.joinPermission?.let { player.hasPermission(it) } == false) {
+            if (!player.passPermission(channel.settings.joinPermission)) {
                 player.sendLang("General-No-Permission")
                 return false
             }

@@ -19,12 +19,20 @@ private val jsonParser = JsonParser()
 private val reportedErrors = mutableListOf<String>()
 
 fun Throwable.print(title: String, printStackTrace: Boolean = true) {
-    console().sendMessage("§c[TrChat] §8$title")
-    console().sendMessage("         §8${localizedMessage}")
+    console().sendMessage("§c[TrChat] §7$title")
+    console().sendMessage("§7${javaClass.name}: $localizedMessage")
     if (printStackTrace){
-        stackTrace.forEach {
-            console().sendMessage("         §8$it")
-        }
+        stackTrace.forEach { console().sendMessage("§8\tat $it") }
+        printCause()
+    }
+}
+
+private fun Throwable.printCause() {
+    val cause = cause
+    if (cause != null) {
+        console().sendMessage("§7Caused by: ${javaClass.name}: ${cause.localizedMessage}")
+        cause.stackTrace.forEach { console().sendMessage("§8\tat $it") }
+        cause.printCause()
     }
 }
 

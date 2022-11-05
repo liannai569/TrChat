@@ -88,6 +88,13 @@ Cooldowns-EnderChest-Show:
     sound: 'ENTITY_ITEM_BREAK'
     volume: 1
     pitch: 0
+Cooldowns-Image-Show:
+  - type: actionbar
+    text: '&3&lRequieres esperar &a{0} segundos &3&lantes de mostrar tu image nuevamente.'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 0
 
 Command-Controller-Deny: '&c&lNo puedes utilizar este comando'
 Command-Controller-Cooldown: '&c&lRequieres esperar &6{0} segundos &7&lantes de usar un comando otravez.'
@@ -111,6 +118,11 @@ Function-Item-Show-Format:
   - type: json
     text: '[&8\[&3{0} &bx{1}&8\]]'
     args: [ ]
+Function-Item-Show-Format-Translatable:
+  - type: json
+    text: '&8\[[item] &bx{0}&8\]'
+    args:
+      - color: '00aaaa'
 Function-Inventory-Show-Format:
   - type: json
     text: '[&8\[&3Inventory of {0}&8\]]'
@@ -129,6 +141,19 @@ Function-Mention-All-Format:
   - type: json
     text: ' [&a@&2Everyone] '
     args: [ ]
+Function-Image-Show-Format:
+  - type: json
+    text: '[&8\[&f&lImage&8\]]'
+    args:
+      - hover: '&7Click to view this image({0})'
+        command: '/view-image {1}'
+Function-Image-Show-Unavailable:
+  - type: actionbar
+    text: '&c&lThis image is still loading...'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 0
 
 Private-Message-Spy-Format: '&8[&3Spy&8] &6{0} &2-> &3{1}&f: &7{2}'
 Private-Message-Spy-On:

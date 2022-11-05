@@ -98,6 +98,13 @@ Cooldowns-EnderChest-Show:
     sound: 'ENTITY_ITEM_BREAK'
     volume: 1
     pitch: 0
+Cooldowns-Image-Show:
+  - type: actionbar
+    text: '&3&l您需要等待冷却 &a{0}s &3&l后才能再次展示图片.'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 0
 
 Command-Controller-Deny: '&c&l你不能使用该命令...'
 Command-Controller-Cooldown: '&c&l该命令冷却中...({0})'
@@ -117,10 +124,19 @@ Function-Mention-Notify:
     sound: 'BLOCK_ANVIL_LAND'
     volume: 1
     pitch: 2
+Function-Mention-All-Format:
+  - type: json
+    text: ' [&a@&2所有人] '
+    args: [ ]
 Function-Item-Show-Format:
   - type: json
     text: '[&8\[&3{0} &bx{1}&8\]]'
     args: [ ]
+Function-Item-Show-Format-Translatable:
+  - type: json
+    text: '&8\[[item] &bx{0}&8\]'
+    args:
+      - color: '00aaaa'
 Function-Inventory-Show-Format:
   - type: json
     text: '[&8\[&3{0}的背包&8\]]'
@@ -135,10 +151,19 @@ Function-EnderChest-Show-Format:
       - hover: '&7点击查看{0}的末影箱'
         command: '/view-enderchest {1}'
 Function-EnderChest-Show-Unavailable: '&c&l该末影箱已过期或不存在...'
-Function-Mention-All-Format:
+Function-Image-Show-Format:
   - type: json
-    text: ' [&a@&2所有人] '
-    args: [ ]
+    text: '[&8\[&f&l图片&8\]]'
+    args:
+      - hover: '&7点击查看图片({0})'
+        command: '/view-image {1}'
+Function-Image-Show-Unavailable:
+  - type: actionbar
+    text: '&c&l该图片加载中...'
+  - type: sound
+    sound: 'ENTITY_ITEM_BREAK'
+    volume: 1
+    pitch: 0
 
 Private-Message-Spy-Format: '&8[&3监听&8] &6{0} &2-> &3{1}&f: &7{2}'
 Private-Message-Spy-On:

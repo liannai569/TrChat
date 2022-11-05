@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.command.sub
 
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -15,9 +14,8 @@ import taboolib.platform.util.onlinePlayers
  * @author wlys
  * @since 2021/8/11 12:08
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
-object CommandRemoveMessage {
+object CommandRecallMessage {
 
     val command = subCommand {
         dynamic("message") {

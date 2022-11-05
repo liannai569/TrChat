@@ -1,7 +1,7 @@
 val taboolibVersion: String by project
 
 plugins {
-    id("io.izzel.taboolib") version "1.42"
+    id("io.izzel.taboolib") version "1.50"
 }
 
 taboolib {
@@ -33,7 +33,7 @@ taboolib {
         "module-ui"
     )
     install("platform-bukkit")
-    install("expansion-command-helper", "expansion-javascript")
+    install("expansion-alkaid-redis", "expansion-command-helper", "expansion-javascript")
     options("skip-minimize", "keep-kotlin-module")
     classifier = null
     version = taboolibVersion

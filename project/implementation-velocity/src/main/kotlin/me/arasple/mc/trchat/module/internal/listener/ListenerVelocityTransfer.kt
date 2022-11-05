@@ -6,6 +6,7 @@ import com.velocitypowered.api.proxy.ServerConnection
 import me.arasple.mc.trchat.module.conf.VelocityChannelManager
 import me.arasple.mc.trchat.module.internal.TrChatVelocity.plugin
 import me.arasple.mc.trchat.module.internal.VelocityProxyManager
+import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
 import me.arasple.mc.trchat.util.toUUID
 import net.kyori.adventure.audience.MessageType
@@ -38,7 +39,8 @@ object ListenerVelocityTransfer {
                     val data = message.build()
                     execute(data, e.source as ServerConnection)
                 }
-            } catch (_: IOException) {
+            } catch (ex: IOException) {
+                ex.print("Error occurred while reading plugin message.")
             }
         }
     }
@@ -66,7 +68,7 @@ object ListenerVelocityTransfer {
                     }
                 } else {
                     plugin.server.allServers.forEach { server ->
-                        server.playersConnected.filter { permission == "null" || it.hasPermission(permission) }.forEach { player ->
+                        server.playersConnected.filter { permission == "" || it.hasPermission(permission) }.forEach { player ->
                             player.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                         }
                     }
@@ -91,7 +93,7 @@ object ListenerVelocityTransfer {
                 } else {
                     plugin.server.allServers.forEach { server ->
                         if (ports.contains(server.serverInfo.address.port)) {
-                            server.playersConnected.filter { permission == "null" || it.hasPermission(permission) }.forEach { player ->
+                            server.playersConnected.filter { permission == "" || it.hasPermission(permission) }.forEach { player ->
                                 player.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                             }
                         }
@@ -116,6 +118,16 @@ object ListenerVelocityTransfer {
             "LoadedProxyChannel" -> {
                 val id = data[1]
                 VelocityChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connection.serverInfo.address.port)
+            }
+            "InventoryShow" -> {
+                plugin.server.allServers.forEach {
+                    VelocityProxyManager.sendTrChatMessage(it, "InventoryShow", data[1], data[2], data[3], data[4])
+                }
+            }
+            "EnderChestShow" -> {
+                plugin.server.allServers.forEach {
+                    VelocityProxyManager.sendTrChatMessage(it, "EnderChestShow", data[1], data[2], data[3], data[4])
+                }
             }
         }
     }

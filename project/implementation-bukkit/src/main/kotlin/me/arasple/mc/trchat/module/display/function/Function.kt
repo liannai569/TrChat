@@ -4,13 +4,15 @@ import me.arasple.mc.trchat.api.event.TrChatReloadEvent
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.legacy
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Player
 import taboolib.common.io.getInstance
 import taboolib.common.io.runningClassesWithoutLibrary
 import taboolib.common.platform.ProxyCommandSender
+import taboolib.common.platform.ProxyPlayer
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.severe
 import taboolib.common.util.VariableReader
@@ -51,47 +53,24 @@ abstract class Function(val id: String) {
             TrChatReloadEvent.Function(functions).call()
         }
 
-        fun Player.getComponentFromLang(node: String, vararg args: Any): TextComponent? {
+        fun Player.getComponentFromLang(
+            node: String,
+            vararg args: Any,
+            processor: (TypeJson, Int, VariableReader.Part, ProxyPlayer) -> Component = { type, i, part, sender ->
+                legacy(
+                    part.text
+                        .replace("\\[", "[").replace("\\]", "]")
+                        .translate(sender).replaceWithOrder(*args)
+                ).toBuilder().applyStyle(type, part, i, sender, *args)
+            }
+        ): Component? {
             val sender = adaptPlayer(this)
             val file = sender.getLocaleFile() ?: return null
             return when (val type = file.nodes[node].let { if (it is TypeList) it.list[0] else it }) {
                 is TypeJson -> {
-                    var i = 0
                     val builder = Component.text()
-                    parser.readToFlatten(type.text!!.joinToString()).forEach { part ->
-                        builder.append(legacy(
-                            part.text
-                            .replace("\\[", "[").replace("\\]", "]")
-                            .translate(sender).replaceWithOrder(*args)
-                        ).toBuilder().run {
-                            if (part.isVariable) {
-                                val arg = type.jsonArgs.getOrNull(i++)
-                                if (arg != null) {
-                                    if (arg.containsKey("hover")) {
-                                        hoverEvent(HoverEvent.showText(legacy(arg["hover"].toString().translate(sender).replaceWithOrder(*args))))
-                                    }
-                                    if (arg.containsKey("command")) {
-                                        clickEvent(ClickEvent.runCommand(arg["command"].toString().translate(sender).replaceWithOrder(*args)))
-                                    }
-                                    if (arg.containsKey("suggest")) {
-                                        clickEvent(ClickEvent.suggestCommand(arg["suggest"].toString().translate(sender).replaceWithOrder(*args)))
-                                    }
-                                    if (arg.containsKey("insertion")) {
-                                        insertion(arg["insertion"].toString().translate(sender).replaceWithOrder(*args))
-                                    }
-                                    if (arg.containsKey("copy")) {
-                                        clickEvent(ClickEvent.copyToClipboard(arg["copy"].toString().translate(sender).replaceWithOrder(*args)))
-                                    }
-                                    if (arg.containsKey("file")) {
-                                        clickEvent(ClickEvent.openFile(arg["file"].toString().translate(sender).replaceWithOrder(*args)))
-                                    }
-                                    if (arg.containsKey("url")) {
-                                        clickEvent(ClickEvent.openUrl(arg["url"].toString().translate(sender).replaceWithOrder(*args)))
-                                    }
-                                }
-                            }
-                            this
-                        }.build())
+                    parser.readToFlatten(type.text!!.joinToString()).forEachIndexed { i, part ->
+                        builder.append(processor(type, i, part, sender))
                     }
                     builder.build()
                 }
@@ -105,7 +84,40 @@ abstract class Function(val id: String) {
             }
         }
 
-        private fun String.translate(sender: ProxyCommandSender): String {
+        fun ComponentBuilder<*, *>.applyStyle(type: TypeJson, part: VariableReader.Part, i: Int, sender: ProxyPlayer, vararg args: Any): Component {
+            if (part.isVariable) {
+                val arg = type.jsonArgs.getOrNull(i)
+                if (arg != null) {
+                    if (arg.containsKey("hover")) {
+                        hoverEvent(HoverEvent.showText(legacy(arg["hover"].toString().translate(sender).replaceWithOrder(*args))))
+                    }
+                    if (arg.containsKey("command")) {
+                        clickEvent(ClickEvent.runCommand(arg["command"].toString().translate(sender).replaceWithOrder(*args)))
+                    }
+                    if (arg.containsKey("suggest")) {
+                        clickEvent(ClickEvent.suggestCommand(arg["suggest"].toString().translate(sender).replaceWithOrder(*args)))
+                    }
+                    if (arg.containsKey("insertion")) {
+                        insertion(arg["insertion"].toString().translate(sender).replaceWithOrder(*args))
+                    }
+                    if (arg.containsKey("copy")) {
+                        clickEvent(ClickEvent.copyToClipboard(arg["copy"].toString().translate(sender).replaceWithOrder(*args)))
+                    }
+                    if (arg.containsKey("file")) {
+                        clickEvent(ClickEvent.openFile(arg["file"].toString().translate(sender).replaceWithOrder(*args)))
+                    }
+                    if (arg.containsKey("url")) {
+                        clickEvent(ClickEvent.openUrl(arg["url"].toString().translate(sender).replaceWithOrder(*args)))
+                    }
+                    if (arg.containsKey("color")) {
+                        color(TextColor.color(arg["color"].toString().translate(sender).replaceWithOrder(*args).toInt(16)))
+                    }
+                }
+            }
+            return build()
+        }
+
+        internal fun String.translate(sender: ProxyCommandSender): String {
             var s = this
             Language.textTransfer.forEach { s = it.translate(sender, s) }
             return s

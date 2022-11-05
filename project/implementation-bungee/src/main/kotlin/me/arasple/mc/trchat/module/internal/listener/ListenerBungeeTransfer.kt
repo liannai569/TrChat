@@ -45,8 +45,8 @@ object ListenerBungeeTransfer {
                     val data = message.build()
                     execute(data, e.sender)
                 }
-            } catch (e: IOException) {
-                e.print("Error occurred while reading plugin message.")
+            } catch (ex: IOException) {
+                ex.print("Error occurred while reading plugin message.")
             }
         }
     }
@@ -77,7 +77,7 @@ object ListenerBungeeTransfer {
                     }
                 } else {
                     server<ProxyServer>().servers.forEach { (_, v) ->
-                        v.players.filter { permission == "null" || it.hasPermission(permission) }.forEach {
+                        v.players.filter { permission == "" || it.hasPermission(permission) }.forEach {
                             BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                         }
                     }
@@ -102,7 +102,7 @@ object ListenerBungeeTransfer {
                 } else {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         if (ports.contains(v.address.port)) {
-                            v.players.filter { permission == "null" || it.hasPermission(permission) }.forEach {
+                            v.players.filter { permission == "" || it.hasPermission(permission) }.forEach {
                                 BungeeComponentManager.getAudienceProvider().player(it).sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
                             }
                         }
@@ -127,6 +127,16 @@ object ListenerBungeeTransfer {
             "LoadedProxyChannel" -> {
                 val id = data[1]
                 BungeeChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connection.address.port)
+            }
+            "InventoryShow" -> {
+                server<ProxyServer>().servers.forEach { (_, v) ->
+                    BungeeProxyManager.sendTrChatMessage(v, "InventoryShow", data[1], data[2], data[3], data[4])
+                }
+            }
+            "EnderChestShow" -> {
+                server<ProxyServer>().servers.forEach { (_, v) ->
+                    BungeeProxyManager.sendTrChatMessage(v, "EnderChestShow", data[1], data[2], data[3], data[4])
+                }
             }
         }
     }

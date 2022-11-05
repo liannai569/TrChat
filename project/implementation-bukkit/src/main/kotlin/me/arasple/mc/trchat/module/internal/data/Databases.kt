@@ -4,7 +4,6 @@ import me.arasple.mc.trchat.api.event.CustomDatabaseEvent
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQL
 import me.arasple.mc.trchat.module.internal.database.DatabaseSQLite
-import me.arasple.mc.trchat.util.Internal
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
@@ -17,7 +16,6 @@ import taboolib.platform.util.onlinePlayers
  * @author wlys
  * @since 2021/9/11 13:29
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object Databases {
 

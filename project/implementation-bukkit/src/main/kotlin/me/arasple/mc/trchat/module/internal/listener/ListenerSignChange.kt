@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.internal.listener
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.conf.file.Settings
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.MessageColors
 import org.bukkit.event.block.SignChangeEvent
 import taboolib.common.platform.Platform
@@ -16,7 +15,6 @@ import taboolib.common.platform.function.adaptPlayer
  * @author Arasple, wlys
  * @date 2019/8/15 21:18
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object ListenerSignChange {
 

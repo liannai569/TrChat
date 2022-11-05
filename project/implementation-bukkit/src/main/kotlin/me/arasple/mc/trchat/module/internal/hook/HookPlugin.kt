@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.internal.hook
 import me.arasple.mc.trchat.module.internal.hook.impl.HookEcoEnchants
 import me.arasple.mc.trchat.module.internal.hook.impl.HookInteractiveChat
 import me.arasple.mc.trchat.module.internal.hook.impl.HookItemsAdder
-import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.console
@@ -13,9 +12,14 @@ import taboolib.module.lang.sendLang
  * @author Arasple
  * @date 2021/1/26 22:04
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object HookPlugin {
+
+    val registry = arrayListOf(
+        HookEcoEnchants(),
+        HookItemsAdder(),
+        HookInteractiveChat()
+    )
 
     fun printInfo() {
         registry.filter { it.isHooked }.forEach {
@@ -23,11 +27,10 @@ object HookPlugin {
         }
     }
 
-    val registry = arrayListOf(
-        HookEcoEnchants(),
-        HookItemsAdder(),
-        HookInteractiveChat()
-    )
+    fun addHook(element: HookAbstract) {
+        registry.add(element)
+        console().sendLang("Plugin-Dependency-Hooked", element.name)
+    }
 
     fun getEcoEnchants(): HookEcoEnchants {
         return registry[0] as HookEcoEnchants
@@ -39,11 +42,6 @@ object HookPlugin {
 
     fun getInteractiveChat(): HookInteractiveChat {
         return registry[2] as HookInteractiveChat
-    }
-
-    fun addHook(element: HookAbstract) {
-        registry.add(element)
-        console().sendLang("Plugin-Dependency-Hooked", element.name)
     }
 
 }

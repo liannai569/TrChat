@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.display
 
 import me.arasple.mc.trchat.api.nms.NMS
-import me.arasple.mc.trchat.util.Internal
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.SubscribeEvent
@@ -12,7 +11,6 @@ import taboolib.module.nms.PacketReceiveEvent
  * @author wlys
  * @since 2022/6/9 21:24
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object ChatPreview {
 

@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.command.sub
 
-import me.arasple.mc.trchat.util.Internal
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.data
 import org.bukkit.entity.Player
@@ -12,7 +11,6 @@ import taboolib.common.platform.command.subCommand
  * @author wlys
  * @since 2022/6/15 17:49
  */
-@Internal
 @PlatformSide([Platform.BUKKIT])
 object CommandColor {
 

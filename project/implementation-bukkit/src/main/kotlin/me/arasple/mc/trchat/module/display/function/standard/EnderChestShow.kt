@@ -25,6 +25,7 @@ import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.ui.buildMenu
 import taboolib.module.ui.type.Linked
+import taboolib.platform.util.asLangText
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.serializeToByteArray
@@ -76,7 +77,7 @@ object EnderChestShow : Function("ENDERCHEST") {
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
         return mirrorParse {
-            computeAndCache(sender.name, sender.enderChest).let {
+            computeAndCache(sender).let {
                 if (forward) {
                     BukkitProxyManager.sendTrChatMessage(
                         sender,
@@ -96,15 +97,13 @@ object EnderChestShow : Function("ENDERCHEST") {
         return sender.passPermission(permission)
     }
 
-    fun computeAndCache(
-        name: String,
-        inventory: Inventory
-    ): Pair<String, String> {
+    fun computeAndCache(sender: Player): Pair<String, String> {
+        val inventory = sender.enderChest
         val sha1 = inventory.serializeToByteArray().encodeBase64().digest("sha-1")
         if (cache.getIfPresent(sha1) != null) {
             return sha1 to cache.getIfPresent(sha1)!!.serializeToByteArray().encodeBase64()
         }
-        val menu = buildMenu<Linked<ItemStack>>("$name's Ender Chest") {
+        val menu = buildMenu<Linked<ItemStack>>(sender.asLangText("Function-EnderChest-Show-Title", sender.name)) {
             rows(3)
             slots(inventorySlots)
             elements { (0..26).map { inventory.getItem(it).replaceAir() } }

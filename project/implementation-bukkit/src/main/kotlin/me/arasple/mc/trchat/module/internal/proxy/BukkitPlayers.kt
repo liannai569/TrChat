@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.module.chat.uncolored
 
 /**
  * @author Arasple
@@ -37,10 +38,10 @@ object BukkitPlayers {
     }
 
     fun getPlayers(): List<String> {
-        val players = mutableSetOf<String>()
-        players += BukkitPlayers.players
-        players += onlinePlayers().map { it.displayName ?: it.name }
-        return players.filter { it.isNotBlank() }
+        val result = mutableSetOf<String>()
+        result += players
+        result += onlinePlayers().map { it.displayName?.uncolored() ?: it.name }
+        return result.filter { it.isNotBlank() }
     }
 
     fun setPlayers(players: List<String>) {

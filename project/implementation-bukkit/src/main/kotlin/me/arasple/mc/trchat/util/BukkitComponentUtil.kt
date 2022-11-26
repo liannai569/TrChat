@@ -78,7 +78,7 @@ fun Component.hoverItemFixed(item: ItemStack, player: Player): Component {
     val itemJson = nmsItemStack.invokeMethod<Any>("save", nmsNBTTabCompound)!!
     val id = itemJson.invokeMethod<String>("getString", "id") ?: "minecraft:air"
     val tag = itemJson.invokeMethod<Any>("get", "tag")?.toString() ?: "{}"
-    return hoverEvent(HoverEvent.showItem(Key.key(id), newItem.amount, BinaryTagHolder.of(tag)))
+    return hoverEvent(HoverEvent.showItem(Key.key(id), newItem.amount, BinaryTagHolder.of(tag))) // Paper 1.16.5
 }
 
 @Suppress("Deprecation")

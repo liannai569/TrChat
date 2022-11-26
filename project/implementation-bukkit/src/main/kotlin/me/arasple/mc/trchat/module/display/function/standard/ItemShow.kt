@@ -94,14 +94,14 @@ object ItemShow : Function("ITEM") {
             cache.get(item) {
                 if (HookPlugin.getInteractiveChat().isHooked) {
                     HookPlugin.getInteractiveChat().createItemDisplayComponent(sender, item)
-                } else if (type.get() == Type.NAME || MinecraftVersion.major < 7) {
+                } else if (type.get() == Type.NAME || item.shouldUseDisplayName() || MinecraftVersion.major < 7) {
                     sender
                         .getComponentFromLang("Function-Item-Show-Format", item.getDisplayName(sender), item.amount)
                         ?.hoverItemFixed(item, sender)
                 } else {
                     sender
                         .getComponentFromLang("Function-Item-Show-Format-Translatable", item.amount) { type, i, part, sender ->
-                            val component = if (i == 1) {
+                            val component = if (part.isVariable && part.text == "item") {
                                 Component.translatable(item.getInternalName())
                             } else {
                                 legacy(
@@ -110,7 +110,7 @@ object ItemShow : Function("ITEM") {
                                         .translate(sender).replaceWithOrder(item.amount)
                                 )
                             }
-                            component.toBuilder().applyStyle(type, part, 0, sender, item.amount)
+                            component.toBuilder().applyStyle(type, part, i, sender, item.amount)
                         }
                         ?.hoverItemFixed(item, sender)
                 }
@@ -124,11 +124,15 @@ object ItemShow : Function("ITEM") {
 
     @Suppress("Deprecation")
     private fun ItemStack.getDisplayName(player: Player): String {
-        return if (originName || itemMeta?.hasDisplayName() != true) {
-            getI18nName(player)
-        } else {
+        return if (shouldUseDisplayName()) {
             itemMeta!!.displayName
+        } else {
+            getI18nName(player)
         }
+    }
+
+    private fun ItemStack.shouldUseDisplayName(): Boolean {
+        return !originName && itemMeta?.hasDisplayName() == true
     }
 
     enum class Type { NAME, TRANSLATABLE }

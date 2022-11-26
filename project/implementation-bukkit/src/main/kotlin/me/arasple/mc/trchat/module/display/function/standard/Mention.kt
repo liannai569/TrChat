@@ -49,13 +49,9 @@ object Mention : Function("MENTION") {
         return if (!enabled) {
             message
         } else {
-            var result = message
             val regex = BukkitPlayers.getRegex(sender) ?: return message
-            val mentioned = result.contains(regex)
-            if (mentioned) {
-                result = regex.replace(result, "{{MENTION:\$1}}")
-            }
-            if (mentioned && !sender.hasPermission("trchat.bypass.mentioncd")) {
+            val result = regex.replace(message, "{{MENTION:\$1}}")
+            if (result != message && !sender.hasPermission("trchat.bypass.mentioncd")) {
                 sender.updateCooldown(CooldownType.MENTION, cooldown.get())
             }
             result
@@ -64,10 +60,11 @@ object Mention : Function("MENTION") {
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
         return mirrorParse {
+            val name = BukkitPlayers.getPlayerFullName(arg) ?: arg
             if (notify && forward) {
-                sender.sendProxyLang(arg, "Function-Mention-Notify", sender.name)
+                sender.sendProxyLang(name, "Function-Mention-Notify", sender.name)
             }
-            sender.getComponentFromLang("Function-Mention-Format", arg, sender.name)
+            sender.getComponentFromLang("Function-Mention-Format", name, sender.name)
         }
     }
 

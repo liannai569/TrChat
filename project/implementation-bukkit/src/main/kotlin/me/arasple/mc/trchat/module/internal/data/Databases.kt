@@ -22,7 +22,7 @@ object Databases {
     val database by unsafeLazy {
         when (val type = Settings.CONF.getString("Database.Method")?.uppercase()) {
             "LOCAL", "SQLITE", null -> DatabaseSQLite()
-            "SQL" -> DatabaseSQL()
+            "SQL", "MYSQL" -> DatabaseSQL()
             else -> {
                 val event = CustomDatabaseEvent(type)
                 event.call()

@@ -25,6 +25,7 @@ import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.ui.buildMenu
 import taboolib.module.ui.type.Linked
+import taboolib.platform.util.asLangText
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.serializeToByteArray
@@ -75,15 +76,9 @@ object InventoryShow : Function("INVENTORY") {
         }
     }
 
-    @Suppress("Deprecation")
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): Component? {
         return mirrorParse {
-            computeAndCache(
-                sender.name,
-                sender.inventory,
-                sender.inventory.itemInHand,
-                sender.inventory.runCatching { itemInOffHand }.getOrDefault(AIR_ITEM)
-            ).let {
+            computeAndCache(sender).let {
                 if (forward) {
                     BukkitProxyManager.sendTrChatMessage(
                         sender,
@@ -103,17 +98,14 @@ object InventoryShow : Function("INVENTORY") {
         return sender.passPermission(permission)
     }
 
-    fun computeAndCache(
-        name: String,
-        inventory: Inventory,
-        mainHand: ItemStack?,
-        offHand: ItemStack?
-    ): Pair<String, String> {
+    @Suppress("Deprecation")
+    fun computeAndCache(sender: Player): Pair<String, String> {
+        val inventory = sender.inventory
         val sha1 = inventory.serializeToByteArray().encodeBase64().digest("sha-1")
         if (cache.getIfPresent(sha1) != null) {
             return sha1 to cache.getIfPresent(sha1)!!.serializeToByteArray().encodeBase64()
         }
-        val menu = buildMenu<Linked<ItemStack>>("$name's Inventory") {
+        val menu = buildMenu<Linked<ItemStack>>(sender.asLangText("Function-Inventory-Show-Title", sender.name)) {
             rows(6)
             slots(inventorySlots)
             elements {
@@ -123,9 +115,12 @@ object InventoryShow : Function("INVENTORY") {
             onGenerate { _, element, _, _ -> element }
             onBuild { _, inv ->
                 inv.setItem(0, PLACEHOLDER_ITEM)
-                inv.setItem(1, offHand.replaceAir())
-                inv.setItem(2, buildItem(XMaterial.PLAYER_HEAD) { this.name = "§e$name" })
-                inv.setItem(3, mainHand.replaceAir())
+                inv.setItem(1, inventory.runCatching { itemInOffHand }.getOrDefault(AIR_ITEM).replaceAir())
+                inv.setItem(2, buildItem(XMaterial.PLAYER_HEAD) {
+                    name = "§e${sender.name}"
+                    skullOwner = sender.name
+                })
+                inv.setItem(3, inventory.itemInHand.replaceAir())
                 inv.setItem(4, PLACEHOLDER_ITEM)
                 inv.setItem(5, inventory.getItem(inventory.size - 2).replaceAir())
                 inv.setItem(6, inventory.getItem(inventory.size - 3).replaceAir())

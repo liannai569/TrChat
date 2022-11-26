@@ -68,9 +68,13 @@ abstract class Function(val id: String) {
             val file = sender.getLocaleFile() ?: return null
             return when (val type = file.nodes[node].let { if (it is TypeList) it.list[0] else it }) {
                 is TypeJson -> {
+                    var i = 0
                     val builder = Component.text()
-                    parser.readToFlatten(type.text!!.joinToString()).forEachIndexed { i, part ->
+                    parser.readToFlatten(type.text!!.joinToString()).forEach { part ->
                         builder.append(processor(type, i, part, sender))
+                        if (part.isVariable) {
+                            i++
+                        }
                     }
                     builder.build()
                 }

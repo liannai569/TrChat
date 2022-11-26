@@ -144,6 +144,7 @@ Function-Inventory-Show-Format:
       - hover: '&7点击查看{0}的背包'
         command: '/view-inventory {1}'
 Function-Inventory-Show-Unavailable: '&c&l该背包已过期或不存在...'
+Function-Inventory-Show-Title: '{0}的背包'
 Function-EnderChest-Show-Format:
   - type: json
     text: '[&8\[&3{0}的末影箱&8\]]'
@@ -151,6 +152,7 @@ Function-EnderChest-Show-Format:
       - hover: '&7点击查看{0}的末影箱'
         command: '/view-enderchest {1}'
 Function-EnderChest-Show-Unavailable: '&c&l该末影箱已过期或不存在...'
+Function-EnderChest-Show-Title: '{0}的末影箱'
 Function-Image-Show-Format:
   - type: json
     text: '[&8\[&f&l图片&8\]]'

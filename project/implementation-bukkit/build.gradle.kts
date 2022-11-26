@@ -50,13 +50,13 @@ repositories {
 dependencies {
     api(project(":project:common"))
 
-    compileOnly("net.kyori:adventure-platform-bukkit:4.1.2")
-
     compileOnly("ink.ptms.core:v11902:11902:mapped")
 //    compileOnly("ink.ptms.core:v11900:11900:mapped")
     compileOnly("ink.ptms.core:v11902:11902:universal")
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.1.2")
+    compileOnly("io.github.admin4j:http:0.4.2")
 
     compileOnly("com.willfp:eco:6.6.3") { isTransitive = false }
     compileOnly("me.clip:placeholderapi:2.11.1") { isTransitive = false }

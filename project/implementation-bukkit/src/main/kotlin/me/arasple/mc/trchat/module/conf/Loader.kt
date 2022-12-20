@@ -121,10 +121,9 @@ object Loader {
             val proxy = section.getBoolean("Proxy", false)
             val doubleTransfer = section.getBoolean("Double-Transfer", true)
             val ports = section.getString("Ports")?.split(";")?.map { it.toInt() } ?: emptyList()
-            val redis = section.getString("Redis", "")!!
             val disabledFunctions = section.getStringList("Disabled-Functions")
             val filterBeforeSending = section.getBoolean("Filter-Before-Sending", false)
-            ChannelSettings(joinPermission, speakCondition, autoJoin, isPrivate, range, proxy, doubleTransfer, ports, redis, disabledFunctions, filterBeforeSending)
+            ChannelSettings(joinPermission, speakCondition, autoJoin, isPrivate, range, proxy, doubleTransfer, ports, disabledFunctions, filterBeforeSending)
         }
 
         val bindings = conf.getConfigurationSection("Bindings")?.let {

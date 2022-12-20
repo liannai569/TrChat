@@ -1,5 +1,6 @@
 package me.arasple.mc.trchat.module.internal
 
+import com.google.gson.JsonObject
 import me.arasple.mc.trchat.FilterManager
 import me.arasple.mc.trchat.module.internal.filter.processer.Filter
 import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
@@ -7,15 +8,19 @@ import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.parseJson
 import me.arasple.mc.trchat.util.reportOnce
 import taboolib.common.env.DependencyDownloader
+import taboolib.common.io.digest
+import taboolib.common.io.newFile
 import taboolib.common.platform.Awake
 import taboolib.common.platform.PlatformFactory
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.ProxyPlayer
+import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.decodeUnicode
 import taboolib.common5.mirrorNow
 import taboolib.module.lang.sendLang
 import java.io.BufferedInputStream
+import java.io.File
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
@@ -87,35 +92,33 @@ object DefaultFilterManager : FilterManager {
     }
 
     private fun catchCloudThesaurus(url: String, notify: ProxyCommandSender?): List<String> {
-        val collected = mutableListOf<String>()
-
         return kotlin.runCatching {
             URL(url).openConnection().also { it.connectTimeout = 60 * 1000 }.getInputStream().use { inputStream ->
                 BufferedInputStream(inputStream).use { bufferedInputStream ->
-                    val database = DependencyDownloader.readFully(bufferedInputStream, StandardCharsets.UTF_8).parseJson().asJsonObject
+                    val origin = DependencyDownloader.readFully(bufferedInputStream, StandardCharsets.UTF_8)
+                    val database = origin.parseJson().asJsonObject
                     require(database.has("lastUpdateDate") && database.has("words")) {
                         "Wrong database json object"
                     }
-
-                    val lastUpdateDate = database["lastUpdateDate"].asString
-                    cloud_last_update[url] = when (cloud_last_update[url]) {
-                        null -> lastUpdateDate
-                        lastUpdateDate -> return emptyList()
-                        else -> lastUpdateDate
+                    val collected = readDatabase(url, database)
+                    if (collected.isNotEmpty()) {
+                        val file = newFile(getDataFolder(), "filters/${url.digest("md5")}")
+                        file.writeText(origin)
                     }
-                    database["words"].asJsonArray.forEach {
-                        val word = it.asString.decodeUnicode()
-                        if (ignored_cloud_words.none { w -> w.equals(word, ignoreCase = true) }) {
-                            collected.add(word)
-                        }
-                    }
+                    notify?.sendLang("Plugin-Loaded-Filter-Cloud", collected.size, url, cloud_last_update[url]!!)
+                    collected
                 }
             }
-            notify?.sendLang("Plugin-Loaded-Filter-Cloud", collected.size, url, cloud_last_update[url]!!)
-            collected
-        }.getOrElse {
-            it.reportOnce("Error occurred while catching cloud thesaurus of $url.", printStackTrace = false)
-            emptyList()
+        }.getOrElse { t ->
+            val file = File(getDataFolder(), "filters/${url.digest("md5")}")
+            if (file.exists()) {
+                t.reportOnce("Failed to catch cloud thesaurus of $url.Use cache instead.", printStackTrace = false)
+                val database = file.readText().parseJson().asJsonObject
+                readDatabase(url, database)
+            } else {
+                t.reportOnce("Failed to catch cloud thesaurus of $url.", printStackTrace = false)
+                emptyList()
+            }
         }
     }
 
@@ -128,6 +131,28 @@ object DefaultFilterManager : FilterManager {
             }
         } else {
             FilteredObject(string, 0)
+        }
+    }
+
+    private fun readDatabase(url: String, database: JsonObject): List<String> {
+        return try {
+            val lastUpdateDate = database["lastUpdateDate"].asString
+            cloud_last_update[url] = when (cloud_last_update[url]) {
+                lastUpdateDate -> return emptyList()
+                null -> lastUpdateDate
+                else -> lastUpdateDate
+            }
+            database["words"].asJsonArray.mapNotNull {
+                val word = it.asString.decodeUnicode()
+                if (ignored_cloud_words.none { w -> w.equals(word, ignoreCase = true) }) {
+                    word
+                } else {
+                    null
+                }
+            }
+        } catch (t: Throwable) {
+            t.reportOnce("Failed to load filter database of $url!")
+            emptyList()
         }
     }
 

@@ -14,6 +14,7 @@ import taboolib.expansion.SingleRedisConnection
 import taboolib.expansion.SingleRedisConnector
 import taboolib.expansion.fromConfig
 import taboolib.module.configuration.ConfigNode
+import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.lang.sendLang
 import taboolib.platform.util.onlinePlayers
 
@@ -25,6 +26,14 @@ object RedisManager {
 
     @ConfigNode("Redis.enabled", "settings.yml")
     var enabled = false
+        private set
+
+    @ConfigNode("Redis.channel", "settings.yml")
+    var channel = ""
+        private set
+
+    @ConfigNode("Redis.subscribe", "settings.yml")
+    val subscribe = ConfigNodeTransfer<List<String>, Array<String>> { toTypedArray() }
 
     operator fun invoke(default: Boolean = true): SingleRedisConnection? {
         if (!enabled) {
@@ -45,8 +54,8 @@ object RedisManager {
     }
 
     fun init(connection: SingleRedisConnection) {
-        connection.subscribe(*Settings.CONF.getStringList("Redis.subscribe").toTypedArray()) {
-            val message = get<RedisChatMessage>(false)
+        connection.subscribe(*subscribe.get()) {
+            val message = get<TrRedisMessage>(false)
             if (message.target == null) {
                 if (message.permission == null) {
                     onlinePlayers.forEach { it.sendComponent(message.sender, message.component) }
@@ -62,7 +71,7 @@ object RedisManager {
         }
     }
 
-    fun sendMessage(channel: String, message: RedisChatMessage) {
+    fun sendMessage(message: TrRedisMessage) {
         if (enabled) {
             (connection ?: RedisManager())!!.publish(channel, message)
         }

@@ -57,11 +57,7 @@ abstract class Function(val id: String) {
             node: String,
             vararg args: Any,
             processor: (TypeJson, Int, VariableReader.Part, ProxyPlayer) -> Component = { type, i, part, sender ->
-                legacy(
-                    part.text
-                        .replace("\\[", "[").replace("\\]", "]")
-                        .translate(sender).replaceWithOrder(*args)
-                ).toBuilder().applyStyle(type, part, i, sender, *args)
+                legacy(part.text.translate(sender).replaceWithOrder(*args)).toBuilder().applyStyle(type, part, i, sender, *args)
             }
         ): Component? {
             val sender = adaptPlayer(this)

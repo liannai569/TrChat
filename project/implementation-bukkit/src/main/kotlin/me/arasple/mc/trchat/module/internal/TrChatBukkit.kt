@@ -78,8 +78,12 @@ object TrChatBukkit : Plugin() {
 
     override fun onEnable() {
         Databases.database
-        BukkitProxyManager.processor
-        RedisManager()
+        if (RedisManager.enabled) {
+            RedisManager()
+        } else {
+            BukkitProxyManager.processor
+        }
+
         if (!isPaperEnv) {
             BukkitComponentManager.init()
         }

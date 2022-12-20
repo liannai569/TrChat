@@ -11,8 +11,8 @@ import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
-import me.arasple.mc.trchat.module.internal.redis.RedisChatMessage
 import me.arasple.mc.trchat.module.internal.redis.RedisManager
+import me.arasple.mc.trchat.module.internal.redis.TrRedisMessage
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.text.Component
@@ -49,7 +49,12 @@ class PrivateChannel(
         if (bindings.command.isNullOrEmpty()) {
             return
         }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission) {
+        command(
+            bindings.command[0],
+            subList(bindings.command, 1),
+            "Channel $id command",
+            permission = settings.joinPermission
+        ) {
             execute<Player> { sender, _, _ ->
                 if (sender.session.channel == this@PrivateChannel.id) {
                     quit(sender)
@@ -58,11 +63,12 @@ class PrivateChannel(
                 }
             }
             dynamic("player", optional = true) {
-                suggestion<Player>(uncheck = (settings.redis.isNotEmpty())) { _, _ ->
+                suggestion<Player>(uncheck = RedisManager.enabled) { _, _ ->
                     BukkitPlayers.getPlayers().filter { !PlayerData.vanishing.contains(it) }
                 }
                 execute<Player> { sender, _, argument ->
-                    sender.session.lastPrivateTo = BukkitPlayers.getPlayerFullName(argument) ?: return@execute sender.sendLang("Command-Player-Not-Exist")
+                    sender.session.lastPrivateTo = BukkitPlayers.getPlayerFullName(argument)
+                        ?: return@execute sender.sendLang("Command-Player-Not-Exist")
                     join(sender, this@PrivateChannel)
                 }
                 dynamic("message", optional = true) {
@@ -135,7 +141,21 @@ class PrivateChannel(
 
         player.sendComponent(player, send)
 
-        if (settings.proxy && BukkitProxyManager.processor != null) {
+        PlayerData.DATA.filterValues { it.isSpying }.entries.forEach { (_, v) ->
+            v.player.player?.sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
+        }
+        console().sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
+
+        CommandReply.lastMessageFrom[session.lastPrivateTo] = player.name
+        ChatLogs.logPrivate(player.name, session.lastPrivateTo, message)
+        Metrics.increase(0)
+
+        if (settings.proxy && RedisManager.enabled) {
+            // Redis
+            RedisManager.sendMessage(TrRedisMessage(receive, player.uniqueId, target = session.lastPrivateTo))
+            return send to receive
+        } else if (settings.proxy && BukkitProxyManager.processor != null) {
+            // BungeeCord / Velocity
             player.sendTrChatMessage(
                 "SendRaw",
                 session.lastPrivateTo,
@@ -147,21 +167,8 @@ class PrivateChannel(
             getProxyPlayer(session.lastPrivateTo)?.let {
                 it.sendComponent(player, receive)
                 it.sendLang("Private-Message-Receive", player.name)
-            } ?: kotlin.run {
-                if (settings.redis.isNotEmpty()) {
-                    RedisManager.sendMessage(settings.redis, RedisChatMessage(receive, player.uniqueId, target = session.lastPrivateTo))
-                }
             }
         }
-
-        PlayerData.DATA.filterValues { it.isSpying }.entries.forEach { (_, v) ->
-            v.player.player?.sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
-        }
-        console().sendLang("Private-Message-Spy-Format", player.name, session.lastPrivateTo, msg)
-
-        CommandReply.lastMessageFrom[session.lastPrivateTo] = player.name
-        ChatLogs.logPrivate(player.name, session.lastPrivateTo, message)
-        Metrics.increase(0)
 
         return send to receive
     }

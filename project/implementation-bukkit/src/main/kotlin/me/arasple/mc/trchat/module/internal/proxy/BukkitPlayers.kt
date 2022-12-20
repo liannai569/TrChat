@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.internal.proxy
 
 import me.arasple.mc.trchat.module.display.function.standard.Mention
 import me.arasple.mc.trchat.module.internal.data.PlayerData
+import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -34,7 +35,13 @@ object BukkitPlayers {
 
     fun getPlayerFullName(target: String): String? {
         val player = Bukkit.getPlayerExact(target)
-        return if (player != null && player.isOnline) player.name else players.firstOrNull { it.equals(target, ignoreCase = true) }
+        return if (player != null && player.isOnline) {
+            player.name
+        } else if (!RedisManager.enabled) {
+            players.firstOrNull { it.equals(target, ignoreCase = true) }
+        } else {
+            target
+        }
     }
 
     fun getPlayers(): List<String> {

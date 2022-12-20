@@ -7,14 +7,14 @@ import taboolib.library.configuration.Converter
 import taboolib.module.configuration.UUIDConverter
 import java.util.*
 
-class RedisChatMessage(
+class TrRedisMessage(
     @Conversion(ComponentConverter::class) val component: Component = Component.empty(),
     @Conversion(UUIDConverter::class) val sender: UUID? = null,
     val target: String? = null,
     val permission: String? = null
 ) {
 
-    class ComponentConverter : Converter<Component, String> {
+    private class ComponentConverter : Converter<Component, String> {
         override fun convertToField(value: String): Component {
             return gson(value)
         }

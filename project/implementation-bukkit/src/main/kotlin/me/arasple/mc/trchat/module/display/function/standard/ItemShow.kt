@@ -104,11 +104,7 @@ object ItemShow : Function("ITEM") {
                             val component = if (part.isVariable && part.text == "item") {
                                 Component.translatable(item.getInternalName())
                             } else {
-                                legacy(
-                                    part.text
-                                        .replace("\\[", "[").replace("\\]", "]")
-                                        .translate(sender).replaceWithOrder(item.amount)
-                                )
+                                legacy(part.text.translate(sender).replaceWithOrder(item.amount))
                             }
                             component.toBuilder().applyStyle(type, part, i, sender, item.amount)
                         }

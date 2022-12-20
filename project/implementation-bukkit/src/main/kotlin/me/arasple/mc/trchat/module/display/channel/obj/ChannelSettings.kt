@@ -18,7 +18,6 @@ class ChannelSettings(
     @Path("Proxy") val proxy: Boolean = false,
     @Path("Double-Transfer") val doubleTransfer: Boolean = true,
     @Path("Ports") @Conversion(PortConverter::class) val ports: List<Int> = emptyList(),
-    @Path("Redis") val redis: String = "",
     @Path("Disabled-Functions") val disabledFunctions: List<String> = emptyList(),
     @Path("Filter-Before-Sending") val filterBeforeSending: Boolean = false
 ) {

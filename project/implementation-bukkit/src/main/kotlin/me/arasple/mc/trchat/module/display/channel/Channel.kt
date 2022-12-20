@@ -10,8 +10,8 @@ import me.arasple.mc.trchat.module.display.channel.obj.Range
 import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
-import me.arasple.mc.trchat.module.internal.redis.RedisChatMessage
 import me.arasple.mc.trchat.module.internal.redis.RedisManager
+import me.arasple.mc.trchat.module.internal.redis.TrRedisMessage
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import net.kyori.adventure.identity.Identity
@@ -160,32 +160,40 @@ open class Channel(
             return component to null
         }
 
+        player.session.lastMessage = msg
+        ChatLogs.log(player, msg)
+        Metrics.increase(0)
+
         // TODO: 跨服事件传递
-        if (settings.proxy && BukkitProxyManager.processor != null) {
-            val gson = gson(component)
-            if (settings.ports.isNotEmpty()) {
-                player.sendTrChatMessage(
-                    "ForwardRaw",
-                    player.uniqueId.parseString(),
-                    gson,
-                    settings.joinPermission,
-                    settings.ports.joinToString(";"),
-                    settings.doubleTransfer.toString()
-                )
-            } else {
-                player.sendTrChatMessage(
-                    "BroadcastRaw",
-                    player.uniqueId.parseString(),
-                    gson,
-                    settings.joinPermission,
-                    settings.doubleTransfer.toString()
-                )
+        // Proxy
+        if (settings.proxy) {
+            if (RedisManager.enabled) {
+                // Redis
+                RedisManager.sendMessage(TrRedisMessage(component, player.uniqueId, permission = settings.joinPermission))
+                return component to null
+            } else if (BukkitProxyManager.processor != null) {
+                // BungeeCord / Velocity
+                val gson = gson(component)
+                if (settings.ports.isNotEmpty()) {
+                    player.sendTrChatMessage(
+                        "ForwardRaw",
+                        player.uniqueId.parseString(),
+                        gson,
+                        settings.joinPermission,
+                        settings.ports.joinToString(";"),
+                        settings.doubleTransfer.toString()
+                    )
+                } else {
+                    player.sendTrChatMessage(
+                        "BroadcastRaw",
+                        player.uniqueId.parseString(),
+                        gson,
+                        settings.joinPermission,
+                        settings.doubleTransfer.toString()
+                    )
+                }
+                return component to null
             }
-            return component to null
-        }
-        // Redis
-        if (settings.redis.isNotEmpty()) {
-            RedisManager.sendMessage(settings.redis, RedisChatMessage(component, player.uniqueId, permission = settings.joinPermission))
         }
         // Local
         when (settings.range.type) {
@@ -216,11 +224,6 @@ open class Channel(
             }
         }
         console().cast<CommandSender>().sendComponent(player, component)
-
-        player.session.lastMessage = msg
-        ChatLogs.log(player, msg)
-        Metrics.increase(0)
-
         return component to null
     }
 

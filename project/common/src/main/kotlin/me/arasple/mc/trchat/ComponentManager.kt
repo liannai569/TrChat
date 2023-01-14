@@ -4,7 +4,7 @@ import net.kyori.adventure.platform.AudienceProvider
 import net.kyori.adventure.text.Component
 
 /**
- * @author wlys
+ * @author ItsFlicker
  * @since 2022/6/18 15:16
  */
 interface ComponentManager {
@@ -12,11 +12,9 @@ interface ComponentManager {
     fun getAudienceProvider(): AudienceProvider? = null
 
     fun init() {
-
     }
 
     fun release() {
-
     }
 
     /**

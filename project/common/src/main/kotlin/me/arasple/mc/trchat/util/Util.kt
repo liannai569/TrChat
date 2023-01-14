@@ -11,7 +11,7 @@ import java.util.*
  * Util
  * me.arasple.mc.trchat.util
  *
- * @author wlys
+ * @author ItsFlicker
  * @since 2021/9/12 18:11
  */
 private val jsonParser = JsonParser()

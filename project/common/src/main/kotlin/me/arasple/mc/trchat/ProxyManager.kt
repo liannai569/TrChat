@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 
 /**
- * @author wlys
+ * @author ItsFlicker
  * @since 2022/6/18 15:19
  */
 interface ProxyManager {

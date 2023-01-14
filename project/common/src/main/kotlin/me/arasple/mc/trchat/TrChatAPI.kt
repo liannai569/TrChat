@@ -4,7 +4,7 @@ import taboolib.common.platform.ProxyCommandSender
 import java.util.concurrent.CompletableFuture
 
 /**
- * @author wlys
+ * @author ItsFlicker
  * @since 2022/6/18 15:13
  */
 interface TrChatAPI {

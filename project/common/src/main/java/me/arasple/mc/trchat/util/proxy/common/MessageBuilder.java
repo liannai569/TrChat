@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class MessageBuilder {
      *
      * @param message 源数据
      */
-    public static List<byte[]> create(String[] message) throws IOException {
+    public static List<byte[]> create(String[] message) {
         List<byte[]> messages = Lists.newArrayList();
         JsonArray array = new JsonArray();
         for (int i = 1; i < message.length; i++) {

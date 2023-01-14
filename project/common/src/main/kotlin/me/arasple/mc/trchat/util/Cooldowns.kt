@@ -4,23 +4,23 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * @author wlys
+ * @author ItsFlicker
  * @since 2022/3/5 14:09
  */
 object Cooldowns {
 
     private val COOLDOWNS = ConcurrentHashMap<UUID, Cooldown>()
 
-    fun getCooldownLeft(uuid: UUID, type: CooldownType): Long {
-        return COOLDOWNS.computeIfAbsent(uuid) { Cooldown() }.data.getOrDefault(type.alias, 0L) - System.currentTimeMillis()
+    fun getCooldownLeft(uuid: UUID, type: String): Long {
+        return COOLDOWNS.computeIfAbsent(uuid) { Cooldown() }.data.getOrDefault(type, 0L) - System.currentTimeMillis()
     }
 
-    fun isInCooldown(uuid: UUID, type: CooldownType): Boolean {
+    fun isInCooldown(uuid: UUID, type: String): Boolean {
         return getCooldownLeft(uuid, type) > 0
     }
 
-    fun updateCooldown(uuid: UUID, type: CooldownType, lasts: Long) {
-        COOLDOWNS.computeIfAbsent(uuid) { Cooldown() }.data[type.alias] = System.currentTimeMillis() + lasts
+    fun updateCooldown(uuid: UUID, type: String, lasts: Long) {
+        COOLDOWNS.computeIfAbsent(uuid) { Cooldown() }.data[type] = System.currentTimeMillis() + lasts
     }
 }
 

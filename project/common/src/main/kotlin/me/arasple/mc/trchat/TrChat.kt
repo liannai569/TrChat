@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat
 
 /**
- * @author wlys
+ * @author ItsFlicker
  * @since 2022/6/18 14:50
  */
 object TrChat {

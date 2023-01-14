@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.arasple.mc.trchat.util.UtilKt;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +26,7 @@ public class MessageReader {
      *
      * @param packet 通讯数据（未经过处理的原始内容）
      */
-    public static Message read(byte[] packet) throws IOException {
+    public static Message read(byte[] packet) {
         return read(new String(packet, StandardCharsets.UTF_8));
     }
 

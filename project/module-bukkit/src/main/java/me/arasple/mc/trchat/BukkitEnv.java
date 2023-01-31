@@ -19,7 +19,6 @@ import taboolib.common.env.RuntimeDependency;
 )
 @RuntimeDependency(
         value = "!net.kyori:adventure-text-minimessage:4.12.0",
-        test = "!net.kyori.adventure.text.minimessage.MiniMessage",
-        initiative = true
+        test = "net.kyori.adventure.text.minimessage.MiniMessage"
 )
 public class BukkitEnv {  }

@@ -18,16 +18,10 @@ import org.bukkit.plugin.messaging.PluginMessageRecipient
 import taboolib.common.util.unsafeLazy
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.nmsClass
-import taboolib.module.nms.obcClass
 import taboolib.module.ui.MenuHolder
 import taboolib.module.ui.type.Basic
 import taboolib.platform.util.sendLang
 
-/**
- * @author ItsFlicker
- * @since 2022/6/8 12:48
- */
-val classCraftItemStack = obcClass("inventory.CraftItemStack")
 val classChatSerializer by unsafeLazy { nmsClass("IChatBaseComponent\$ChatSerializer") }
 val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
 private val noClickBasic = object : Basic() {
@@ -58,9 +52,9 @@ fun Player.passPermission(permission: String?): Boolean {
             || hasPermission(permission)
 }
 
-val Player.session get() = ChatSession.getSession(this)
+inline val Player.session get() = ChatSession.getSession(this)
 
-val OfflinePlayer.data get() = PlayerData.getData(this)
+inline val OfflinePlayer.data get() = PlayerData.getData(this)
 
 fun Player.checkMute(): Boolean {
     if (TrChatBukkit.isGlobalMuting && !hasPermission("trchat.bypass.globalmute")) {

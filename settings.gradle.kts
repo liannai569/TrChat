@@ -1,9 +1,10 @@
 rootProject.name = "TrChat"
 
 include("plugin")
-include("plugin-shaded")
 include("project:common")
 include("project:common-impl")
-include("project:module-bukkit")
-include("project:module-bungee")
-include("project:module-velocity")
+include("project:module-adventure")
+include("project:module-nms")
+include("project:runtime-bukkit")
+include("project:runtime-bungee")
+include("project:runtime-velocity")

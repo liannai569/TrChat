@@ -39,4 +39,4 @@ jobs:
           prerelease: false
           title: "TrChat 自动构建最新版本"
           files: |
-            build/libs/*.*
+            plugin/build/libs/*.*

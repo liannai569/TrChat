@@ -122,7 +122,7 @@ object DefaultFilterManager : FilterManager {
         }
     }
 
-    override fun filter(string: String, execute: Boolean, player: ProxyPlayer?): FilteredObject {
+    override fun filter(string: String, player: ProxyPlayer?, execute: Boolean): FilteredObject {
         return if (execute && player?.hasPermission("trchat.bypass.filter") != true) {
             mirrorNow("Handler:DoFilter") {
                 Filter.doFilter(string).also {

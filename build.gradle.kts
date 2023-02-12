@@ -1,70 +1,87 @@
-val taboolibVersion: String by project
+@file:Suppress("PropertyName", "SpellCheckingInspection")
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+val taboolib_version: String by project
+
+val kotlinVersionNum: String
+    get() = project.kotlin.coreLibrariesVersion.replace(".", "")
 
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.7.21" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.7.21"
+    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
 
 subprojects {
     apply<JavaPlugin>()
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "com.github.johnrengelman.shadow")
 
     repositories {
-//        mavenLocal()
+        mavenLocal()
         mavenCentral()
         maven {
             url = uri("http://ptms.ink:8081/repository/releases/")
             isAllowInsecureProtocol = true
         }
+        maven("https://jitpack.io")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        maven("https://papermc.io/repo/repository/maven-public/")
+        maven("https://repo.xenondevs.xyz/releases")
+        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+        maven("https://repo.codemc.io/repository/maven-public/")
     }
+
     dependencies {
-        compileOnly("io.izzel.taboolib:common:$taboolibVersion")
-        compileOnly("io.izzel.taboolib:common-5:$taboolibVersion")
+        compileOnly(kotlin("stdlib"))
+        compileOnly(fileTree("${rootDir.resolve("libs")}"))
         compileOnly("com.google.code.gson:gson:2.8.5")
         compileOnly("com.google.guava:guava:21.0")
         compileOnly("net.kyori:adventure-api:4.12.0")
-        compileOnly(kotlin("stdlib"))
+        implementation("com.eatthepath:fast-uuid:0.2.0")
+
+        compileOnly("io.izzel.taboolib:common:$taboolib_version")
+        implementation("io.izzel.taboolib:common-5:$taboolib_version")
+        implementation("io.izzel.taboolib:module-chat:$taboolib_version")
+        implementation("io.izzel.taboolib:module-configuration:$taboolib_version")
+        implementation("io.izzel.taboolib:module-database:$taboolib_version")
+        implementation("io.izzel.taboolib:module-kether:$taboolib_version")
+        implementation("io.izzel.taboolib:module-lang:$taboolib_version")
+        implementation("io.izzel.taboolib:module-metrics:$taboolib_version")
+        implementation("io.izzel.taboolib:module-nms:$taboolib_version")
+        implementation("io.izzel.taboolib:module-nms-util:$taboolib_version")
+        implementation("io.izzel.taboolib:module-ui:$taboolib_version")
+        implementation("io.izzel.taboolib:platform-bukkit:$taboolib_version")
+        implementation("io.izzel.taboolib:platform-bungee:$taboolib_version")
+        implementation("io.izzel.taboolib:platform-velocity:$taboolib_version")
+        implementation("io.izzel.taboolib:expansion-alkaid-redis:$taboolib_version")
+        implementation("io.izzel.taboolib:expansion-command-helper:$taboolib_version")
+        implementation("io.izzel.taboolib:expansion-javascript:$taboolib_version")
+    }
+
+    java {
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-Xjvm-default=all")
+            freeCompilerArgs = listOf("-Xjvm-default=all", "-Xextended-compiler-checks")
         }
     }
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    tasks.withType<ShadowJar> {
+        relocate("taboolib", "${rootProject.group}.taboolib")
+        relocate("kotlin.", "kotlin${kotlinVersionNum}.") { exclude("kotlin.Metadata") }
+        relocate("com.eatthepath.uuid", "${rootProject.group}.library.uuid")
     }
 }
 
-tasks.build {
-    doFirst {
-        buildDir.deleteRecursively()
-    }
-    doLast {
-        val plugin = project(":plugin")
-        val file = file("${plugin.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-$version.jar") }
-
-        file?.copyTo(file("$buildDir/libs/${project.name}-$version.jar"), true)
-
-        val pluginShaded = project(":plugin-shaded")
-        val fileShaded = file("${pluginShaded.buildDir}/libs").listFiles()?.find { it.endsWith("plugin-shaded-$version-shaded.jar") }
-
-        fileShaded?.copyTo(file("$buildDir/libs/${project.name}-$version-shaded.jar"), true)
-
-        val ver = file("$buildDir/libs/版本说明 Versions.txt")
-        ver.createNewFile()
-        ver.writeText("""
-            1.16.5及以上的paper或分支: 必须使用普通版本
-            其他情况下二者皆可
-            若低版本与其他插件依赖冲突, 使用shaded版本
-
-            paper and its forks above 1.16.5: must use common version.
-            if conflict occurred with other plugins in lower minecraft versions, use shaded version.
-        """.trimIndent())
-    }
-    dependsOn(project(":plugin").tasks.build, project(":plugin-shaded").tasks.build)
+gradle.buildFinished {
+    buildDir.deleteRecursively()
 }

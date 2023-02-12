@@ -1,32 +1,38 @@
+@file:Suppress("PropertyName", "SpellCheckingInspection")
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-}
+val taboolib_version: String by project
 
 dependencies {
     implementation(project(":project:common"))
     implementation(project(":project:common-impl"))
-    implementation(project(":project:module-bukkit"))
-    implementation(project(":project:module-bungee"))
-    implementation(project(":project:module-velocity"))
-    implementation("com.eatthepath:fast-uuid:0.2.0")
+    implementation(project(":project:module-adventure"))
+    implementation(project(":project:module-nms"))
+    implementation(project(":project:runtime-bukkit"))
+    implementation(project(":project:runtime-bungee"))
+    implementation(project(":project:runtime-velocity"))
 }
 
 tasks {
     withType<ShadowJar> {
+        archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
+        // 删除一些不必要的文件
         exclude("META-INF/maven/**")
         exclude("META-INF/tf/**")
         exclude("module-info.java")
-
-        relocate("com.eatthepath.uuid", "me.arasple.mc.trchat.library.uuid")
-        relocate("taboolib", "me.arasple.mc.trchat.taboolib")
-        relocate("kotlin.", "kotlin1721.") {
-            exclude("kotlin.Metadata")
-        }
+    }
+    sourcesJar {
+        archiveFileName.set("${rootProject.name}-${archiveFileName.get().substringAfter('-')}")
+        // 打包子项目源代码
+        rootProject.subprojects.forEach { from(it.sourceSets["main"].allSource) }
     }
     build {
         dependsOn(shadowJar)
     }
+}
+
+gradle.buildFinished {
+    File(buildDir, "libs/${project.name}-${rootProject.version}.jar").delete()
 }

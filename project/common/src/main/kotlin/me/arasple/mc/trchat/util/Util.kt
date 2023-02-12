@@ -14,9 +14,12 @@ import java.util.*
  * @author ItsFlicker
  * @since 2021/9/12 18:11
  */
+@Suppress("Deprecation")
 private val jsonParser = JsonParser()
 
 private val reportedErrors = mutableListOf<String>()
+
+val nilUUID = UUID(0, 0)
 
 fun Throwable.print(title: String, printStackTrace: Boolean = true) {
     console().sendMessage("§c[TrChat] §7$title")
@@ -43,6 +46,7 @@ fun Throwable.reportOnce(title: String, printStackTrace: Boolean = true) {
     }
 }
 
+@Suppress("Deprecation")
 fun String.parseJson(): JsonElement = jsonParser.parse(this)!!
 
 fun buildMessage(vararg messages: String): List<ByteArray> {

@@ -11,7 +11,7 @@ import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import org.bukkit.Bukkit
 import taboolib.common.platform.*
@@ -74,10 +74,10 @@ object TrChatBukkit : Plugin() {
     }
 
     fun reload(notify: ProxyCommandSender) {
-        Settings.CONF.reload()
-        Functions.CONF.reload()
-        Filters.CONF.reload()
-        Kether.isAllowToleranceParser = Settings.CONF.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
+        Settings.conf.reload()
+        Functions.conf.reload()
+        Filters.conf.reload()
+        Kether.isAllowToleranceParser = Settings.conf.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
         TrChat.api().getChannelManager().loadChannels(notify)
         Loader.loadFunctions(notify)
     }

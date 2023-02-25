@@ -2,10 +2,10 @@ package me.arasple.mc.trchat.module.display.function.standard
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.display.function.StandardFunction
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.CooldownType
 import me.arasple.mc.trchat.util.getCooldownLeft
@@ -41,7 +41,7 @@ object InventoryShow : Function("INVENTORY") {
     override val alias = "Inventory-Show"
 
     override val reaction by resettableLazy("functions") {
-        Functions.CONF["General.Inventory-Show.Action"]?.let { Reaction(it.asList()) }
+        Functions.conf["General.Inventory-Show.Action"]?.let { Reaction(it.asList()) }
     }
 
     @ConfigNode("General.Inventory-Show.Enabled", "function.yml")
@@ -77,20 +77,18 @@ object InventoryShow : Function("INVENTORY") {
     }
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        return mirrorParse {
-            computeAndCache(sender).let {
-                if (forward) {
-                    BukkitProxyManager.sendTrChatMessage(
-                        sender,
-                        "InventoryShow",
-                        MinecraftVersion.minecraftVersion,
-                        sender.name,
-                        it.first,
-                        it.second
-                    )
-                }
-                sender.getComponentFromLang("Function-Inventory-Show-Format", sender.name, it.first)
+        return computeAndCache(sender).let {
+            if (forward) {
+                BukkitProxyManager.sendTrChatMessage(
+                    sender,
+                    "InventoryShow",
+                    MinecraftVersion.minecraftVersion,
+                    sender.name,
+                    it.first,
+                    it.second
+                )
             }
+            sender.getComponentFromLang("Function-Inventory-Show-Format", sender.name, it.first)
         }
     }
 

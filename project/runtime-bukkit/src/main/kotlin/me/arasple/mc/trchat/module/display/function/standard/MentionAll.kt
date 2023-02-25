@@ -28,7 +28,7 @@ object MentionAll : Function("MENTIONALL") {
     override val alias = "Mention-All"
 
     override val reaction by resettableLazy("functions") {
-        Functions.CONF["General.Mention-All.Action"]?.let { Reaction(it.asList()) }
+        Functions.conf["General.Mention-All.Action"]?.let { Reaction(it.asList()) }
     }
 
     @ConfigNode("General.Mention-All.Enabled", "function.yml")
@@ -59,14 +59,12 @@ object MentionAll : Function("MENTIONALL") {
     }
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        return mirrorParse {
-            if (notify && forward) {
-                BukkitPlayers.getPlayers().filter { it != arg }.forEach {
-                    sender.sendProxyLang(it, "Function-Mention-Notify", sender.name)
-                }
+        if (notify && forward) {
+            BukkitPlayers.getPlayers().filter { it != arg }.forEach {
+                sender.sendProxyLang(it, "Function-Mention-Notify", sender.name)
             }
-            sender.getComponentFromLang("Function-Mention-All-Format", sender.name)
         }
+        return sender.getComponentFromLang("Function-Mention-All-Format", sender.name)
     }
 
     override fun canUse(sender: Player): Boolean {

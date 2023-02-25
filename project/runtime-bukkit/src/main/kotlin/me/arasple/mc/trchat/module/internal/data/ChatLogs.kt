@@ -43,7 +43,7 @@ object ChatLogs {
 
     @Schedule(period = (20 * 60 * 60).toLong(), async = true)
     fun autoDelete() {
-        val days = Settings.CONF.getLong("General.Log-Delete-Time", 0L)
+        val days = Settings.conf.getLong("General.Log-Delete-Time", 0L)
         if (days > 0) {
             val millis = TimeUnit.DAYS.toMillis(days)
             kotlin.runCatching {
@@ -58,7 +58,7 @@ object ChatLogs {
 
     fun log(player: Player, originalMessage: String) {
         waveList.add(
-            Settings.CONF.getString("General.Log-Normal", "[{0}] {1}: {2}")!!.replaceWithOrder(
+            Settings.logNormal.replaceWithOrder(
                 dateFormat1.format(System.currentTimeMillis()),
                 player.name,
                 originalMessage
@@ -68,7 +68,7 @@ object ChatLogs {
 
     fun logPrivate(from: String, to: String, originalMessage: String) {
         waveList.add(
-            Settings.CONF.getString("General.Log-Private", "[{0}] {1} -> {2}: {3}")!!.replaceWithOrder(
+            Settings.logPrivate.replaceWithOrder(
                 dateFormat1.format(System.currentTimeMillis()),
                 from,
                 to,

@@ -20,14 +20,14 @@ import java.util.concurrent.ConcurrentHashMap
 class DatabaseSQLite : Database() {
 
     val file by lazy {
-        newFile(Settings.CONF.getString("Database.SQLite.file")!!.replace("{plugin_folder}", getDataFolder().absolutePath))
+        newFile(Settings.conf.getString("Database.SQLite.file")!!.replace("{plugin_folder}", getDataFolder().absolutePath))
     }
 
     val host by lazy {
         file.getHost()
     }
 
-    val table = Table(Settings.CONF.getString("Database.SQLite.table")!!, host) {
+    val table = Table(Settings.conf.getString("Database.SQLite.table")!!, host) {
         add {
             name("user")
             type(ColumnTypeSQLite.TEXT, 36) {

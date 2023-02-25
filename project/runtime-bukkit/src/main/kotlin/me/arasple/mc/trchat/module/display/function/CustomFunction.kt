@@ -26,9 +26,7 @@ class CustomFunction(
     }
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText {
-        return mirrorParse {
-            displayJson.toTextComponent(sender, arg)
-        }
+        return displayJson.toTextComponent(sender, arg)
     }
 
     override fun canUse(sender: Player): Boolean {

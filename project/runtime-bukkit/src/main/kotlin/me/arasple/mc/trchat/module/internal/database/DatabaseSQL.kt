@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 class DatabaseSQL : Database() {
 
-    val host = Settings.CONF.getHost("Database.SQL")
+    val host = Settings.conf.getHost("Database.SQL")
 
-    val table = Table(Settings.CONF.getString("Database.SQL.table")!!, host) {
+    val table = Table(Settings.conf.getString("Database.SQL.table")!!, host) {
         add {
             name("user")
             type(ColumnTypeSQL.VARCHAR, 36) {

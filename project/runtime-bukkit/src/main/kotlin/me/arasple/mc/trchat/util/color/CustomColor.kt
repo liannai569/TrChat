@@ -14,13 +14,13 @@ class CustomColor(val type: ColorType, val color: String) {
     }
 
     fun colored(sender: CommandSender, msg: String): String {
-        var message = msg
+        var message = MessageColors.replaceWithPermission(sender, msg)
 
-        message = MessageColors.replaceWithPermission(sender, message)
-
-        message = when (type) {
-            ColorType.NORMAL -> color + message
-            ColorType.SPECIAL -> (color + message).parseRainbow().parseGradients()
+        if (!msg.startsWith("§")) {
+            message = when (type) {
+                ColorType.NORMAL -> color + message
+                ColorType.SPECIAL -> (color + message).parseRainbow().parseGradients()
+            }
         }
 
         return message

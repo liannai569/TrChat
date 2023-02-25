@@ -12,8 +12,14 @@ import java.util.*
  */
 abstract class NMS {
 
+    /**
+     * ComponentText -> IChatBaseComponent
+     */
     abstract fun craftChatMessageFromComponent(component: ComponentText): Any
 
+    /**
+     * IChatBaseComponent -> RawMessage
+     */
     abstract fun rawMessageFromCraftChatMessage(component: Any): String
 
     abstract fun sendMessage(receiver: Player, component: ComponentText, sender: UUID?)
@@ -21,6 +27,10 @@ abstract class NMS {
     abstract fun hoverItem(component: ComponentText, itemStack: ItemStack): ComponentText
 
     abstract fun optimizeNBT(itemStack: ItemStack, nbtWhitelist: Array<String> = whitelistTags): ItemStack
+
+    abstract fun addCustomChatCompletions(player: Player, entries: List<String>)
+
+    abstract fun removeCustomChatCompletions(player: Player, entries: List<String>)
 
     companion object {
 

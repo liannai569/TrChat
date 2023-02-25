@@ -19,7 +19,7 @@ import taboolib.common.platform.function.submitAsync
 @PlatformSide([Platform.BUKKIT])
 object ListenerQuit {
 
-    private fun quit(player: Player) {
+    private fun disconnect(player: Player) {
         Channel.channels.values.forEach { it.listeners -= player.name }
 
         ChatSession.removeSession(player)
@@ -30,13 +30,13 @@ object ListenerQuit {
         }
     }
 
-    @SubscribeEvent(EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onQuit(e: PlayerQuitEvent) {
-        quit(e.player)
+        disconnect(e.player)
     }
 
-    @SubscribeEvent(EventPriority.HIGHEST, ignoreCancelled = true)
+    @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onKick(e: PlayerKickEvent) {
-        quit(e.player)
+        disconnect(e.player)
     }
 }

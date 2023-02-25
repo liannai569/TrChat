@@ -16,8 +16,14 @@ import taboolib.module.configuration.Configuration
 object Settings {
 
     @Config("settings.yml")
-    lateinit var CONF: Configuration
+    lateinit var conf: Configuration
         private set
+
+    @ConfigNode("Options.Log-Normal", "settings.yml")
+    var logNormal = "[{0}] {1}: {2}"
+
+    @ConfigNode("Options.Log-Private", "settings.yml")
+    var logPrivate = "[{0}] {1} -> {2}: {3}"
 
     @ConfigNode("Channel.Default", "settings.yml")
     var defaultChannel = "Normal"

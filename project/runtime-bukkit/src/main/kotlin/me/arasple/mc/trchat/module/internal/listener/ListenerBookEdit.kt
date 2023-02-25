@@ -20,7 +20,7 @@ object ListenerBookEdit {
     fun onBookEdit(e: PlayerEditBookEvent) {
         val p = e.player
         val meta = e.newBookMeta
-        if (Settings.CONF.getBoolean("Color.Book")) {
+        if (Settings.conf.getBoolean("Color.Book")) {
             meta.pages = MessageColors.replaceWithPermission(p, meta.pages, MessageColors.Type.BOOK)
         }
         e.newBookMeta = meta

@@ -7,14 +7,11 @@ import me.arasple.mc.trchat.module.internal.script.Condition
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.pass
 import me.arasple.mc.trchat.util.session
-import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.util.VariableReader
-import taboolib.common5.mirrorNow
 import taboolib.module.chat.ComponentText
 import taboolib.module.chat.Components
-import taboolib.module.chat.impl.DefaultComponent
 
 /**
  * @author ItsFlicker
@@ -53,33 +50,12 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
     }
 
     override fun toTextComponent(sender: CommandSender, vararg vars: String): ComponentText {
-        return mirrorNow("Chat:Format:Msg") {
-            val message = vars[0]
-            val component = Components.empty()
-            var dragonCore = false
-            parser.readToFlatten(message).forEach { part ->
-                component.append(if (part.isVariable) {
-                    val args = part.text.split(":", limit = 2)
-                    if (args[0] == "DRAGONCORE") {
-                        dragonCore = true
-                        DefaultComponent(listOf(TextComponent("§#${args[1]}")))
-                    } else {
-                        Components.text(args[1])
-                    }
-                } else {
-                    if (dragonCore) {
-                        dragonCore = false
-                        DefaultComponent(listOf(TextComponent(part.text)))
-                    } else {
-                        Components.text(part.text)
-                    }
-                })
-            }
-            style.forEach {
-                it.applyTo(component, sender, *vars, message = component.toPlainText())
-            }
-            component
+        val message = vars[0]
+        val component = Components.text(message)
+        style.forEach {
+            it.applyTo(component, sender, *vars, message = component.toPlainText())
         }
+        return component
     }
 
     companion object {

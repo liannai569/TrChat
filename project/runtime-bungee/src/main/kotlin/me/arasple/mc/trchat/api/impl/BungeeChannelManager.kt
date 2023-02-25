@@ -1,9 +1,8 @@
-package me.arasple.mc.trchat.module.conf
+package me.arasple.mc.trchat.api.impl
 
-import com.velocitypowered.api.proxy.ProxyServer
-import me.arasple.mc.trchat.ChannelManager
-import me.arasple.mc.trchat.module.internal.VelocityProxyManager
+import me.arasple.mc.trchat.api.ChannelManager
 import me.arasple.mc.trchat.util.print
+import net.md_5.bungee.api.ProxyServer
 import taboolib.common.io.newFile
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformFactory
@@ -22,8 +21,8 @@ import kotlin.system.measureTimeMillis
  * @author ItsFlicker
  * @since 2022/6/19 20:26
  */
-@PlatformSide([Platform.VELOCITY])
-object VelocityChannelManager : ChannelManager {
+@PlatformSide([Platform.BUNGEE])
+object BungeeChannelManager : ChannelManager {
 
     init {
         PlatformFactory.registerAPI<ChannelManager>(this)
@@ -33,7 +32,7 @@ object VelocityChannelManager : ChannelManager {
         val folder = File(getDataFolder(), "channels")
 
         if (!folder.exists()) {
-            releaseResourceFile("channels/Velocity.yml", replace = true)
+            releaseResourceFile("channels/Bungee.yml", replace = true)
             newFile(File(getDataFolder(), "data"), folder = true)
         }
 
@@ -80,18 +79,20 @@ object VelocityChannelManager : ChannelManager {
         return channels[id]
     }
 
-    fun sendProxyChannel(id: String, channel: String, all: Boolean = false) {
-        server<ProxyServer>().allServers.filter {
-            all || !loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
-        }.forEach {
-            VelocityProxyManager.sendTrChatMessage(it, "SendProxyChannel", id, channel)
+    @Suppress("Deprecation")
+    fun sendProxyChannel(id: String, channel: String) {
+        server<ProxyServer>().servers.filterNot {
+            loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.value.address.port)
+        }.forEach { (_, server) ->
+            BungeeProxyManager.sendTrChatMessage(server, "SendProxyChannel", id, channel)
         }
     }
 
+    @Suppress("Deprecation")
     fun sendAllProxyChannels(port: Int) {
-        val server = server<ProxyServer>().allServers.firstOrNull { it.serverInfo.address.port == port } ?: return
+        val server = server<ProxyServer>().servers.values.firstOrNull { it.address.port == port } ?: return
         channels.forEach {
-            VelocityProxyManager.sendTrChatMessage(server, "SendProxyChannel", it.key, it.value)
+            BungeeProxyManager.sendTrChatMessage(server, "SendProxyChannel", it.key, it.value)
         }
     }
 

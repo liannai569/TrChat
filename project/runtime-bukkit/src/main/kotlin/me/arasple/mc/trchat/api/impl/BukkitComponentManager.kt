@@ -1,7 +1,7 @@
-package me.arasple.mc.trchat.module.internal
+package me.arasple.mc.trchat.api.impl
 
-import me.arasple.mc.trchat.ComponentManager
 import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.api.ComponentManager
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.util.data
@@ -32,12 +32,8 @@ object BukkitComponentManager : ComponentManager {
     }
 
     override fun filterComponent(component: ComponentText, maxLength: Int): ComponentText {
-        return if (Filters.CONF.getBoolean("Enable.Chat")) {
-            val baseComponents = ComponentSerializer.parse(component.toRawMessage())
-            validateComponent(DefaultComponent(baseComponents.map { filterComponent(it) }), maxLength)
-        } else {
-            validateComponent(component, maxLength)
-        }
+        val baseComponents = ComponentSerializer.parse(component.toRawMessage())
+        return validateComponent(DefaultComponent(baseComponents.map { filterComponent(it) }), maxLength)
     }
 
     override fun sendComponent(receiver: Any, component: ComponentText, sender: Any?) {
@@ -58,7 +54,7 @@ object BukkitComponentManager : ComponentManager {
         if (commandSender is Player && commandSender.data.ignored.contains(uuid)) {
             return
         }
-        val newComponent = if (commandSender is Player && commandSender.data.isFilterEnabled) {
+        val newComponent = if (Filters.conf.getBoolean("Enable.Chat") && commandSender is Player && commandSender.data.isFilterEnabled) {
             filterComponent(component, 32000)
         } else {
             validateComponent(component, 32000)

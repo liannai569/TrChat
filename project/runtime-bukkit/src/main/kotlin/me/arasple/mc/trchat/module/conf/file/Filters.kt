@@ -19,23 +19,23 @@ import taboolib.module.configuration.Configuration
 object Filters {
 
     @Config("filter.yml")
-    lateinit var CONF: Configuration
+    lateinit var conf: Configuration
         private set
 
     @Awake(LifeCycle.ENABLE)
     fun init() {
-        CONF.onReload { reload() }
+        conf.onReload { reload() }
         reload()
     }
 
     fun reload(notify: CommandSender? = null) {
         TrChat.api().getFilterManager().loadFilter(
-            CONF.getStringList("Local"),
-            CONF.getStringList("Ignored-Punctuations"),
-            CONF.getString("Replacement", "*")!![0],
-            CONF.getBoolean("Cloud-Thesaurus.Enabled"),
-            CONF.getStringList("Cloud-Thesaurus.Urls"),
-            CONF.getStringList("Cloud-Thesaurus.Ignored"),
+            conf.getStringList("Local"),
+            conf.getStringList("Ignored-Punctuations"),
+            conf.getString("Replacement", "*")!![0],
+            conf.getBoolean("Cloud-Thesaurus.Enabled"),
+            conf.getStringList("Cloud-Thesaurus.Urls"),
+            conf.getStringList("Cloud-Thesaurus.Ignored"),
             notify = notify?.let { adaptCommandSender(it) } ?: console()
         )
     }

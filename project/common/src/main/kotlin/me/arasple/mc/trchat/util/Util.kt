@@ -16,10 +16,9 @@ import java.util.*
  */
 @Suppress("Deprecation")
 private val jsonParser = JsonParser()
-
 private val reportedErrors = mutableListOf<String>()
-
 val nilUUID = UUID(0, 0)
+val papiRegex = "(%)(.+?)(%)|(:)(.+?)(:)|(?!\\{\")((\\{)(.+?)(}))".toRegex()
 
 fun Throwable.print(title: String, printStackTrace: Boolean = true) {
     console().sendMessage("§c[TrChat] §7$title")

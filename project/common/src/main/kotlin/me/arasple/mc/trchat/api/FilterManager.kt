@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.api
 
 import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
 import taboolib.common.platform.ProxyCommandSender

@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.internal.listener
 
-import me.arasple.mc.trchat.module.conf.BungeeChannelManager
-import me.arasple.mc.trchat.module.internal.BungeeProxyManager
+import me.arasple.mc.trchat.api.impl.BungeeChannelManager
+import me.arasple.mc.trchat.api.impl.BungeeProxyManager
 import me.arasple.mc.trchat.module.internal.TrChatBungee
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader

@@ -20,7 +20,7 @@ object ListenerTabComplete {
     @Ghost
     @SubscribeEvent
     fun onTab(e: PlayerCommandSendEvent) {
-        if (Settings.CONF.getBoolean("Options.Prevent-Tab-Complete", false)
+        if (Settings.conf.getBoolean("Options.Prevent-Tab-Complete", false)
             && !e.player.hasPermission("trchat.bypass.tabcomplete")) {
             e.commands.clear()
         }

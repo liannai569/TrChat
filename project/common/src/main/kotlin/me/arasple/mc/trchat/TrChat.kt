@@ -1,5 +1,7 @@
 package me.arasple.mc.trchat
 
+import me.arasple.mc.trchat.api.TrChatAPI
+
 /**
  * @author ItsFlicker
  * @since 2022/6/18 14:50

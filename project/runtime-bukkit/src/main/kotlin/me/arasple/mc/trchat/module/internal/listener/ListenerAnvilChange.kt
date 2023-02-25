@@ -4,7 +4,7 @@ import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.color.MessageColors
-import me.arasple.mc.trchat.util.color.colorify
+import me.arasple.mc.trchat.util.parseSimple
 import net.md_5.bungee.chat.ComponentSerializer
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.inventory.PrepareAnvilEvent
@@ -14,7 +14,6 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptPlayer
-import taboolib.module.chat.Components
 import taboolib.platform.util.isAir
 import taboolib.platform.util.modifyMeta
 
@@ -38,14 +37,12 @@ object ListenerAnvilChange {
             if (!hasDisplayName()) {
                 return@modifyMeta
             }
-            if (Filters.CONF.getBoolean("Enable.Anvil")) {
+            if (Filters.conf.getBoolean("Enable.Anvil")) {
                 setDisplayName(TrChat.api().getFilterManager().filter(displayName, player = adaptPlayer(p)).filtered)
             }
-            if (Settings.CONF.getBoolean("Color.Anvil")) {
+            if (Settings.conf.getBoolean("Color.Anvil")) {
                 if (p.hasPermission("trchat.color.simple")) {
-                    setDisplayNameComponent(ComponentSerializer.parse(Components.parseSimple(displayName).build {
-                        transform { it.colorify() }
-                    }.toRawMessage()))
+                    setDisplayNameComponent(ComponentSerializer.parse(displayName.parseSimple().toRawMessage()))
                 } else {
                     setDisplayName(MessageColors.replaceWithPermission(p, displayName, MessageColors.Type.ANVIL))
                 }

@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.conf
 
 import me.arasple.mc.trchat.api.event.TrChatReloadEvent
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.channel.PrivateChannel
@@ -16,7 +17,6 @@ import me.arasple.mc.trchat.module.display.format.obj.Style
 import me.arasple.mc.trchat.module.display.format.obj.Text
 import me.arasple.mc.trchat.module.display.function.CustomFunction
 import me.arasple.mc.trchat.module.display.function.Function
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.print
@@ -185,7 +185,7 @@ object Loader {
     }
 
     fun loadFunctions() {
-        val customs = Functions.CONF.getMap<String, ConfigurationSection>("Custom")
+        val customs = Functions.conf.getMap<String, ConfigurationSection>("Custom")
         val functions = customs.map { (id, map) ->
             val condition = map.getString("condition")?.toCondition()
             val priority = map.getInt("priority", 100)

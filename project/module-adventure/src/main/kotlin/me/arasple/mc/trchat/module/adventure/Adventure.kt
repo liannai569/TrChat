@@ -25,6 +25,10 @@ fun gson(component: Component) = (gsonSerializer as GsonComponentSerializer).ser
 
 fun gson(string: String) = (gsonSerializer as GsonComponentSerializer).deserialize(string)
 
+fun Component.toNative() = Components.parseRaw(gson(this))
+
+fun ComponentText.toAdventure() = gson(toRawMessage())
+
 fun Packet.getComponent(): ComponentText? {
     return when (name) {
         "ClientboundSystemChatPacket" -> {

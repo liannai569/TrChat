@@ -1,6 +1,7 @@
-package me.arasple.mc.trchat.module.conf
+package me.arasple.mc.trchat.api.impl
 
-import me.arasple.mc.trchat.ChannelManager
+import me.arasple.mc.trchat.api.ChannelManager
+import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.channel.Channel
 import taboolib.common.platform.*
 

@@ -1,9 +1,8 @@
 package me.arasple.mc.trchat.module.internal.script
 
-import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.internal.script.js.JavaScriptAgent
+import me.arasple.mc.trchat.module.internal.script.kether.KetherHandler
 import org.bukkit.entity.Player
-import taboolib.common.platform.function.adaptPlayer
 import taboolib.common5.Coerce
 
 /**
@@ -25,7 +24,7 @@ value class Condition(private val script: String) {
         fun eval(player: Player, script: String): Boolean {
             val (isJavaScript, js) = JavaScriptAgent.serialize(script)
             return if (isJavaScript) JavaScriptAgent.eval(player, js!!).thenApply { Coerce.toBoolean(it) }.get()
-            else TrChat.api().eval(adaptPlayer(player), script).thenApply { Coerce.toBoolean(it) }.get()
+            else KetherHandler.eval(script, player).thenApply { Coerce.toBoolean(it) }.get()
         }
     }
 }

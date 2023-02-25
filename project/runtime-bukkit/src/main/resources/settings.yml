@@ -3,7 +3,6 @@ Options:
   Log-Private: '[{0}] {1} -> {2}: {3}'
   Depend-Expansions: ['player', 'server']
   Prevent-Tab-Complete: false
-  ChatEvent-Hooks: ['AmazingBot', 'ChatBubbles', 'PlayMoreSounds', 'QuestCreator']
   # AUTO, NONE, BUNGEE, VELOCITY
   Proxy: AUTO
 
@@ -22,7 +21,7 @@ Database:
 
 Redis:
   enabled: false
-  channel: ''
+  channel: 'trchat-message'
   subscribe: []
   host: localhost
   port: 6379

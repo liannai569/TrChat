@@ -1,12 +1,12 @@
 package me.arasple.mc.trchat.util
 
+import me.arasple.mc.trchat.api.impl.BukkitComponentManager
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.display.ChatSession
-import me.arasple.mc.trchat.module.internal.BukkitComponentManager
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.command.main.CommandMute
 import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Condition
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer

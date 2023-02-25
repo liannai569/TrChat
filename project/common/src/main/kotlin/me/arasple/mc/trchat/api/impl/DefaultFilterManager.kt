@@ -1,7 +1,7 @@
-package me.arasple.mc.trchat.module.internal
+package me.arasple.mc.trchat.api.impl
 
 import com.google.gson.JsonObject
-import me.arasple.mc.trchat.FilterManager
+import me.arasple.mc.trchat.api.FilterManager
 import me.arasple.mc.trchat.module.internal.filter.processer.Filter
 import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
 import me.arasple.mc.trchat.module.internal.service.Metrics
@@ -17,7 +17,6 @@ import taboolib.common.platform.ProxyPlayer
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.decodeUnicode
-import taboolib.common5.mirrorNow
 import taboolib.module.lang.sendLang
 import java.io.BufferedInputStream
 import java.io.File
@@ -57,9 +56,9 @@ object DefaultFilterManager : FilterManager {
         Filter.setPunctuations(punctuations)
         Filter.setReplacement(replacement)
 
-        this.isCloudEnabled = isCloudEnabled
+        DefaultFilterManager.isCloudEnabled = isCloudEnabled
         cloud_url += cloudUrls
-        this.ignored_cloud_words += ignoredCloudWords
+        ignored_cloud_words += ignoredCloudWords
 
         notify?.sendLang("Plugin-Loaded-Filter-Local", localWords.size)
 
@@ -124,10 +123,8 @@ object DefaultFilterManager : FilterManager {
 
     override fun filter(string: String, player: ProxyPlayer?, execute: Boolean): FilteredObject {
         return if (execute && player?.hasPermission("trchat.bypass.filter") != true) {
-            mirrorNow("Handler:DoFilter") {
-                Filter.doFilter(string).also {
-                    Metrics.increase(1, it.sensitiveWords)
-                }
+            Filter.doFilter(string).also {
+                Metrics.increase(1, it.sensitiveWords)
             }
         } else {
             FilteredObject(string, 0)

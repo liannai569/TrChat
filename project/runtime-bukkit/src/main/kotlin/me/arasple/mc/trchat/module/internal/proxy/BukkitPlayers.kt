@@ -1,10 +1,7 @@
 package me.arasple.mc.trchat.module.internal.proxy
 
-import me.arasple.mc.trchat.module.display.function.standard.Mention
-import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.onlinePlayers
@@ -18,15 +15,6 @@ import taboolib.module.chat.uncolored
 object BukkitPlayers {
 
     private var players = listOf<String>()
-
-    fun getRegex(player: Player): Regex? {
-        val names = getPlayers()
-            .filter { (Mention.selfMention || it != player.name) && !PlayerData.vanishing.contains(it) }
-            .takeIf { it.isNotEmpty() }
-            ?.joinToString("|") { Regex.escape(it) }
-            ?: return null
-        return Regex("@? ?($names)", RegexOption.IGNORE_CASE)
-    }
 
     fun isPlayerOnline(target: String): Boolean {
         val player = Bukkit.getPlayerExact(target)

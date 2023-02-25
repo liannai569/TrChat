@@ -6,7 +6,6 @@ val taboolib_version: String by project
 
 dependencies {
     implementation(project(":project:common"))
-    implementation(project(":project:common-impl"))
     implementation(project(":project:module-adventure"))
     implementation(project(":project:module-nms"))
     implementation(project(":project:runtime-bukkit"))

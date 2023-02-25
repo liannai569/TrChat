@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
  */
 class HookItemsAdder : HookAbstract() {
 
-    fun replaceFontImages(player: Player, message: String): String {
+    fun replaceFontImages(message: String, player: Player?): String {
         return if (isHooked) {
             FontImageWrapper.replaceFontImages(player, message)
         } else {

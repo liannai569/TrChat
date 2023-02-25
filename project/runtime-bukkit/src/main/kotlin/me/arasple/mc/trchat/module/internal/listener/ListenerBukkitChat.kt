@@ -21,11 +21,11 @@ import taboolib.platform.util.sendLang
  * @date 2019/11/30 12:10
  */
 @PlatformSide([Platform.BUKKIT])
-object ListenerChat {
+object ListenerBukkitChat {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onChat(e: AsyncPlayerChatEvent) {
-        e.isCancelled = true
+        e.recipients.clear()
         val player = e.player
         val session = player.session
 
@@ -35,20 +35,6 @@ object ListenerChat {
         if (!checkLimits(player, e.message)) {
             return
         }
-
-        e.handlers.registeredListeners
-            .filter {
-//                it.plugin.isEnabled
-//                    && (it.priority == org.bukkit.event.EventPriority.MONITOR
-//                    && it.isIgnoringCancelled) || hooks.contains(it.plugin.name)
-                it.plugin.name in Settings.CONF.getStringList("Options.ChatEvent-Hooks")
-            }.forEach {
-                try {
-                    it.callEvent(AsyncPlayerChatEvent(e.isAsynchronous, e.player, e.message, e.recipients))
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-            }
 
         Channel.channels.values.forEach { channel ->
             channel.bindings.prefix?.forEach {

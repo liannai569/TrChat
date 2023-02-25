@@ -1,7 +1,7 @@
 package me.arasple.mc.trchat.module.internal.listener
 
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.display.channel.Channel
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.service.Updater
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.passPermission
@@ -21,7 +21,7 @@ import taboolib.platform.util.sendLang
 @PlatformSide([Platform.BUKKIT])
 object ListenerJoin {
 
-    @SubscribeEvent(EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
 

@@ -29,7 +29,7 @@ object RedisManager {
         private set
 
     @ConfigNode("Redis.channel", "settings.yml")
-    var channel = ""
+    var channel = "trchat-message"
         private set
 
     @ConfigNode("Redis.subscribe", "settings.yml")
@@ -41,7 +41,7 @@ object RedisManager {
         }
         if (connector == null) {
             connector = AlkaidRedis.create().apply {
-                fromConfig(Settings.CONF.getConfigurationSection("Redis")!!)
+                fromConfig(Settings.conf.getConfigurationSection("Redis")!!)
             }
             console().sendLang("Plugin-Proxy-Supported", "Redis")
         }

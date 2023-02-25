@@ -1,7 +1,9 @@
 package me.arasple.mc.trchat.module.display.channel
 
 import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.api.IChannel
 import me.arasple.mc.trchat.api.event.TrChatEvent
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
@@ -9,7 +11,6 @@ import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.channel.obj.Range
 import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import me.arasple.mc.trchat.module.internal.redis.TrRedisMessage
 import me.arasple.mc.trchat.module.internal.service.Metrics
@@ -40,11 +41,15 @@ open class Channel(
     val formats: List<Format>,
     val console: Format? = null,
     val listeners: MutableSet<String> = mutableSetOf()
-) {
+) : IChannel {
 
     init {
+        init()
+    }
+
+    override fun init() {
         if (settings.autoJoin) {
-           onlinePlayers.forEach {
+            onlinePlayers.forEach {
                 if (it.passPermission(settings.joinPermission)) {
                     listeners.add(it.name)
                 }
@@ -54,10 +59,6 @@ open class Channel(
                 join(it, id, hint = false)
             }
         }
-        initCommand()
-    }
-
-    private fun initCommand() {
         if (bindings.command.isNullOrEmpty()) {
             return
         }
@@ -82,6 +83,11 @@ open class Channel(
                 sender.sendLang("Command-Not-Player")
             }
         }
+    }
+
+    override fun unregister() {
+        bindings.command?.forEach { unregisterCommand(it) }
+        listeners.clear()
     }
 
     open fun execute(sender: CommandSender, message: String) {
@@ -139,7 +145,7 @@ open class Channel(
         if (!event.call()) {
             return null
         }
-        val msg = events.process(player, event.message) ?: return null
+        val msg = events.process(player, event.message)?.replace("{{", "\\{{") ?: return null
 
         val component = Components.empty()
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
@@ -221,11 +227,6 @@ open class Channel(
         }
         console().cast<CommandSender>().sendComponent(player, component)
         return component to null
-    }
-
-    open fun unregister() {
-        bindings.command?.forEach { unregisterCommand(it) }
-        listeners.clear()
     }
 
     companion object {

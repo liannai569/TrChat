@@ -18,7 +18,7 @@ object Vars {
 
     fun checkExpansions(sender: CommandSender): Boolean {
         val registered = PlaceholderAPI.getRegisteredIdentifiers()
-        val depends = Settings.CONF.getStringList("Options.Depend-Expansions") - "multiverse"
+        val depends = Settings.conf.getStringList("Options.Depend-Expansions") - "multiverse"
         val uninstalled = depends.filter { ex -> registered.none { it.equals(ex, true) } }.toTypedArray()
         return if (uninstalled.isEmpty()) {
             true

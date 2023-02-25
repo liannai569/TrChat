@@ -38,7 +38,7 @@ object ImageShow : Function("IMAGE") {
     override val alias = "Image-Show"
 
     override val reaction by resettableLazy("functions") {
-        Functions.CONF["General.Image-Show.Action"]?.let { Reaction(it.asList()) }
+        Functions.conf["General.Image-Show.Action"]?.let { Reaction(it.asList()) }
     }
 
     @ConfigNode("General.Image-Show.Enabled", "function.yml")
@@ -68,13 +68,11 @@ object ImageShow : Function("IMAGE") {
     }
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        return mirrorParse {
-            val args = arg.split(";", limit = 2)
-            val description = args[0]
-            val url = args[1].decodeBase64().decodeToString()
-            computeAndCache(url)
-            sender.getComponentFromLang("Function-Image-Show-Format", description, args[1])
-        }
+        val args = arg.split(";", limit = 2)
+        val description = args[0]
+        val url = args[1].decodeBase64().decodeToString()
+        computeAndCache(url)
+        return sender.getComponentFromLang("Function-Image-Show-Format", description, args[1])
     }
 
     override fun canUse(sender: Player): Boolean {

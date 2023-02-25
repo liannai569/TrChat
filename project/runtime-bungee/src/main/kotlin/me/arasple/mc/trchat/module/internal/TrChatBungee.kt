@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.internal
 
-import me.arasple.mc.trchat.module.conf.BungeeChannelManager
+import me.arasple.mc.trchat.api.impl.BungeeChannelManager
+import me.arasple.mc.trchat.api.impl.BungeeProxyManager
 import net.md_5.bungee.api.ProxyServer
 import taboolib.common.platform.*
 import taboolib.common.platform.command.command

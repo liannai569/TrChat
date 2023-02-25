@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.display.function.standard
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import me.arasple.mc.trchat.module.adventure.toNative
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.display.function.StandardFunction
@@ -40,7 +41,7 @@ object ItemShow : Function("ITEM") {
     override val alias = "Item-Show"
 
     override val reaction by resettableLazy("functions") {
-        Functions.CONF["General.Item-Show.Action"]?.let { Reaction(it.asList()) }
+        Functions.conf["General.Item-Show.Action"]?.let { Reaction(it.asList()) }
     }
 
     @ConfigNode("General.Item-Show.Enabled", "function.yml")
@@ -82,29 +83,27 @@ object ItemShow : Function("ITEM") {
     }
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        return mirrorParse {
-            val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).let {
-                if (compatible) {
-                    buildItem(it) { material = Material.STONE }
-                } else {
-                    var newItem = it.clone()
-                    HookPlugin.registry.filterIsInstance(HookDisplayItem::class.java).forEach { element ->
-                        newItem = element.displayItem(newItem, sender)
-                    }
-                    newItem
+        val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).let {
+            if (compatible) {
+                buildItem(it) { material = Material.STONE }
+            } else {
+                var newItem = it.clone()
+                HookPlugin.registry.filterIsInstance(HookDisplayItem::class.java).forEach { element ->
+                    newItem = element.displayItem(newItem, sender)
                 }
+                newItem
             }
-            cache.get(item) {
-                sender
-                    .getComponentFromLang("Function-Item-Show-Format-New", item.amount) { type, i, part, proxySender ->
-                        val component = if (part.isVariable && part.text == "item") {
-                            item.getNameComponent(sender)
-                        } else {
-                            Components.text(part.text.translate(proxySender).replaceWithOrder(item.amount))
-                        }
-                        component.applyStyle(type, part, i, proxySender, item.amount).hoverItemFixed(item)
+        }
+        return cache.get(item) {
+            sender
+                .getComponentFromLang("Function-Item-Show-Format-New", item.amount) { type, i, part, proxySender ->
+                    val component = if (part.isVariable && part.text == "item") {
+                        item.getNameComponent(sender)
+                    } else {
+                        Components.text(part.text.translate(proxySender).replaceWithOrder(item.amount))
                     }
-            }
+                    component.applyStyle(type, part, i, proxySender, item.amount).hoverItemFixed(item)
+                }
         }
     }
 
@@ -135,9 +134,13 @@ object ItemShow : Function("ITEM") {
             }
         } else {
             try {
-                Components.empty().append(DefaultComponent(itemMeta!!.displayNameComponent.toList()))
+                Components.empty().append(itemMeta!!.displayName()!!.toNative())
             } catch (_: Throwable) {
-                Components.text(itemMeta!!.displayName)
+                try {
+                    Components.empty().append(DefaultComponent(itemMeta!!.displayNameComponent.toList()))
+                } catch (_: Throwable) {
+                    Components.text(itemMeta!!.displayName)
+                }
             }
         }
     }

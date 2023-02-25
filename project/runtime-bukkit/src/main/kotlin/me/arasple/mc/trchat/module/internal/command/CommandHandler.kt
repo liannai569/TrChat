@@ -1,6 +1,5 @@
 package me.arasple.mc.trchat.module.internal.command
 
-import me.arasple.mc.trchat.module.display.menu.MenuControlPanel
 import me.arasple.mc.trchat.module.display.menu.MenuFilterControl
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.command.sub.CommandColor
@@ -14,8 +13,6 @@ import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
-import taboolib.common.platform.function.submitAsync
-import taboolib.common5.Mirror
 import taboolib.expansion.createHelper
 import taboolib.module.lang.sendLang
 import taboolib.platform.util.sendLang
@@ -38,30 +35,10 @@ object CommandHandler {
         }
     }
 
-    @CommandBody(permission = "trchat.command.controlpanel", optional = true)
-    val controlPanel = subCommand {
-        execute<Player> { sender, _, _ ->
-            MenuControlPanel.displayFor(sender)
-        }
-    }
-
     @CommandBody(permission = "trchat.command.chatfilter", optional = true)
     val chatFilter = subCommand {
         execute { sender, _, _ ->
             MenuFilterControl.displayFor(sender)
-        }
-    }
-
-    @CommandBody(permission = "trchat.command.mirror", optional = true)
-    val mirror = subCommand {
-        execute<ProxyCommandSender> { sender, _, _ ->
-            submitAsync {
-                sender.sendMessage("\n§b§lTrChat §a§l§nPerformance Mirror\n§r")
-                Mirror.report(sender) {
-                    childFormat = "§8  {0}§7{1} §2[{3} ms] §7{4}%"
-                    parentFormat = "§8  §8{0}§7{1} §8[{3} ms] §7{4}%"
-                }
-            }
         }
     }
 

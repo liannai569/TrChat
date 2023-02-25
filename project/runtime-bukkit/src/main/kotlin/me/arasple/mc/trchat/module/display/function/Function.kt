@@ -11,7 +11,6 @@ import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.severe
 import taboolib.common.util.VariableReader
 import taboolib.common.util.replaceWithOrder
-import taboolib.common5.mirrorNow
 import taboolib.module.chat.ComponentText
 import taboolib.module.chat.Components
 import taboolib.module.lang.*
@@ -29,10 +28,6 @@ abstract class Function(val id: String) {
     abstract fun canUse(sender: Player): Boolean
 
     abstract fun checkCooldown(sender: Player, message: String): Boolean
-
-    protected open fun <T> mirrorParse(func: () -> T): T {
-        return mirrorNow("Function:$alias:ParseVariable", func)
-    }
 
     companion object {
 

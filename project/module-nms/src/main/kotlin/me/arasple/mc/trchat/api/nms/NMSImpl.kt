@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.api.nms
 
 import me.arasple.mc.trchat.util.reportOnce
+import net.minecraft.network.protocol.game.ClientboundCustomChatCompletionsPacket
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.server.v1_12_R1.*
 import org.bukkit.entity.Player
@@ -108,5 +109,21 @@ class NMSImpl : NMS() {
             t.reportOnce("Got an error optimizing item nbt")
         }
         return itemStack
+    }
+
+    override fun addCustomChatCompletions(player: Player, entries: List<String>) {
+        if (majorLegacy < 11901) return
+        player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
+            ClientboundCustomChatCompletionsPacket.a.ADD,
+            entries
+        ))
+    }
+
+    override fun removeCustomChatCompletions(player: Player, entries: List<String>) {
+        if (majorLegacy < 11901) return
+        player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
+            ClientboundCustomChatCompletionsPacket.a.REMOVE,
+            entries
+        ))
     }
 }

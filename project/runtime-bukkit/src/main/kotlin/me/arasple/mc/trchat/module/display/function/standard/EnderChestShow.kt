@@ -2,10 +2,10 @@ package me.arasple.mc.trchat.module.display.function.standard
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.display.function.StandardFunction
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.CooldownType
 import me.arasple.mc.trchat.util.getCooldownLeft
@@ -41,7 +41,7 @@ object EnderChestShow : Function("ENDERCHEST") {
     override val alias = "EnderChest-Show"
 
     override val reaction by resettableLazy("functions") {
-        Functions.CONF["General.EnderChest-Show.Action"]?.let { Reaction(it.asList()) }
+        Functions.conf["General.EnderChest-Show.Action"]?.let { Reaction(it.asList()) }
     }
 
     @ConfigNode("General.EnderChest-Show.Enabled", "function.yml")
@@ -76,20 +76,18 @@ object EnderChestShow : Function("ENDERCHEST") {
     }
 
     override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        return mirrorParse {
-            computeAndCache(sender).let {
-                if (forward) {
-                    BukkitProxyManager.sendTrChatMessage(
-                        sender,
-                        "EnderChestShow",
-                        MinecraftVersion.minecraftVersion,
-                        sender.name,
-                        it.first,
-                        it.second
-                    )
-                }
-                sender.getComponentFromLang("Function-EnderChest-Show-Format", sender.name, it.first)
+        return computeAndCache(sender).let {
+            if (forward) {
+                BukkitProxyManager.sendTrChatMessage(
+                    sender,
+                    "EnderChestShow",
+                    MinecraftVersion.minecraftVersion,
+                    sender.name,
+                    it.first,
+                    it.second
+                )
             }
+            sender.getComponentFromLang("Function-EnderChest-Show-Format", sender.name, it.first)
         }
     }
 

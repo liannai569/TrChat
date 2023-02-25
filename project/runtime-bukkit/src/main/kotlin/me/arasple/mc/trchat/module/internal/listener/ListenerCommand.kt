@@ -24,7 +24,7 @@ object ListenerCommand {
         val player = e.player
         var cmd = e.message.removePrefix("/").trimIndent()
 
-        if (!Functions.CONF.getBoolean("General.Command-Controller.Enable", true) || cmd.isEmpty()) {
+        if (!Functions.conf.getBoolean("General.Command-Controller.Enable", true) || cmd.isEmpty()) {
             return
         }
         val command = cmd.split(" ")

@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.internal
 
-import me.arasple.mc.trchat.module.conf.VelocityChannelManager
+import me.arasple.mc.trchat.api.impl.VelocityChannelManager
+import me.arasple.mc.trchat.api.impl.VelocityProxyManager
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Plugin

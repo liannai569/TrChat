@@ -10,7 +10,7 @@ val kotlinVersionNum: String
 
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.7.21"
+    id("org.jetbrains.kotlin.jvm") version "1.8.10"
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
 

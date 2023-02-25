@@ -14,7 +14,9 @@ import taboolib.module.nms.PacketSendEvent
 @PlatformSide([Platform.BUKKIT])
 object ListenerPackets {
 
-    /* 去除登录时右上角提示 */
+    /**
+     * 去除登录时右上角提示
+     */
     @SubscribeEvent
     fun secure(e: PacketSendEvent) {
         if (majorLegacy >= 11902) {
@@ -25,6 +27,9 @@ object ListenerPackets {
         }
     }
 
+    /**
+     * 记录玩家收到的消息
+     */
     @SubscribeEvent
     fun recall(e: PacketSendEvent) {
         val session = e.player.session

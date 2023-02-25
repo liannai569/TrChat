@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.display.channel
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.event.TrChatEvent
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelBindings
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelEvents
 import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
@@ -10,7 +11,6 @@ import me.arasple.mc.trchat.module.internal.command.main.CommandReply
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
-import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyManager
 import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import me.arasple.mc.trchat.module.internal.redis.TrRedisMessage
 import me.arasple.mc.trchat.module.internal.service.Metrics
@@ -40,22 +40,17 @@ class PrivateChannel(
 ) : Channel(id, settings, bindings, events, emptyList()) {
 
     init {
+        init()
+    }
+
+    override fun init() {
         onlinePlayers.filter { it.session.channel == id }.forEach {
             join(it, id, hint = false)
         }
-        initCommand()
-    }
-
-    private fun initCommand() {
         if (bindings.command.isNullOrEmpty()) {
             return
         }
-        command(
-            bindings.command[0],
-            subList(bindings.command, 1),
-            "Channel $id command",
-            permission = settings.joinPermission
-        ) {
+        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission) {
             execute<Player> { sender, _, _ ->
                 if (sender.session.channel == this@PrivateChannel.id) {
                     quit(sender)
@@ -104,7 +99,7 @@ class PrivateChannel(
         if (!event.call()) {
             return null
         }
-        val msg = events.process(player, event.message) ?: return null
+        val msg = events.process(player, event.message)?.replace("{{", "\\{{") ?: return null
 
         val send = Components.empty()
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->

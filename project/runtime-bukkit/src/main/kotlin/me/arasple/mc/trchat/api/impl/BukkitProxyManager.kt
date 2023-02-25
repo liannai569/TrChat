@@ -1,8 +1,9 @@
-package me.arasple.mc.trchat.module.internal.proxy
+package me.arasple.mc.trchat.api.impl
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import me.arasple.mc.trchat.ProxyManager
+import me.arasple.mc.trchat.api.ProxyManager
 import me.arasple.mc.trchat.module.conf.file.Settings
+import me.arasple.mc.trchat.module.internal.proxy.BukkitProxyProcessor
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageRecipient
@@ -35,6 +36,29 @@ object BukkitProxyManager : ProxyManager {
         Executors.newFixedThreadPool(2, factory)
     }
 
+    val platform: Platform by unsafeLazy {
+        val force = kotlin.runCatching {
+            Platform.valueOf(Settings.conf.getString("Options.Proxy")?.uppercase() ?: "AUTO")
+        }
+        if (force.isSuccess) {
+            force.getOrThrow()
+        } else {
+            if (SpigotConfig.bungee) {
+                console().sendLang("Plugin-Proxy-Supported", "Bungee")
+                Platform.BUNGEE
+            } else if (kotlin.runCatching {
+                    Bukkit.spigot().paperConfig.getBoolean("proxies.velocity.enabled", false) ||
+                            Bukkit.spigot().paperConfig.getBoolean("settings.velocity-support.enabled", false)
+                }.getOrDefault(false)) {
+                console().sendLang("Plugin-Proxy-Supported", "Velocity")
+                Platform.VELOCITY
+            } else {
+                console().sendLang("Plugin-Proxy-None")
+                Platform.UNKNOWN
+            }
+        }
+    }
+
     val processor by unsafeLazy {
         executor
         when (platform) {
@@ -45,29 +69,6 @@ object BukkitProxyManager : ProxyManager {
                 BukkitProxyProcessor.VelocitySide()
             }
             else -> null
-        }
-    }
-
-    val platform: Platform by unsafeLazy {
-        val force = kotlin.runCatching {
-            Platform.valueOf(Settings.CONF.getString("Options.Proxy")?.uppercase() ?: "AUTO")
-        }
-        if (force.isSuccess) {
-            force.getOrThrow()
-        } else {
-            if (SpigotConfig.bungee) {
-                console().sendLang("Plugin-Proxy-Supported", "Bungee")
-                Platform.BUNGEE
-            } else if (kotlin.runCatching {
-                    Bukkit.spigot().paperConfig.getBoolean("proxies.velocity.enabled", false) ||
-                    Bukkit.spigot().paperConfig.getBoolean("settings.velocity-support.enabled", false)
-            }.getOrDefault(false)) {
-                console().sendLang("Plugin-Proxy-Supported", "Velocity")
-                Platform.VELOCITY
-            } else {
-                console().sendLang("Plugin-Proxy-None")
-                Platform.UNKNOWN
-            }
         }
     }
 

@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat
+package me.arasple.mc.trchat.api
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future

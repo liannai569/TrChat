@@ -19,7 +19,7 @@ import taboolib.platform.util.onlinePlayers
 object Databases {
 
     val database by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        when (val type = Settings.CONF.getString("Database.Method")?.uppercase()) {
+        when (val type = Settings.conf.getString("Database.Method")?.uppercase()) {
             "LOCAL", "SQLITE", null -> DatabaseSQLite()
             "SQL", "MYSQL" -> DatabaseSQL()
             else -> {

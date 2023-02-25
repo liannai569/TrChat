@@ -23,12 +23,12 @@ import java.util.concurrent.TimeUnit
 object Functions {
 
     @Config("function.yml", autoReload = true)
-    lateinit var CONF: Configuration
+    lateinit var conf: Configuration
         private set
 
     @Awake(LifeCycle.LOAD)
     fun init() {
-        CONF.onReload {
+        conf.onReload {
             Loader.loadFunctions()
             ResettableLazy.reset("functions")
         }

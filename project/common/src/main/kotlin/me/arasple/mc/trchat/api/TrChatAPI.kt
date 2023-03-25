@@ -14,4 +14,8 @@ interface TrChatAPI {
 
     fun getFilterManager(): FilterManager
 
+    fun getClientMessageManager(): ClientMessageManager
+
+    fun getProxyMessageManager(): ProxyMessageManager
+
 }

@@ -164,7 +164,7 @@ open class Channel(
         }
 
         player.session.lastMessage = msg
-        ChatLogs.log(player, msg)
+        ChatLogs.logNormal(player.name, msg)
         Metrics.increase(0)
 
         // TODO: 跨服事件传递

@@ -19,12 +19,6 @@ object Settings {
     lateinit var conf: Configuration
         private set
 
-    @ConfigNode("Options.Log-Normal", "settings.yml")
-    var logNormal = "[{0}] {1}: {2}"
-
-    @ConfigNode("Options.Log-Private", "settings.yml")
-    var logPrivate = "[{0}] {1} -> {2}: {3}"
-
     @ConfigNode("Channel.Default", "settings.yml")
     var defaultChannel = "Normal"
 

@@ -24,4 +24,8 @@ object DefaultTrChatAPI : TrChatAPI {
 
     override fun getFilterManager() = PlatformFactory.getAPI<FilterManager>()
 
+    override fun getClientMessageManager() = PlatformFactory.getAPI<ClientMessageManager>()
+
+    override fun getProxyMessageManager() = PlatformFactory.getAPI<ProxyMessageManager>()
+
 }

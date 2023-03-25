@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.internal.data
 
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.print
-import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.io.newFile
 import taboolib.common.platform.Awake
@@ -11,6 +10,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.util.replaceWithOrder
+import taboolib.module.configuration.ConfigNode
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
@@ -25,6 +25,12 @@ object ChatLogs {
     private val waveList = mutableListOf<String>()
     private val dateFormat0 = SimpleDateFormat("yyyy-MM-dd")
     private val dateFormat1 = SimpleDateFormat("HH:mm:ss")
+
+    @ConfigNode("Options.Log-Normal", "settings.yml")
+    var logNormal = "[{0}] {1}: {2}"
+
+    @ConfigNode("Options.Log-Private", "settings.yml")
+    var logPrivate = "[{0}] {1} -> {2}: {3}"
 
     @Schedule(delay = (20 * 15).toLong(), period = (20 * 60 * 5).toLong(), async = true)
     @Awake(LifeCycle.DISABLE)
@@ -56,24 +62,15 @@ object ChatLogs {
         }
     }
 
-    fun log(player: Player, originalMessage: String) {
+    fun logNormal(from: String, message: String) {
         waveList.add(
-            Settings.logNormal.replaceWithOrder(
-                dateFormat1.format(System.currentTimeMillis()),
-                player.name,
-                originalMessage
-            )
+            logNormal.replaceWithOrder(dateFormat1.format(System.currentTimeMillis()), from, message)
         )
     }
 
-    fun logPrivate(from: String, to: String, originalMessage: String) {
+    fun logPrivate(from: String, to: String, message: String) {
         waveList.add(
-            Settings.logPrivate.replaceWithOrder(
-                dateFormat1.format(System.currentTimeMillis()),
-                from,
-                to,
-                originalMessage
-            )
+            logPrivate.replaceWithOrder(dateFormat1.format(System.currentTimeMillis()), from, to, message)
         )
     }
 }

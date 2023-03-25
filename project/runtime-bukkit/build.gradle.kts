@@ -29,7 +29,6 @@ taboolib {
             name("PlaceholderAPI").with("bukkit")
             name("EcoEnchants").with("bukkit").optional(true)
             name("ItemsAdder").with("bukkit").optional(true)
-            name("InteractiveChat").with("bukkit").optional(true)
             name("Nova").with("bukkit").optional(true)
             name("Multiverse-Core").loadafter(true)
         }

@@ -38,7 +38,7 @@ fun ItemStack.optimizeShulkerBox(): ItemStack {
         val contents = shulkerBox.inventory.contents
         val contentsClone = contents.mapNotNull {
             if (it.isNotAir()) {
-                ItemStack(Material.STONE, it!!.amount, it.durability).modifyMeta<ItemMeta> {
+                ItemStack(Material.STONE, it.amount, it.durability).modifyMeta<ItemMeta> {
                     if (it.itemMeta?.hasDisplayName() == true) {
                         setDisplayName(it.itemMeta!!.displayName)
                     } else {

@@ -125,6 +125,6 @@ object EnderChestShow : Function("ENDERCHEST") {
         return sha1 to menu.serializeToByteArray().encodeBase64()
     }
 
-    private fun ItemStack?.replaceAir() = if (isAir()) AIR_ITEM else this!!
+    private fun ItemStack?.replaceAir() = if (isAir()) AIR_ITEM else this
 
 }

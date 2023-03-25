@@ -33,7 +33,7 @@ object ListenerAnvilChange {
         if (e.inventory.type != InventoryType.ANVIL || result.isAir()) {
             return
         }
-        result!!.modifyMeta<ItemMeta> {
+        result.modifyMeta<ItemMeta> {
             if (!hasDisplayName()) {
                 return@modifyMeta
             }

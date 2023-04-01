@@ -114,7 +114,7 @@ class NMSImpl : NMS() {
     override fun addCustomChatCompletions(player: Player, entries: List<String>) {
         if (majorLegacy < 11901) return
         player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
-            ClientboundCustomChatCompletionsPacket.a.ADD,
+            ClientboundCustomChatCompletionsPacket.Action.ADD,
             entries
         ))
     }
@@ -122,7 +122,7 @@ class NMSImpl : NMS() {
     override fun removeCustomChatCompletions(player: Player, entries: List<String>) {
         if (majorLegacy < 11901) return
         player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
-            ClientboundCustomChatCompletionsPacket.a.REMOVE,
+            ClientboundCustomChatCompletionsPacket.Action.REMOVE,
             entries
         ))
     }

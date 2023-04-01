@@ -25,6 +25,7 @@ object ListenerBukkitChat {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onChat(e: AsyncPlayerChatEvent) {
+        if (e.isCancelled) return
         e.recipients.clear()
         val player = e.player
         val session = player.session

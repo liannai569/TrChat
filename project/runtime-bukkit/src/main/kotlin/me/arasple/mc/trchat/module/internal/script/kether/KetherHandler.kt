@@ -5,7 +5,7 @@ import taboolib.common.platform.function.adaptCommandSender
 import taboolib.library.kether.LocalizedException
 import taboolib.module.kether.KetherFunction
 import taboolib.module.kether.KetherShell
-import taboolib.module.kether.KetherTransfer
+import taboolib.module.kether.ScriptOptions
 import java.util.concurrent.CompletableFuture
 
 object KetherHandler {
@@ -16,9 +16,11 @@ object KetherHandler {
         return try {
             KetherShell.eval(
                 source,
-                namespace = namespace,
-                sender = adaptCommandSender(sender),
-                vars = KetherShell.VariableMap(vars)
+                ScriptOptions.new {
+                    namespace(namespace)
+                    sender(adaptCommandSender(sender))
+                    vars(vars)
+                }
             )
         } catch (e: LocalizedException) {
             println("§c[TrChat] §8Unexpected exception while parsing kether script:")
@@ -38,10 +40,11 @@ object KetherHandler {
             try {
                 return KetherFunction.parse(
                     source,
-                    namespace = namespace,
-                    cache = KetherTransfer.cacheMap,
-                    sender = adaptCommandSender(sender),
-                    vars = KetherShell.VariableMap(vars)
+                    ScriptOptions.new {
+                        namespace(namespace)
+                        sender(adaptCommandSender(sender))
+                        vars(vars)
+                    }
                 )
             } catch (e: LocalizedException) {
                 println("§c[TrChat] §8Unexpected exception while parsing kether script:")

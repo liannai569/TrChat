@@ -18,14 +18,6 @@ taboolib {
             name("ItsFlicker").description("Maintainer")
         }
     }
-    install(
-        "common",
-        "common-5",
-        "module-chat",
-        "module-configuration",
-        "module-lang",
-        "platform-velocity"
-    )
     install("common", "platform-velocity")
     options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null

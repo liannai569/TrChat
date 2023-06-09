@@ -7,7 +7,7 @@ import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.parseJson
 import me.arasple.mc.trchat.util.reportOnce
-import taboolib.common.env.DependencyDownloader
+import taboolib.common.env.IO
 import taboolib.common.io.digest
 import taboolib.common.io.newFile
 import taboolib.common.platform.Awake
@@ -94,7 +94,7 @@ object DefaultFilterManager : FilterManager {
         return kotlin.runCatching {
             URL(url).openConnection().also { it.connectTimeout = 60 * 1000 }.getInputStream().use { inputStream ->
                 BufferedInputStream(inputStream).use { bufferedInputStream ->
-                    val origin = DependencyDownloader.readFully(bufferedInputStream, StandardCharsets.UTF_8)
+                    val origin = IO.readFully(bufferedInputStream, StandardCharsets.UTF_8)
                     val database = origin.parseJson().asJsonObject
                     require(database.has("lastUpdateDate") && database.has("words")) {
                         "Wrong database json object"

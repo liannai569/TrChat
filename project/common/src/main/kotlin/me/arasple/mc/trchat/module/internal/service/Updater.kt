@@ -2,7 +2,7 @@ package me.arasple.mc.trchat.module.internal.service
 
 import me.arasple.mc.trchat.util.parseJson
 import taboolib.common.LifeCycle
-import taboolib.common.env.DependencyDownloader.readFully
+import taboolib.common.env.IO
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.SkipTo
 import taboolib.common.platform.function.console
@@ -36,7 +36,7 @@ object Updater {
         kotlin.runCatching {
             URL(api_url).openStream().use { inputStream ->
                 BufferedInputStream(inputStream).use { bufferedInputStream ->
-                    val read = readFully(bufferedInputStream, StandardCharsets.UTF_8)
+                    val read = IO.readFully(bufferedInputStream, StandardCharsets.UTF_8)
                     val json = read.parseJson().asJsonObject
                     val latestVersion = json["tag_name"].asString.substring(1)
                     latest_Version = Version(latestVersion)

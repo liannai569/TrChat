@@ -5,6 +5,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import me.arasple.mc.trchat.util.proxy.common.MessageBuilder
 import taboolib.common.platform.function.console
+import taboolib.common.util.asList
+import taboolib.library.configuration.Converter
 import java.util.*
 
 /**
@@ -14,7 +16,6 @@ import java.util.*
  * @author ItsFlicker
  * @since 2021/9/12 18:11
  */
-@Suppress("Deprecation")
 private val jsonParser = JsonParser()
 private val reportedErrors = mutableListOf<String>()
 val nilUUID = UUID(0, 0)
@@ -45,7 +46,6 @@ fun Throwable.reportOnce(title: String, printStackTrace: Boolean = true) {
     }
 }
 
-@Suppress("Deprecation")
 fun String.parseJson(): JsonElement = jsonParser.parse(this)!!
 
 fun buildMessage(vararg messages: String): List<ByteArray> {
@@ -55,3 +55,13 @@ fun buildMessage(vararg messages: String): List<ByteArray> {
 fun String.toUUID(): UUID = FastUUID.parseUUID(this)
 
 fun UUID.parseString(): String = FastUUID.toString(this)
+
+class ArrayLikeConverter : Converter<Array<String>, Any> {
+    override fun convertToField(value: Any): Array<String> {
+        return value.asList().toTypedArray()
+    }
+
+    override fun convertFromField(value: Array<String>): Any {
+        return if (value.size == 1) value[0] else value.toList()
+    }
+}

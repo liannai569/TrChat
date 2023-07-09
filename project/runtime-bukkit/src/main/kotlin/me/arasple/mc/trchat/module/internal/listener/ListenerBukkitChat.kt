@@ -5,7 +5,6 @@ package me.arasple.mc.trchat.module.internal.listener
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.Function
-import me.arasple.mc.trchat.module.display.function.standard.*
 import me.arasple.mc.trchat.util.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -40,13 +39,13 @@ object ListenerBukkitChat {
         Channel.channels.values.forEach { channel ->
             channel.bindings.prefix?.forEach {
                 if (e.message.startsWith(it, ignoreCase = true)) {
-                    channel.execute(player, e.message.substring(it.length))
+                    channel.execute(player, e.message.substring(it.length), false)
                     return
                 }
             }
         }
 
-        session.getChannel()?.execute(player, e.message)
+        session.getChannel()?.execute(player, e.message, false)
     }
 
     private fun checkLimits(player: Player, message: String): Boolean {

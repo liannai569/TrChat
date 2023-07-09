@@ -2,12 +2,12 @@ package me.arasple.mc.trchat.api.impl
 
 import com.google.gson.JsonObject
 import me.arasple.mc.trchat.api.FilterManager
-import me.arasple.mc.trchat.module.internal.filter.processer.Filter
-import me.arasple.mc.trchat.module.internal.filter.processer.FilteredObject
+import me.arasple.mc.trchat.module.internal.filter.Filter
+import me.arasple.mc.trchat.module.internal.filter.FilteredObject
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.parseJson
 import me.arasple.mc.trchat.util.reportOnce
-import taboolib.common.env.DependencyDownloader
+import taboolib.common.env.IO
 import taboolib.common.io.digest
 import taboolib.common.io.newFile
 import taboolib.common.platform.Awake
@@ -90,11 +90,21 @@ object DefaultFilterManager : FilterManager {
         }
     }
 
+    override fun filter(string: String, player: ProxyPlayer?, execute: Boolean): FilteredObject {
+        return if (execute && player?.hasPermission("trchat.bypass.filter") != true) {
+            Filter.doFilter(string).also {
+                Metrics.increase(1, it.sensitiveWords)
+            }
+        } else {
+            FilteredObject(string, 0)
+        }
+    }
+
     private fun catchCloudThesaurus(url: String, notify: ProxyCommandSender?): List<String> {
         return kotlin.runCatching {
-            URL(url).openConnection().also { it.connectTimeout = 60 * 1000 }.getInputStream().use { inputStream ->
+            URL(url).openConnection().also { it.connectTimeout = 30 * 1000; it.readTimeout = 30 * 1000 }.getInputStream().use { inputStream ->
                 BufferedInputStream(inputStream).use { bufferedInputStream ->
-                    val origin = DependencyDownloader.readFully(bufferedInputStream, StandardCharsets.UTF_8)
+                    val origin = IO.readFully(bufferedInputStream, StandardCharsets.UTF_8)
                     val database = origin.parseJson().asJsonObject
                     require(database.has("lastUpdateDate") && database.has("words")) {
                         "Wrong database json object"
@@ -118,16 +128,6 @@ object DefaultFilterManager : FilterManager {
                 t.reportOnce("Failed to catch cloud thesaurus of $url.", printStackTrace = false)
                 emptyList()
             }
-        }
-    }
-
-    override fun filter(string: String, player: ProxyPlayer?, execute: Boolean): FilteredObject {
-        return if (execute && player?.hasPermission("trchat.bypass.filter") != true) {
-            Filter.doFilter(string).also {
-                Metrics.increase(1, it.sensitiveWords)
-            }
-        } else {
-            FilteredObject(string, 0)
         }
     }
 

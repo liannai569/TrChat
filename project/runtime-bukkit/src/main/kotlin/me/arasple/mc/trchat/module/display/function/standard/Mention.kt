@@ -1,12 +1,15 @@
 package me.arasple.mc.trchat.module.display.function.standard
 
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.display.function.StandardFunction
 import me.arasple.mc.trchat.module.internal.data.PlayerData
-import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.*
+import me.arasple.mc.trchat.util.CooldownType
+import me.arasple.mc.trchat.util.isInCooldown
+import me.arasple.mc.trchat.util.passPermission
+import me.arasple.mc.trchat.util.updateCooldown
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -59,10 +62,10 @@ object Mention : Function("MENTION") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        val name = BukkitPlayers.getPlayerFullName(arg) ?: arg
-        if (notify && forward) {
-            sender.sendProxyLang(name, "Function-Mention-Notify", sender.name)
+    override fun parseVariable(sender: Player, arg: String): ComponentText? {
+        val name = BukkitProxyManager.getExactName(arg) ?: arg
+        if (notify) {
+            BukkitProxyManager.sendProxyLang(sender, name, "Function-Mention-Notify", sender.name)
         }
         return sender.getComponentFromLang("Function-Mention-Format", name, sender.name)
     }
@@ -76,9 +79,10 @@ object Mention : Function("MENTION") {
     }
 
     fun getRegex(player: Player): Regex? {
-        val names = BukkitPlayers.getPlayers()
-            .filter { (selfMention || it != player.name) && !PlayerData.vanishing.contains(it) }
+        val names = BukkitProxyManager.getPlayerNames().keys
+            .filter { (selfMention || it != player.name) && it !in PlayerData.vanishing }
             .takeIf { it.isNotEmpty() }
+            ?.sortedByDescending { it.length }
             ?.joinToString("|") { Regex.escape(it) }
             ?: return null
         return Regex("@? ?($names)", RegexOption.IGNORE_CASE)

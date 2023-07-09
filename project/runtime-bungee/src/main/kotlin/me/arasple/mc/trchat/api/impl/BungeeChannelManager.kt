@@ -80,11 +80,9 @@ object BungeeChannelManager : ChannelManager {
     }
 
     @Suppress("Deprecation")
-    fun sendProxyChannel(id: String, channel: String) {
-        server<ProxyServer>().servers.filterNot {
-            loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.value.address.port)
-        }.forEach { (_, server) ->
-            BungeeProxyManager.sendTrChatMessage(server, "SendProxyChannel", id, channel)
+    fun sendProxyChannel(id: String, channel: String, all: Boolean = false) {
+        BungeeProxyManager.sendMessageToAll("SendProxyChannel", id, channel) {
+            all || it.address.port !in loadedServers.computeIfAbsent(id) { ArrayList() }
         }
     }
 
@@ -92,7 +90,7 @@ object BungeeChannelManager : ChannelManager {
     fun sendAllProxyChannels(port: Int) {
         val server = server<ProxyServer>().servers.values.firstOrNull { it.address.port == port } ?: return
         channels.forEach {
-            BungeeProxyManager.sendTrChatMessage(server, "SendProxyChannel", it.key, it.value)
+            BungeeProxyManager.sendMessage(server, "SendProxyChannel", it.key, it.value)
         }
     }
 

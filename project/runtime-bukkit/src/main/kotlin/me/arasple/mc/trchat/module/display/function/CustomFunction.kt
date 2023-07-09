@@ -25,7 +25,7 @@ class CustomFunction(
         return message.replaceRegex(regex, filterTextRegex) { "{{$id:$it}}" }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText {
+    override fun parseVariable(sender: Player, arg: String): ComponentText {
         return displayJson.toTextComponent(sender, arg)
     }
 

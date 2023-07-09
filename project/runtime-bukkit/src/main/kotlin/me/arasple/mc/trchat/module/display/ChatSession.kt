@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.getDataContainer
+import me.arasple.mc.trchat.util.reportOnce
 import org.bukkit.entity.Player
 import taboolib.module.nms.Packet
 import taboolib.module.nms.sendPacket
@@ -32,7 +33,7 @@ class ChatSession(
         return if (forces.isNotEmpty()) {
             CustomColor.get(forces[0])
         } else {
-            val selectedColor = player.getDataContainer().getString("color")
+            val selectedColor = player.getDataContainer()["color"].takeIf { it != "null" }
             if (selectedColor != null && player.hasPermission(MessageColors.COLOR_PERMISSION_NODE + selectedColor)) {
                 CustomColor.get(selectedColor)
             } else {
@@ -47,9 +48,16 @@ class ChatSession(
     }
 
     fun addMessage(packet: Packet) {
-        receivedMessages += ChatMessage(packet.source, packet.getComponent()?.toPlainText()?.replace("\\s".toRegex(), "")?.takeLast(48))
-        if (receivedMessages.size > 100) {
-            receivedMessages.removeFirstOrNull()
+        try {
+            receivedMessages += ChatMessage(
+                packet.source,
+                packet.getComponent()?.toPlainText()?.replace("\\s".toRegex(), "")?.takeLast(48)
+            )
+            if (receivedMessages.size > 100) {
+                receivedMessages.removeFirstOrNull()
+            }
+        } catch (t: Throwable) {
+            t.reportOnce("Error occurred while caching chat packet!Maybe your server doesn't support it")
         }
     }
 

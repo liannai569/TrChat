@@ -73,9 +73,7 @@ object Loader {
         Channel.channels.values.forEach { it.unregister() }
         Channel.channels.clear()
 
-        if (onlinePlayers.isNotEmpty()) {
-            BukkitProxyManager.sendTrChatMessage(onlinePlayers.iterator().next(), "FetchProxyChannels")
-        }
+        BukkitProxyManager.sendMessage(onlinePlayers.firstOrNull(), arrayOf("FetchProxyChannels"))
 
         filterChannelFiles(folder).forEach {
             if (FileWatcher.INSTANCE.hasListener(it)) {

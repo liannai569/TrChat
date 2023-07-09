@@ -1,23 +1,23 @@
 package me.arasple.mc.trchat.util
 
 import me.arasple.mc.trchat.api.impl.BukkitComponentManager
-import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.command.main.CommandMute
-import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.script.Condition
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.plugin.messaging.PluginMessageRecipient
 import taboolib.common.util.unsafeLazy
-import taboolib.library.configuration.ConfigurationSection
+import taboolib.expansion.DataContainer
+import taboolib.expansion.playerDataContainer
+import taboolib.expansion.playerDatabase
 import taboolib.module.chat.ComponentText
 import taboolib.module.ui.MenuHolder
 import taboolib.module.ui.type.Basic
+import taboolib.platform.compat.replacePlaceholder
 import taboolib.platform.util.sendLang
 
 val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
@@ -49,6 +49,19 @@ fun Player.passPermission(permission: String?): Boolean {
             || hasPermission(permission)
 }
 
+fun String.setPlaceholders(sender: CommandSender): String {
+    return try {
+        if (sender is Player) {
+            replacePlaceholder(sender)
+        } else {
+            this
+        }
+    } catch (t: Throwable) {
+        t.print("Error occurred when parsing placeholder!This is not a bug of TrChat")
+        this
+    }
+}
+
 inline val Player.session get() = ChatSession.getSession(this)
 
 inline val OfflinePlayer.data get() = PlayerData.getData(this)
@@ -66,20 +79,16 @@ fun Player.checkMute(): Boolean {
     return true
 }
 
-fun OfflinePlayer.getDataContainer(): ConfigurationSection {
-    return Databases.database.pull(this)
+fun OfflinePlayer.getDataContainer(): DataContainer {
+    return if (isOnline) {
+        playerDataContainer[uniqueId] ?: error("Database is not initialized")
+    } else {
+        playerDataContainer.computeIfAbsent(uniqueId) { DataContainer(uniqueId.parseString(), playerDatabase!!) }
+    }
 }
 
 fun Any.sendComponent(sender: Any?, component: ComponentText) {
     BukkitComponentManager.sendComponent(this, component, sender)
-}
-
-fun PluginMessageRecipient.sendTrChatMessage(vararg args: String) {
-    BukkitProxyManager.sendTrChatMessage(this, *args)
-}
-
-fun Player.sendProxyLang(target: String, node: String, vararg args: String) {
-    BukkitProxyManager.sendProxyLang(this, target, node, *args)
 }
 
 fun Player.getCooldownLeft(type: CooldownType) = Cooldowns.getCooldownLeft(uniqueId, type.alias)

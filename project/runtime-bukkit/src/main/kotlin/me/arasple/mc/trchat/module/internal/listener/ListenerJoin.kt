@@ -12,6 +12,8 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import taboolib.expansion.playerDataContainer
+import taboolib.expansion.setupDataContainer
 import taboolib.platform.util.sendLang
 
 /**
@@ -25,7 +27,10 @@ object ListenerJoin {
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
 
-        BukkitProxyManager.sendTrChatMessage(player, "FetchProxyChannels")
+        if (!playerDataContainer.containsKey(player.uniqueId)) {
+            player.setupDataContainer()
+        }
+        BukkitProxyManager.sendMessage(player, arrayOf("FetchProxyChannels"))
 
         Channel.channels.values.filter { it.settings.autoJoin }.forEach {
             if (player.passPermission(it.settings.joinPermission)) {
@@ -36,7 +41,7 @@ object ListenerJoin {
         player.data
 
         submit(delay = 20) {
-            if (player.isOnline && player.hasPermission("trchat.admin") && Updater.latest_Version > Updater.current_version && !Updater.notified.contains(player.uniqueId)) {
+            if (player.isOnline && player.hasPermission("trchat.admin") && Updater.latest_Version > Updater.current_version && player.uniqueId !in Updater.notified) {
                 player.sendLang("Plugin-Updater-Header", Updater.current_version, Updater.latest_Version)
                 player.sendMessage(Updater.information)
                 player.sendLang("Plugin-Updater-Footer")

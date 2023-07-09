@@ -15,5 +15,5 @@ class TrChatEvent(
     val channel: Channel,
     val session: ChatSession,
     var message: String,
-    val forward: Boolean
+    val forward: Boolean = true
 ) : BukkitProxyEvent()

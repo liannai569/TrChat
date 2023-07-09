@@ -10,13 +10,14 @@ import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.internal.command.main.CommandReply
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
 import me.arasple.mc.trchat.module.internal.data.PlayerData
-import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
-import me.arasple.mc.trchat.module.internal.redis.RedisManager
-import me.arasple.mc.trchat.module.internal.redis.TrRedisMessage
 import me.arasple.mc.trchat.module.internal.service.Metrics
-import me.arasple.mc.trchat.util.*
+import me.arasple.mc.trchat.util.checkMute
+import me.arasple.mc.trchat.util.pass
+import me.arasple.mc.trchat.util.sendComponent
+import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.command
+import taboolib.common.platform.command.suggest
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.subList
@@ -40,49 +41,44 @@ class PrivateChannel(
 ) : Channel(id, settings, bindings, events, emptyList()) {
 
     init {
-        init()
-    }
-
-    override fun init() {
         onlinePlayers.filter { it.session.channel == id }.forEach {
             join(it, id, hint = false)
         }
-        if (bindings.command.isNullOrEmpty()) {
-            return
-        }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission) {
-            execute<Player> { sender, _, _ ->
-                if (sender.session.channel == this@PrivateChannel.id) {
-                    quit(sender)
-                } else {
-                    sender.sendLang("Private-Message-No-Player")
-                }
-            }
-            dynamic("player", optional = true) {
-                suggestion<Player>(uncheck = RedisManager.enabled) { _, _ ->
-                    BukkitPlayers.getPlayers().filter { !PlayerData.vanishing.contains(it) }
-                }
-                execute<Player> { sender, _, argument ->
-                    sender.session.lastPrivateTo = BukkitPlayers.getPlayerFullName(argument)
-                        ?: return@execute sender.sendLang("Command-Player-Not-Exist")
-                    join(sender, this@PrivateChannel)
-                }
-                dynamic("message", optional = true) {
-                    execute<Player> { sender, ctx, argument ->
-                        BukkitPlayers.getPlayerFullName(ctx["player"])?.let {
-                            sender.session.lastPrivateTo = it
-                            execute(sender, argument)
-                        } ?: sender.sendLang("Command-Player-Not-Exist")
+        if (bindings.command?.isNotEmpty() == true) {
+            command(bindings.command[0], subList(bindings.command, 1), "Channel $id", permission = settings.joinPermission) {
+                execute<Player> { sender, _, _ ->
+                    if (sender.session.channel == this@PrivateChannel.id) {
+                        quit(sender)
+                    } else {
+                        sender.sendLang("Private-Message-No-Player")
                     }
                 }
-            }
-            incorrectSender { sender, _ ->
-                sender.sendLang("Command-Not-Player")
+                dynamic("player", optional = true) {
+                    suggest {
+                        BukkitProxyManager.getPlayerNames().keys.filter { it !in PlayerData.vanishing }
+                    }
+                    execute<Player> { sender, _, argument ->
+                        sender.session.lastPrivateTo = BukkitProxyManager.getExactName(argument)
+                            ?: return@execute sender.sendLang("Command-Player-Not-Exist")
+                        join(sender, this@PrivateChannel)
+                    }
+                    dynamic("message", optional = true) {
+                        execute<Player> { sender, ctx, argument ->
+                            BukkitProxyManager.getExactName(ctx["player"])?.let {
+                                sender.session.lastPrivateTo = it
+                                execute(sender, argument)
+                            } ?: sender.sendLang("Command-Player-Not-Exist")
+                        }
+                    }
+                }
+                incorrectSender { sender, _ ->
+                    sender.sendLang("Command-Not-Player")
+                }
             }
         }
     }
 
-    override fun execute(player: Player, message: String, forward: Boolean): Pair<ComponentText, ComponentText?>? {
+    override fun execute(player: Player, message: String, toConsole: Boolean): Pair<ComponentText, ComponentText?>? {
         if (!player.checkMute()) {
             return null
         }
@@ -95,7 +91,7 @@ class PrivateChannel(
             return null
         }
         val session = player.session
-        val event = TrChatEvent(this, session, message, forward)
+        val event = TrChatEvent(this, session, message)
         if (!event.call()) {
             return null
         }
@@ -106,7 +102,7 @@ class PrivateChannel(
             format.prefix
                 .mapNotNull { prefix -> prefix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { prefix -> send.append(prefix) }
-            send.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
+            send.append(format.msg.createComponent(player, msg, settings.disabledFunctions))
             format.suffix
                 .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { suffix -> send.append(suffix) }
@@ -117,16 +113,11 @@ class PrivateChannel(
             format.prefix
                 .mapNotNull { prefix -> prefix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { prefix -> receive.append(prefix) }
-            receive.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
+            receive.append(format.msg.createComponent(player, msg, settings.disabledFunctions))
             format.suffix
                 .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { suffix -> receive.append(suffix) }
         } ?: return null
-
-        // Chat preview
-        if (!forward) {
-            return send to receive
-        }
 
         // Channel event
         if (!events.send(player, session.lastPrivateTo, msg)) {
@@ -144,19 +135,14 @@ class PrivateChannel(
         ChatLogs.logPrivate(player.name, session.lastPrivateTo, message)
         Metrics.increase(0)
 
-        if (settings.proxy && RedisManager.enabled) {
-            // Redis
-            RedisManager.sendMessage(TrRedisMessage(receive, player.uniqueId, target = session.lastPrivateTo))
-            return send to receive
-        } else if (settings.proxy && BukkitProxyManager.processor != null) {
-            // BungeeCord / Velocity
-            player.sendTrChatMessage(
-                "SendRaw",
+        if (settings.proxy && BukkitProxyManager.processor != null) {
+            BukkitProxyManager.sendRaw(
+                player,
                 session.lastPrivateTo,
-                receive.toRawMessage(),
-                settings.doubleTransfer.toString()
+                receive,
+                settings.doubleTransfer
             )
-            player.sendProxyLang("Private-Message-Receive", player.name)
+            BukkitProxyManager.sendProxyLang(player, session.lastPrivateTo, "Private-Message-Receive", player.name)
         } else {
             getProxyPlayer(session.lastPrivateTo)?.let {
                 it.sendComponent(player, receive)

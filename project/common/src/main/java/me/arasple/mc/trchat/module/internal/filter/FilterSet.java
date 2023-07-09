@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.module.internal.filter.processer;
+package me.arasple.mc.trchat.module.internal.filter;
 
 public class FilterSet {
 

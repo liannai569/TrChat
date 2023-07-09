@@ -1,11 +1,14 @@
 package me.arasple.mc.trchat.module.display.function.standard
 
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.function.Function
 import me.arasple.mc.trchat.module.display.function.StandardFunction
-import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.module.internal.script.Reaction
-import me.arasple.mc.trchat.util.*
+import me.arasple.mc.trchat.util.CooldownType
+import me.arasple.mc.trchat.util.getCooldownLeft
+import me.arasple.mc.trchat.util.passPermission
+import me.arasple.mc.trchat.util.updateCooldown
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -58,10 +61,10 @@ object MentionAll : Function("MENTIONALL") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
-        if (notify && forward) {
-            BukkitPlayers.getPlayers().filter { it != arg }.forEach {
-                sender.sendProxyLang(it, "Function-Mention-Notify", sender.name)
+    override fun parseVariable(sender: Player, arg: String): ComponentText? {
+        if (notify) {
+            BukkitProxyManager.getPlayerNames().keys.filter { it != arg }.forEach {
+                BukkitProxyManager.sendProxyLang(sender, it, "Function-Mention-Notify", sender.name)
             }
         }
         return sender.getComponentFromLang("Function-Mention-All-Format", sender.name)

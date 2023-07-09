@@ -1,8 +1,8 @@
 package me.arasple.mc.trchat.module.internal.command.main
 
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.channel.PrivateChannel
-import me.arasple.mc.trchat.module.internal.proxy.BukkitPlayers
 import me.arasple.mc.trchat.util.checkMute
 import me.arasple.mc.trchat.util.passPermission
 import me.arasple.mc.trchat.util.session
@@ -35,7 +35,7 @@ object CommandReply {
                     val session = sender.session
                     if (sender.checkMute()) {
                         if (lastMessageFrom.containsKey(sender.name)) {
-                            val to = BukkitPlayers.getPlayerFullName(lastMessageFrom[sender.name]!!)
+                            val to = BukkitProxyManager.getExactName(lastMessageFrom[sender.name]!!)
                                 ?: return@execute sender.sendLang("Command-Player-Not-Exist")
                             session.lastPrivateTo = to
                             Channel.channels.values

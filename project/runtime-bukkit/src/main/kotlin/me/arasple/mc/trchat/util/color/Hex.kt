@@ -6,10 +6,8 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.module.nms.MinecraftVersion
 import java.awt.Color
-import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.stream.Collectors
 import kotlin.math.*
 
 /**
@@ -147,12 +145,9 @@ object Hex {
             val parsedGradient = StringBuilder()
             var speed = -1
             val looping = getCaptureGroup(matcher, "loop") != null
-            val hexSteps = Arrays.stream(
-                getCaptureGroup(matcher, "hex")!!.substring(1).split(":").toTypedArray()
-            )
-                .map { x: String -> if (x.length != 4) x else String.format("#%s%s%s%s%s%s", x[1], x[1], x[2], x[2], x[3], x[3]) }
-                .map { nm: String? -> Color.decode(nm) }
-                .collect(Collectors.toList())
+            val hexSteps = getCaptureGroup(matcher, "hex")!!.substring(1).split(":")
+                .map { x -> if (x.length != 4) x else String.format("#%s%s%s%s%s%s", x[1], x[1], x[2], x[2], x[3], x[3]) }
+                .map { nm -> Color.decode(nm) }
             val speedGroup = getCaptureGroup(matcher, "speed")
             if (speedGroup != null) {
                 try {
@@ -257,7 +252,7 @@ object Hex {
         if (MinecraftVersion.majorLegacy >= 11600) return ChatColor.of(color).toString()
         var minDist = Int.MAX_VALUE
         var legacy = ChatColor.WHITE
-        for (mapping: ChatColorHexMapping in ChatColorHexMapping.values()) {
+        for (mapping in ChatColorHexMapping.entries) {
             val r = mapping.red - color.red
             val g = mapping.green - color.green
             val b = mapping.blue - color.blue

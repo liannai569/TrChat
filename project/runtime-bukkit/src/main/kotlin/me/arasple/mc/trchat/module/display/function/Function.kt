@@ -23,7 +23,7 @@ abstract class Function(val id: String) {
 
     abstract fun createVariable(sender: Player, message: String): String
 
-    abstract fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText?
+    abstract fun parseVariable(sender: Player, arg: String): ComponentText?
 
     abstract fun canUse(sender: Player): Boolean
 

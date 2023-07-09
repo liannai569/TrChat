@@ -1,39 +1,27 @@
-package me.arasple.mc.trchat.module.internal.redis
+package me.arasple.mc.trchat.module.internal.proxy.redis
 
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Settings
-import me.arasple.mc.trchat.util.passPermission
-import me.arasple.mc.trchat.util.sendComponent
-import org.bukkit.Bukkit
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.common.platform.function.console
 import taboolib.expansion.AlkaidRedis
 import taboolib.expansion.SingleRedisConnection
 import taboolib.expansion.SingleRedisConnector
 import taboolib.expansion.fromConfig
 import taboolib.module.configuration.ConfigNode
-import taboolib.module.configuration.ConfigNodeTransfer
-import taboolib.module.lang.sendLang
-import taboolib.platform.util.onlinePlayers
 
 @PlatformSide([Platform.BUKKIT])
 object RedisManager {
 
     private var connector: SingleRedisConnector? = null
     var connection: SingleRedisConnection? = null
+    var channel = "trchat-message"
 
     @ConfigNode("Redis.enabled", "settings.yml")
     var enabled = false
         private set
-
-    @ConfigNode("Redis.channel", "settings.yml")
-    var channel = "trchat-message"
-        private set
-
-    @ConfigNode("Redis.subscribe", "settings.yml")
-    val subscribe = ConfigNodeTransfer<List<String>, Array<String>> { toTypedArray() }
 
     operator fun invoke(default: Boolean = true): SingleRedisConnection? {
         if (!enabled) {
@@ -43,7 +31,6 @@ object RedisManager {
             connector = AlkaidRedis.create().apply {
                 fromConfig(Settings.conf.getConfigurationSection("Redis")!!)
             }
-            console().sendLang("Plugin-Proxy-Supported", "Redis")
         }
         connection?.close()
         connection = connector!!.connect().connection()
@@ -54,20 +41,9 @@ object RedisManager {
     }
 
     fun init(connection: SingleRedisConnection) {
-        connection.subscribe(*subscribe.get()) {
-            val message = get<TrRedisMessage>(false)
-            if (message.target == null) {
-                if (message.permission == null) {
-                    onlinePlayers.forEach { it.sendComponent(message.sender, message.component) }
-                } else {
-                    onlinePlayers
-                        .filter { it.passPermission(message.permission) }
-                        .forEach { it.sendComponent(message.sender, message.component) }
-                }
-                console().sendComponent(message.sender, message.component)
-            } else {
-                Bukkit.getPlayer(message.target)?.sendComponent(message.sender, message.component)
-            }
+        connection.subscribe(channel) {
+            val message = get<TrRedisMessage>(ignoreConstructor = true)
+            BukkitProxyManager.processor?.execute(message.data)
         }
     }
 

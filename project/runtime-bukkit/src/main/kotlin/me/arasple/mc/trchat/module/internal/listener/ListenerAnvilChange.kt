@@ -3,7 +3,6 @@ package me.arasple.mc.trchat.module.internal.listener
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.parseSimple
-import net.md_5.bungee.chat.ComponentSerializer
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.meta.ItemMeta
@@ -49,7 +48,7 @@ object ListenerAnvilChange {
             }
             if (color) {
                 if (p.hasPermission("trchat.color.simple")) {
-                    setDisplayNameComponent(ComponentSerializer.parse(displayName.parseSimple().toRawMessage()))
+                    setDisplayNameComponent(arrayOf(displayName.parseSimple().toSpigotObject()))
                 } else {
                     setDisplayName(MessageColors.replaceWithPermission(p, displayName, MessageColors.Type.ANVIL))
                 }

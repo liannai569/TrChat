@@ -1,7 +1,6 @@
 package me.arasple.mc.trchat.module.display.channel
 
 import me.arasple.mc.trchat.TrChat
-import me.arasple.mc.trchat.api.IChannel
 import me.arasple.mc.trchat.api.event.TrChatEvent
 import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.file.Settings
@@ -11,11 +10,8 @@ import me.arasple.mc.trchat.module.display.channel.obj.ChannelSettings
 import me.arasple.mc.trchat.module.display.channel.obj.Range
 import me.arasple.mc.trchat.module.display.format.Format
 import me.arasple.mc.trchat.module.internal.data.ChatLogs
-import me.arasple.mc.trchat.module.internal.redis.RedisManager
-import me.arasple.mc.trchat.module.internal.redis.TrRedisMessage
 import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.command
@@ -41,13 +37,9 @@ open class Channel(
     val formats: List<Format>,
     val console: Format? = null,
     val listeners: MutableSet<String> = mutableSetOf()
-) : IChannel {
+) {
 
     init {
-        init()
-    }
-
-    override fun init() {
         if (settings.autoJoin) {
             onlinePlayers.forEach {
                 if (it.passPermission(settings.joinPermission)) {
@@ -59,33 +51,32 @@ open class Channel(
                 join(it, id, hint = false)
             }
         }
-        if (bindings.command.isNullOrEmpty()) {
-            return
-        }
-        command(bindings.command[0], subList(bindings.command, 1), "Channel $id command", permission = settings.joinPermission) {
-            execute<Player> { sender, _, _ ->
-                if (sender.session.channel == this@Channel.id) {
-                    quit(sender)
-                } else {
-                    join(sender, this@Channel)
-                }
-            }
-            dynamic("message", optional = true) {
-                execute<CommandSender> { sender, _, argument ->
-                    if (sender is Player) {
-                        execute(sender, argument)
+        if (bindings.command?.isNotEmpty() == true) {
+            command(bindings.command[0], subList(bindings.command, 1), "Channel $id", permission = settings.joinPermission) {
+                execute<Player> { sender, _, _ ->
+                    if (sender.session.channel == this@Channel.id) {
+                        quit(sender)
                     } else {
-                        execute(sender, argument)
+                        join(sender, this@Channel)
                     }
                 }
-            }
-            incorrectSender { sender, _ ->
-                sender.sendLang("Command-Not-Player")
+                dynamic("message", optional = true) {
+                    execute<CommandSender> { sender, _, argument ->
+                        if (sender is Player) {
+                            execute(sender, argument)
+                        } else {
+                            execute(sender, argument)
+                        }
+                    }
+                }
+                incorrectSender { sender, _ ->
+                    sender.sendLang("Command-Not-Player")
+                }
             }
         }
     }
 
-    override fun unregister() {
+    open fun unregister() {
         bindings.command?.forEach { unregisterCommand(it) }
         listeners.clear()
     }
@@ -99,37 +90,27 @@ open class Channel(
         console?.let { format ->
             format.prefix.forEach { prefix ->
                 component.append(prefix.value[0].content.toTextComponent(sender)) }
-            component.append(format.msg.createComponent(sender, message, settings.disabledFunctions, true))
+            component.append(format.msg.createComponent(sender, message, settings.disabledFunctions))
             format.suffix.forEach { suffix ->
                 component.append(suffix.value[0].content.toTextComponent(sender)) }
         } ?: return
 
         if (settings.proxy && BukkitProxyManager.processor != null) {
-            if (settings.ports.isNotEmpty()) {
-                Bukkit.getServer().sendTrChatMessage(
-                    "ForwardRaw",
-                    nilUUID.parseString(),
-                    component.toRawMessage(),
-                    settings.joinPermission,
-                    settings.ports.joinToString(";"),
-                    settings.doubleTransfer.toString()
-                )
-            } else {
-                Bukkit.getServer().sendTrChatMessage(
-                    "BroadcastRaw",
-                    nilUUID.parseString(),
-                    component.toRawMessage(),
-                    settings.joinPermission,
-                    settings.doubleTransfer.toString()
-                )
-            }
+            BukkitProxyManager.sendBroadcastRaw(
+                onlinePlayers.firstOrNull(),
+                nilUUID,
+                component,
+                settings.joinPermission,
+                settings.doubleTransfer,
+                settings.ports
+            )
         } else {
             listeners.forEach { getProxyPlayer(it)?.sendComponent(null, component) }
             sender.sendComponent(null, component)
         }
     }
 
-    open fun execute(player: Player, message: String, forward: Boolean = true): Pair<ComponentText, ComponentText?>? {
+    open fun execute(player: Player, message: String, toConsole: Boolean = true): Pair<ComponentText, ComponentText?>? {
         if (!player.checkMute()) {
             return null
         }
@@ -141,7 +122,7 @@ open class Channel(
             player.sendLang("Channel-Bad-Language")
             return null
         }
-        val event = TrChatEvent(this, player.session, message, forward)
+        val event = TrChatEvent(this, player.session, message)
         if (!event.call()) {
             return null
         }
@@ -152,16 +133,11 @@ open class Channel(
             format.prefix
                 .mapNotNull { prefix -> prefix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { prefix -> component.append(prefix) }
-            component.append(format.msg.createComponent(player, msg, settings.disabledFunctions, forward))
+            component.append(format.msg.createComponent(player, msg, settings.disabledFunctions))
             format.suffix
                 .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { suffix -> component.append(suffix) }
         } ?: return null
-
-        // Chat preview
-        if (!forward) {
-            return component to null
-        }
 
         player.session.lastMessage = msg
         ChatLogs.logNormal(player.name, msg)
@@ -170,30 +146,15 @@ open class Channel(
         // TODO: 跨服事件传递
         // Proxy
         if (settings.proxy) {
-            if (RedisManager.enabled) {
-                // Redis
-                RedisManager.sendMessage(TrRedisMessage(component, player.uniqueId, permission = settings.joinPermission))
-                return component to null
-            } else if (BukkitProxyManager.processor != null) {
-                // BungeeCord / Velocity
-                if (settings.ports.isNotEmpty()) {
-                    player.sendTrChatMessage(
-                        "ForwardRaw",
-                        player.uniqueId.parseString(),
-                        component.toRawMessage(),
-                        settings.joinPermission,
-                        settings.ports.joinToString(";"),
-                        settings.doubleTransfer.toString()
-                    )
-                } else {
-                    player.sendTrChatMessage(
-                        "BroadcastRaw",
-                        player.uniqueId.parseString(),
-                        component.toRawMessage(),
-                        settings.joinPermission,
-                        settings.doubleTransfer.toString()
-                    )
-                }
+            if (BukkitProxyManager.processor != null) {
+                BukkitProxyManager.sendBroadcastRaw(
+                    player,
+                    player.uniqueId,
+                    component,
+                    settings.joinPermission,
+                    settings.doubleTransfer,
+                    settings.ports
+                )
                 return component to null
             }
         }
@@ -205,14 +166,14 @@ open class Channel(
                 }
             }
             Range.Type.SINGLE_WORLD -> {
-                onlinePlayers.filter { listeners.contains(it.name)
+                onlinePlayers.filter { it.name in listeners
                         && it.world == player.world
                         && events.send(player, it.name, msg) }.forEach {
                     it.sendComponent(player, component)
                 }
             }
             Range.Type.DISTANCE -> {
-                onlinePlayers.filter { listeners.contains(it.name)
+                onlinePlayers.filter { it.name in listeners
                         && it.world == player.world
                         && it.location.distance(player.location) <= settings.range.distance
                         && events.send(player, it.name, msg) }.forEach {
@@ -225,7 +186,9 @@ open class Channel(
                 }
             }
         }
-        console().cast<CommandSender>().sendComponent(player, component)
+        if (toConsole) {
+            console().sendComponent(player, component)
+        }
         return component to null
     }
 
@@ -234,7 +197,8 @@ open class Channel(
         val channels = mutableMapOf<String, Channel>()
 
         fun join(player: Player, channel: String, hint: Boolean = true): Boolean {
-            channels[channel]?.let {
+            val id = channels.keys.firstOrNull { channel.equals(it, ignoreCase = true) }
+            channels[id]?.let {
                 return join(player, it, hint)
             }
             quit(player)

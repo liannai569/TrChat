@@ -23,7 +23,7 @@ taboolib {
         desc("Advanced Minecraft Chat Control")
         contributors {
             name("Arasple")
-            name("ItsFlicker").description("Maintainer")
+            name("ItsFlicker")
         }
         dependencies {
             name("PlaceholderAPI").with("bukkit")

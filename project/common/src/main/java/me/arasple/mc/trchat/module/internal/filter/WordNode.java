@@ -1,4 +1,4 @@
-package me.arasple.mc.trchat.module.internal.filter.processer;
+package me.arasple.mc.trchat.module.internal.filter;
 
 import java.util.LinkedList;
 import java.util.List;

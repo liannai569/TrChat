@@ -47,61 +47,6 @@ object ListenerVelocityTransfer {
 
     private fun execute(data: Array<String>, connection: ServerConnection) {
         when (data[0]) {
-            "SendRaw" -> {
-                val to = data[1]
-                val raw = data[2]
-                val player = getProxyPlayer(to)?.cast<Player>() ?: return
-                val message = GsonComponentSerializer.gson().deserialize(raw)
-
-                player.sendMessage(message)
-            }
-            "BroadcastRaw" -> {
-                val uuid = data[1]
-                val raw = data[2]
-                val permission = data[3]
-                val doubleTransfer = data[4].toBoolean()
-                val message = GsonComponentSerializer.gson().deserialize(raw)
-
-                if (doubleTransfer) {
-                    plugin.server.allServers.forEach {
-                        VelocityProxyManager.sendTrChatMessage(it, "BroadcastRaw", uuid, raw, permission)
-                    }
-                } else {
-                    plugin.server.allServers.forEach { server ->
-                        server.playersConnected.filter { permission == "" || it.hasPermission(permission) }.forEach { player ->
-                            player.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
-                        }
-                    }
-                }
-
-                plugin.server.consoleCommandSource.sendMessage(message)
-            }
-            "ForwardRaw" -> {
-                val uuid = data[1]
-                val raw = data[2]
-                val permission = data[3]
-                val ports = data[4].split(";").map { it.toInt() }
-                val doubleTransfer = data[5].toBoolean()
-                val message = GsonComponentSerializer.gson().deserialize(raw)
-
-                if (doubleTransfer) {
-                    plugin.server.allServers.forEach {
-                        if (ports.contains(it.serverInfo.address.port)) {
-                            VelocityProxyManager.sendTrChatMessage(it, "BroadcastRaw", uuid, raw, permission)
-                        }
-                    }
-                } else {
-                    plugin.server.allServers.forEach { server ->
-                        if (ports.contains(server.serverInfo.address.port)) {
-                            server.playersConnected.filter { permission == "" || it.hasPermission(permission) }.forEach { player ->
-                                player.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
-                            }
-                        }
-                    }
-                }
-
-                plugin.server.consoleCommandSource.sendMessage(message)
-            }
             "SendLang" -> {
                 val to = data[1]
                 val node = data[2]
@@ -112,22 +57,52 @@ object ListenerVelocityTransfer {
                 } catch (_: IllegalStateException) {
                 }
             }
+            "SendRaw" -> {
+                val to = data[1]
+                val raw = data[2]
+                val player = getProxyPlayer(to)?.cast<Player>() ?: return
+
+                player.sendMessage(GsonComponentSerializer.gson().deserialize(raw))
+            }
+            "BroadcastRaw" -> {
+                val uuid = data[1]
+                val raw = data[2]
+                val perm = data[3]
+                val doubleTransfer = data[4].toBoolean()
+                val ports = data[5].takeIf { it != "" }?.split(";")?.map { it.toInt() }
+                val message = GsonComponentSerializer.gson().deserialize(raw)
+
+                if (doubleTransfer) {
+                    VelocityProxyManager.sendMessageToAll("BroadcastRaw", uuid, raw, perm, data[4], data[5]) {
+                        ports == null || it.serverInfo.address.port in ports
+                    }
+                } else {
+                    plugin.server.allServers.forEach { server ->
+                        if (ports == null || server.serverInfo.address.port in ports) {
+                            server.playersConnected.filter { perm == "" || it.hasPermission(perm) }.forEach {
+                                it.sendMessage(Identity.identity(uuid.toUUID()), message, MessageType.CHAT)
+                            }
+                        }
+                    }
+                }
+                plugin.server.consoleCommandSource.sendMessage(message)
+            }
+            "UpdateNames" -> {
+                val names = data[1].split(",").map { it.split("-", limit = 2) }
+                VelocityProxyManager.allNames[connection.serverInfo.address.port] = names.associate { it[0] to it[1].takeIf { dn -> dn != "null" } }
+            }
+            "InventoryShow" -> {
+                VelocityProxyManager.sendMessageToAll("InventoryShow", data[1], data[2], data[3], data[4])
+            }
+            "EnderChestShow" -> {
+                VelocityProxyManager.sendMessageToAll("EnderChestShow", data[1], data[2], data[3], data[4])
+            }
             "FetchProxyChannels" -> {
                 VelocityChannelManager.sendAllProxyChannels(connection.serverInfo.address.port)
             }
             "LoadedProxyChannel" -> {
                 val id = data[1]
                 VelocityChannelManager.loadedServers.computeIfAbsent(id) { ArrayList() }.add(connection.serverInfo.address.port)
-            }
-            "InventoryShow" -> {
-                plugin.server.allServers.forEach {
-                    VelocityProxyManager.sendTrChatMessage(it, "InventoryShow", data[1], data[2], data[3], data[4])
-                }
-            }
-            "EnderChestShow" -> {
-                plugin.server.allServers.forEach {
-                    VelocityProxyManager.sendTrChatMessage(it, "EnderChestShow", data[1], data[2], data[3], data[4])
-                }
             }
         }
     }

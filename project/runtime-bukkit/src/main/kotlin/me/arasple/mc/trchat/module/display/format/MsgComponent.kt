@@ -19,7 +19,7 @@ import taboolib.module.chat.Components
  */
 class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style: List<Style>) : JsonComponent(null, style) {
 
-    fun createComponent(sender: CommandSender, msg: String, disabledFunctions: List<String>, forward: Boolean): ComponentText {
+    fun createComponent(sender: CommandSender, msg: String, disabledFunctions: List<String>): ComponentText {
         val component = Components.empty()
         var message = msg
 
@@ -39,7 +39,7 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
                 val args = part.text.split(":", limit = 2)
                 val function = Function.functions.firstOrNull { it.id == args[0] }
                 if (function != null) {
-                    function.parseVariable(sender, forward, args[1])?.let { component.append(it) }
+                    function.parseVariable(sender, args[1])?.let { component.append(it) }
                     function.reaction?.eval(sender, "message" to message)
                 }
                 continue

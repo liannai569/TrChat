@@ -75,18 +75,15 @@ object EnderChestShow : Function("ENDERCHEST") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
+    override fun parseVariable(sender: Player, arg: String): ComponentText? {
         return computeAndCache(sender).let {
-            if (forward) {
-                BukkitProxyManager.sendTrChatMessage(
-                    sender,
-                    "EnderChestShow",
-                    MinecraftVersion.minecraftVersion,
-                    sender.name,
-                    it.first,
-                    it.second
-                )
-            }
+            BukkitProxyManager.sendMessage(sender, arrayOf(
+                "EnderChestShow",
+                MinecraftVersion.minecraftVersion,
+                sender.name,
+                it.first,
+                it.second)
+            )
             sender.getComponentFromLang("Function-EnderChest-Show-Format", sender.name, it.first)
         }
     }

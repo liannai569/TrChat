@@ -3,12 +3,10 @@ package me.arasple.mc.trchat.api.impl
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.ComponentManager
 import me.arasple.mc.trchat.api.nms.NMS
-import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.toUUID
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.chat.ComponentSerializer
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ProxiedCommandSender
 import org.bukkit.entity.Entity
@@ -18,6 +16,7 @@ import taboolib.common.platform.function.adaptCommandSender
 import taboolib.module.chat.ComponentText
 import taboolib.module.chat.Components
 import taboolib.module.chat.impl.DefaultComponent
+import taboolib.module.configuration.ConfigNode
 import java.util.*
 
 /**
@@ -27,13 +26,15 @@ import java.util.*
 @PlatformSide([Platform.BUKKIT])
 object BukkitComponentManager : ComponentManager {
 
+    @ConfigNode("Enable.Chat", "filter.yml")
+    var isFilterEnabled = true
+
     init {
         PlatformFactory.registerAPI<ComponentManager>(this)
     }
 
     override fun filterComponent(component: ComponentText, maxLength: Int): ComponentText {
-        val baseComponents = ComponentSerializer.parse(component.toRawMessage())
-        return validateComponent(DefaultComponent(baseComponents.map { filterComponent(it) }), maxLength)
+        return validateComponent(DefaultComponent(listOf(filterComponent(component.toSpigotObject()))), maxLength)
     }
 
     override fun sendComponent(receiver: Any, component: ComponentText, sender: Any?) {
@@ -51,10 +52,10 @@ object BukkitComponentManager : ComponentManager {
             else -> null
         }
 
-        if (commandSender is Player && commandSender.data.ignored.contains(uuid)) {
+        if (commandSender is Player && uuid in commandSender.data.ignored) {
             return
         }
-        val newComponent = if (Filters.conf.getBoolean("Enable.Chat") && commandSender is Player && commandSender.data.isFilterEnabled) {
+        val newComponent = if (isFilterEnabled && commandSender is Player && commandSender.data.isFilterEnabled) {
             filterComponent(component, 32000)
         } else {
             validateComponent(component, 32000)

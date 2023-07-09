@@ -67,7 +67,7 @@ object ImageShow : Function("IMAGE") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
+    override fun parseVariable(sender: Player, arg: String): ComponentText? {
         val args = arg.split(";", limit = 2)
         val description = args[0]
         val url = args[1].decodeBase64().decodeToString()

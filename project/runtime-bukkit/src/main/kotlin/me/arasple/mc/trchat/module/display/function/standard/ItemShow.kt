@@ -82,7 +82,7 @@ object ItemShow : Function("ITEM") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
+    override fun parseVariable(sender: Player, arg: String): ComponentText? {
         val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).let {
             if (compatible) {
                 buildItem(it) { material = Material.STONE }

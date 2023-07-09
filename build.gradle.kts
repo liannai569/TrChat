@@ -10,7 +10,7 @@ val kotlinVersionNum: String
 
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.8.10"
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
 
@@ -39,7 +39,7 @@ subprojects {
         compileOnly(fileTree("${rootDir.resolve("libs")}"))
         compileOnly("com.google.code.gson:gson:2.8.5")
         compileOnly("com.google.guava:guava:21.0")
-        compileOnly("net.kyori:adventure-api:4.12.0")
+        compileOnly("net.kyori:adventure-api:4.13.0")
         implementation("com.eatthepath:fast-uuid:0.2.0")
 
         compileOnly("io.izzel.taboolib:common:$taboolib_version")
@@ -59,6 +59,7 @@ subprojects {
         implementation("io.izzel.taboolib:expansion-alkaid-redis:$taboolib_version")
         implementation("io.izzel.taboolib:expansion-command-helper:$taboolib_version")
         implementation("io.izzel.taboolib:expansion-javascript:$taboolib_version")
+        implementation("io.izzel.taboolib:expansion-player-database:$taboolib_version")
     }
 
     java {
@@ -79,6 +80,9 @@ subprojects {
         relocate("taboolib", "${rootProject.group}.taboolib")
         relocate("kotlin.", "kotlin${kotlinVersionNum}.") { exclude("kotlin.Metadata") }
         relocate("com.eatthepath.uuid", "${rootProject.group}.library.uuid")
+        relocate("@plugin_id@", rootProject.name.toLowerCase())
+        relocate("@plugin_name@", rootProject.name)
+        relocate("@plugin_version@", rootProject.version.toString())
     }
 }
 

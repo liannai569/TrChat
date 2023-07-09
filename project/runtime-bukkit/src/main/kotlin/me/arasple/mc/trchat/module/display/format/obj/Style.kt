@@ -3,11 +3,10 @@ package me.arasple.mc.trchat.module.display.format.obj
 import me.arasple.mc.trchat.module.internal.script.Condition
 import me.arasple.mc.trchat.util.color.colorify
 import me.arasple.mc.trchat.util.pass
+import me.arasple.mc.trchat.util.setPlaceholders
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import taboolib.common.util.replaceWithOrder
 import taboolib.module.chat.ComponentText
-import taboolib.platform.compat.replacePlaceholder
 
 sealed interface Style {
 
@@ -82,12 +81,6 @@ sealed interface Style {
     }
 
     companion object {
-
-        private fun String.setPlaceholders(sender: CommandSender) = if (sender is Player) {
-            replacePlaceholder(sender)
-        } else {
-            this
-        }
 
         fun Style.applyTo(component: ComponentText, sender: CommandSender, vararg vars: String, message: String = "") {
             val content = when (this) {

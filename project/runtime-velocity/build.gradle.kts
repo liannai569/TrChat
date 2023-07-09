@@ -15,7 +15,7 @@ taboolib {
         desc("Advanced Minecraft Chat Control")
         contributors {
             name("Arasple")
-            name("ItsFlicker").description("Maintainer")
+            name("ItsFlicker")
         }
     }
     install("common", "platform-velocity")

@@ -32,6 +32,8 @@ abstract class NMS {
 
     abstract fun removeCustomChatCompletions(player: Player, entries: List<String>)
 
+    abstract fun setCustomChatCompletions(player: Player, entries: List<String>)
+
     companion object {
 
         @JvmStatic

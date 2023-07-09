@@ -76,18 +76,15 @@ object InventoryShow : Function("INVENTORY") {
         }
     }
 
-    override fun parseVariable(sender: Player, forward: Boolean, arg: String): ComponentText? {
+    override fun parseVariable(sender: Player, arg: String): ComponentText? {
         return computeAndCache(sender).let {
-            if (forward) {
-                BukkitProxyManager.sendTrChatMessage(
-                    sender,
-                    "InventoryShow",
-                    MinecraftVersion.minecraftVersion,
-                    sender.name,
-                    it.first,
-                    it.second
-                )
-            }
+            BukkitProxyManager.sendMessage(sender, arrayOf(
+                "InventoryShow",
+                MinecraftVersion.minecraftVersion,
+                sender.name,
+                it.first,
+                it.second)
+            )
             sender.getComponentFromLang("Function-Inventory-Show-Format", sender.name, it.first)
         }
     }

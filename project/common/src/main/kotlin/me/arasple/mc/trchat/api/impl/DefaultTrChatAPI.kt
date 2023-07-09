@@ -18,10 +18,12 @@ object DefaultTrChatAPI : TrChatAPI {
 
     override fun getComponentManager() = PlatformFactory.getAPI<ComponentManager>()
 
-    override fun getProxyManager() = PlatformFactory.getAPI<ProxyManager>()
-
     override fun getChannelManager() = PlatformFactory.getAPI<ChannelManager>()
 
     override fun getFilterManager() = PlatformFactory.getAPI<FilterManager>()
+
+    override fun getClientMessageManager() = PlatformFactory.getAPI<ClientMessageManager>()
+
+    override fun getProxyMessageManager() = PlatformFactory.getAPI<ProxyMessageManager>()
 
 }

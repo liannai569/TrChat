@@ -6,11 +6,11 @@ Options:
   # AUTO, NONE, BUNGEE, VELOCITY
   Proxy: AUTO
 
+Channel:
+  Default: 'Normal'
+
 Database:
   Method: SQLite
-  SQLite:
-    file: '{plugin_folder}/data/data.db'
-    table: trchat_user_data
   SQL:
     host: localhost
     port: 3306
@@ -21,8 +21,6 @@ Database:
 
 Redis:
   enabled: false
-  channel: 'trchat-message'
-  subscribe: []
   host: localhost
   port: 6379
   user: ~
@@ -40,6 +38,3 @@ Color:
   Sign: true
   Anvil: true
   Book: true
-
-Channel:
-  Default: 'Normal'

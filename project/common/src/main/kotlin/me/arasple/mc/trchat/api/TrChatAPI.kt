@@ -8,10 +8,12 @@ interface TrChatAPI {
 
     fun getComponentManager(): ComponentManager
 
-    fun getProxyManager(): ProxyManager
-
     fun getChannelManager(): ChannelManager
 
     fun getFilterManager(): FilterManager
+
+    fun getClientMessageManager(): ClientMessageManager
+
+    fun getProxyMessageManager(): ProxyMessageManager
 
 }

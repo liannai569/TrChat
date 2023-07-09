@@ -1,12 +1,12 @@
 package me.arasple.mc.trchat.util
 
-import me.arasple.mc.trchat.module.conf.file.Settings
 import me.clip.placeholderapi.PlaceholderAPI
 import me.clip.placeholderapi.PlaceholderAPIPlugin
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.submit
+import taboolib.module.configuration.ConfigNode
 import taboolib.platform.util.sendLang
 
 /**
@@ -16,9 +16,12 @@ import taboolib.platform.util.sendLang
 @PlatformSide([Platform.BUKKIT])
 object Vars {
 
+    @ConfigNode("Options.Depend-Expansions", "settings.yml")
+    var depends = emptyList<String>()
+        private set
+
     fun checkExpansions(sender: CommandSender): Boolean {
         val registered = PlaceholderAPI.getRegisteredIdentifiers()
-        val depends = Settings.conf.getStringList("Options.Depend-Expansions") - "multiverse"
         val uninstalled = depends.filter { ex -> registered.none { it.equals(ex, true) } }.toTypedArray()
         return if (uninstalled.isEmpty()) {
             true

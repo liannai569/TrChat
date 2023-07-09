@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.TrChat
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.conf.file.Functions
@@ -8,11 +9,8 @@ import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.Function
-import me.arasple.mc.trchat.module.internal.data.Databases
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.hook.HookPlugin
-import me.arasple.mc.trchat.api.impl.BukkitProxyManager
-import me.arasple.mc.trchat.module.internal.redis.RedisManager
 import org.bukkit.Bukkit
 import taboolib.common.platform.*
 import taboolib.common.platform.function.console
@@ -21,9 +19,6 @@ import taboolib.module.kether.Kether
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion.majorLegacy
 
-/**
- * @author Arasple
- */
 @PlatformSide([Platform.BUKKIT])
 object TrChatBukkit : Plugin() {
 
@@ -49,18 +44,9 @@ object TrChatBukkit : Plugin() {
     }
 
     override fun onEnable() {
-        Databases.database
-
-        if (RedisManager.enabled) {
-            RedisManager()
-        } else {
-            BukkitProxyManager.processor
-        }
-
+        BukkitProxyManager.processor
         HookPlugin.printInfo()
-
         reload(console())
-
         console().sendLang("Plugin-Enabled", pluginVersion)
     }
 

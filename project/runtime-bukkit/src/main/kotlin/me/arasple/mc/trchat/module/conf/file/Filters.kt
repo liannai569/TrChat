@@ -25,7 +25,6 @@ object Filters {
     @Awake(LifeCycle.ENABLE)
     fun init() {
         conf.onReload { reload() }
-        reload()
     }
 
     fun reload(notify: CommandSender? = null) {

@@ -7,6 +7,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.command
+import taboolib.common.platform.command.suggest
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
 import taboolib.common.util.unsafeLazy
@@ -35,19 +36,15 @@ object TrChatVelocity : Plugin() {
 
         command("muteallservers", permission = "trchatv.muteallservers") {
             dynamic("state") {
-                suggestion<ProxyCommandSender> { _, _ ->
+                suggest {
                     listOf("on", "off")
                 }
                 execute<ProxyCommandSender> { _, _, argument ->
-                    plugin.server.allServers.forEach { server ->
-                        VelocityProxyManager.sendTrChatMessage(server, "GlobalMute", argument)
-                    }
+                    VelocityProxyManager.sendMessageToAll("GlobalMute", argument)
                 }
             }
         }
-
         VelocityChannelManager.loadChannels(console())
-
         console().sendLang("Plugin-Enabled", pluginVersion)
     }
 

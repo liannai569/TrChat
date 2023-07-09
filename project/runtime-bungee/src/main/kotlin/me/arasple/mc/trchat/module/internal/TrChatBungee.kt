@@ -3,8 +3,12 @@ package me.arasple.mc.trchat.module.internal
 import me.arasple.mc.trchat.api.impl.BungeeChannelManager
 import me.arasple.mc.trchat.api.impl.BungeeProxyManager
 import net.md_5.bungee.api.ProxyServer
-import taboolib.common.platform.*
+import taboolib.common.platform.Platform
+import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.Plugin
+import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.command
+import taboolib.common.platform.command.suggest
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
 import taboolib.common.platform.function.server
@@ -27,13 +31,11 @@ object TrChatBungee : Plugin() {
     override fun onEnable() {
         command("muteallservers", permission = "trchatb.muteallservers") {
             dynamic("state") {
-                suggestion<ProxyCommandSender> { _, _ ->
+                suggest {
                     listOf("on", "off")
                 }
                 execute<ProxyCommandSender> { _, _, argument ->
-                    server<ProxyServer>().servers.forEach { (_, v) ->
-                        BungeeProxyManager.sendTrChatMessage(v, "GlobalMute", argument)
-                    }
+                    BungeeProxyManager.sendMessageToAll("GlobalMute", argument)
                 }
             }
         }

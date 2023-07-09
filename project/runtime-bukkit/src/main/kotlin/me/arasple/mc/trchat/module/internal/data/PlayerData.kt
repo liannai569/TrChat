@@ -3,6 +3,8 @@ package me.arasple.mc.trchat.module.internal.data
 import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.toUUID
 import org.bukkit.OfflinePlayer
+import taboolib.common5.cbool
+import taboolib.common5.clong
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -18,21 +20,22 @@ class PlayerData(val player: OfflinePlayer) {
         }
     }
 
-    val isSpying get() = player.getDataContainer().getBoolean("spying", false)
+    val isSpying get() = player.getDataContainer()["spying"].cbool
 
-    val isFilterEnabled get() = player.getDataContainer().getBoolean("filter", true)
+    val isFilterEnabled get() = player.getDataContainer()["filter"]?.cbool ?: true
 
-    val muteTime get() = player.getDataContainer().getLong("mute_time", 0)
+    val muteTime get() = player.getDataContainer()["mute_time"].clong
 
     val isMuted get() = muteTime > System.currentTimeMillis()
 
-    val muteReason get() = player.getDataContainer().getString("mute_reason", "null")!!
+    val muteReason
+        get() = player.getDataContainer()["mute_reason"] ?: "null"
 
-    val isVanishing get() = player.getDataContainer().getBoolean("vanish", false)
+    val isVanishing get() = player.getDataContainer()["vanish"].cbool
 
-    val ignored get() = player.getDataContainer().getStringList("ignored").map { it.toUUID() }
+    val ignored get() = player.getDataContainer()["ignored"]?.split(",")?.map { it.toUUID() } ?: emptyList()
 
-    fun selectColor(color: String?) {
+    fun selectColor(color: String) {
         player.getDataContainer()["color"] = color
     }
 
@@ -44,7 +47,7 @@ class PlayerData(val player: OfflinePlayer) {
         player.getDataContainer()["mute_time"] = System.currentTimeMillis() + time
     }
 
-    fun setMuteReason(reason: String?) {
+    fun setMuteReason(reason: String) {
         player.getDataContainer()["mute_reason"] = reason
     }
 
@@ -61,11 +64,13 @@ class PlayerData(val player: OfflinePlayer) {
     }
 
     fun addIgnored(uuid: UUID) {
-        player.getDataContainer()["ignored"] = player.getDataContainer().getStringList("ignored") + uuid.toString()
+        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) + uuid.toString()
+        player.getDataContainer()["ignored"] = new
     }
 
     fun removeIgnored(uuid: UUID) {
-        player.getDataContainer()["ignored"] = player.getDataContainer().getStringList("ignored") - uuid.toString()
+        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) - uuid.toString()
+        player.getDataContainer()["ignored"] = new
     }
 
     fun switchIgnored(uuid: UUID): Boolean {

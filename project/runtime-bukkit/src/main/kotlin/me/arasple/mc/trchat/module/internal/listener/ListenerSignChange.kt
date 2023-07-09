@@ -2,8 +2,6 @@ package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.adventure.toAdventure
-import me.arasple.mc.trchat.module.conf.file.Filters
-import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.color.MessageColors
 import me.arasple.mc.trchat.util.parseSimple
@@ -13,6 +11,7 @@ import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptPlayer
+import taboolib.module.configuration.ConfigNode
 
 /**
  * @author ItsFlicker
@@ -21,16 +20,24 @@ import taboolib.common.platform.function.adaptPlayer
 @PlatformSide([Platform.BUKKIT])
 object ListenerSignChange {
 
+    @ConfigNode("Enable.Sign", "filter.yml")
+    var filter = true
+        private set
+
+    @ConfigNode("Color.Sign", "settings.yml")
+    var color = true
+        private set
+
     @Suppress("Deprecation")
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onSignChange(e: SignChangeEvent) {
         val p = e.player
 
         for (index in e.lines.indices) {
-            if (Filters.conf.getBoolean("Enable.Sign")) {
+            if (filter) {
                 e.setLine(index, TrChat.api().getFilterManager().filter(e.getLine(index) ?: "", player = adaptPlayer(p)).filtered)
             }
-            if (Settings.conf.getBoolean("Color.Sign")) {
+            if (color) {
                 if (TrChatBukkit.isPaperEnv && p.hasPermission("trchat.color.simple")) {
                     e.line(index, (e.getLine(index) ?: "").parseSimple().toAdventure())
                 } else {

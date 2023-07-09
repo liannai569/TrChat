@@ -80,17 +80,15 @@ object VelocityChannelManager : ChannelManager {
     }
 
     fun sendProxyChannel(id: String, channel: String, all: Boolean = false) {
-        server<ProxyServer>().allServers.filter {
-            all || !loadedServers.computeIfAbsent(id) { ArrayList() }.contains(it.serverInfo.address.port)
-        }.forEach {
-            VelocityProxyManager.sendTrChatMessage(it, "SendProxyChannel", id, channel)
+        VelocityProxyManager.sendMessageToAll("SendProxyChannel", id, channel) {
+            all || it.serverInfo.address.port !in loadedServers.computeIfAbsent(id) { ArrayList() }
         }
     }
 
     fun sendAllProxyChannels(port: Int) {
         val server = server<ProxyServer>().allServers.firstOrNull { it.serverInfo.address.port == port } ?: return
         channels.forEach {
-            VelocityProxyManager.sendTrChatMessage(server, "SendProxyChannel", it.key, it.value)
+            VelocityProxyManager.sendMessage(server, "SendProxyChannel", it.key, it.value)
         }
     }
 

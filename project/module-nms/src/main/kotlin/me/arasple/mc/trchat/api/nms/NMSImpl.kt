@@ -3,7 +3,9 @@ package me.arasple.mc.trchat.api.nms
 import me.arasple.mc.trchat.util.reportOnce
 import net.minecraft.network.protocol.game.ClientboundCustomChatCompletionsPacket
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
-import net.minecraft.server.v1_12_R1.*
+import net.minecraft.server.v1_12_R1.ChatMessageType
+import net.minecraft.server.v1_12_R1.IChatBaseComponent
+import net.minecraft.server.v1_12_R1.PacketPlayOutChat
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.library.reflex.Reflex.Companion.invokeConstructor
@@ -123,6 +125,14 @@ class NMSImpl : NMS() {
         if (majorLegacy < 11901) return
         player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
             ClientboundCustomChatCompletionsPacket.Action.REMOVE,
+            entries
+        ))
+    }
+
+    override fun setCustomChatCompletions(player: Player, entries: List<String>) {
+        if (majorLegacy < 11901) return
+        player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
+            ClientboundCustomChatCompletionsPacket.Action.SET,
             entries
         ))
     }

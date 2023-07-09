@@ -2,7 +2,6 @@ Enable:
   Chat: true
   Sign: true
   Anvil: true
-  Item: false
 
 Cloud-Thesaurus:
   Enabled: true

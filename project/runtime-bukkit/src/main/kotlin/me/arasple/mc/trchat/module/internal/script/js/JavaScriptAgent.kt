@@ -67,9 +67,9 @@ object JavaScriptAgent {
                 else script.compileJS()
 
             CompletableFuture.completedFuture(compiledScript?.eval(context))
-        } catch (e: Throwable) {
+        } catch (t: Throwable) {
             println("§c[TrChat] §8Unexpected exception while parsing javascript:")
-            e.localizedMessage.split("\n").forEach {
+            t.localizedMessage.split("\n").forEach {
                 println("         §8$it")
             }
             CompletableFuture.completedFuture(null)

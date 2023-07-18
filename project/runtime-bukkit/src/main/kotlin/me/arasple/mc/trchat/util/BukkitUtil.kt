@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.command.main.CommandMute
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.script.Condition
+import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
@@ -17,7 +18,6 @@ import taboolib.expansion.playerDatabase
 import taboolib.module.chat.ComponentText
 import taboolib.module.ui.MenuHolder
 import taboolib.module.ui.type.Basic
-import taboolib.platform.compat.replacePlaceholder
 import taboolib.platform.util.sendLang
 
 val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
@@ -51,8 +51,8 @@ fun Player.passPermission(permission: String?): Boolean {
 
 fun String.setPlaceholders(sender: CommandSender): String {
     return try {
-        if (sender is Player) {
-            replacePlaceholder(sender)
+        if (sender is OfflinePlayer) {
+            PlaceholderAPI.setPlaceholders(sender, this)
         } else {
             this
         }
@@ -80,11 +80,7 @@ fun Player.checkMute(): Boolean {
 }
 
 fun OfflinePlayer.getDataContainer(): DataContainer {
-    return if (isOnline) {
-        playerDataContainer[uniqueId] ?: error("Database is not initialized")
-    } else {
-        playerDataContainer.computeIfAbsent(uniqueId) { DataContainer(uniqueId.parseString(), playerDatabase!!) }
-    }
+    return playerDataContainer.computeIfAbsent(uniqueId) { DataContainer(uniqueId.parseString(), playerDatabase!!) }
 }
 
 fun Any.sendComponent(sender: Any?, component: ComponentText) {

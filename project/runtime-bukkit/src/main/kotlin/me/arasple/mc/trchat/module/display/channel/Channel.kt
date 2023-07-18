@@ -104,7 +104,7 @@ open class Channel(
                 settings.doubleTransfer,
                 settings.ports
             )
-        } else {
+        } else if (!settings.forceProxy) {
             listeners.forEach { getProxyPlayer(it)?.sendComponent(null, component) }
             sender.sendComponent(null, component)
         }
@@ -146,7 +146,7 @@ open class Channel(
         // TODO: 跨服事件传递
         // Proxy
         if (settings.proxy) {
-            if (BukkitProxyManager.processor != null) {
+            if (BukkitProxyManager.processor != null || settings.forceProxy) {
                 BukkitProxyManager.sendBroadcastRaw(
                     player,
                     player.uniqueId,

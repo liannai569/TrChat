@@ -11,10 +11,10 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.submit
 import taboolib.expansion.playerDataContainer
 import taboolib.expansion.setupDataContainer
-import taboolib.platform.util.sendLang
 
 /**
  * @author ItsFlicker
@@ -23,6 +23,8 @@ import taboolib.platform.util.sendLang
 @PlatformSide([Platform.BUKKIT])
 object ListenerJoin {
 
+    private var hasFetched = false
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
@@ -30,23 +32,21 @@ object ListenerJoin {
         if (!playerDataContainer.containsKey(player.uniqueId)) {
             player.setupDataContainer()
         }
-        BukkitProxyManager.sendMessage(player, arrayOf("FetchProxyChannels"))
-
-        Channel.channels.values.filter { it.settings.autoJoin }.forEach {
-            if (player.passPermission(it.settings.joinPermission)) {
-                it.listeners.add(player.name)
-            }
-        }
-        player.session
         player.data
+        player.session
 
         submit(delay = 20) {
-            if (player.isOnline && player.hasPermission("trchat.admin") && Updater.latest_Version > Updater.current_version && player.uniqueId !in Updater.notified) {
-                player.sendLang("Plugin-Updater-Header", Updater.current_version, Updater.latest_Version)
-                player.sendMessage(Updater.information)
-                player.sendLang("Plugin-Updater-Footer")
-                Updater.notified.add(player.uniqueId)
+            if (!player.isOnline) return@submit
+            if (!hasFetched) {
+                BukkitProxyManager.sendMessage(player, arrayOf("FetchProxyChannels"))
+                hasFetched = true
             }
+            Channel.channels.values.filter { it.settings.autoJoin }.forEach {
+                if (player.passPermission(it.settings.joinPermission)) {
+                    it.listeners.add(player.name)
+                }
+            }
+            Updater.notifyPlayer(adaptPlayer(player))
         }
     }
 }

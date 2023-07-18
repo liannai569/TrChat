@@ -16,6 +16,7 @@ class ChannelSettings(
     @Path("Private") val isPrivate: Boolean = false,
     @Path("Target") @Conversion(Range.TargetConverter::class) val range: Range = Range(Range.Type.ALL, -1),
     @Path("Proxy") val proxy: Boolean = false,
+    @Path("Force-Proxy") val forceProxy: Boolean = false,
     @Path("Double-Transfer") val doubleTransfer: Boolean = true,
     @Path("Ports") @Conversion(PortConverter::class) val ports: List<Int> = emptyList(),
     @Path("Disabled-Functions") val disabledFunctions: List<String> = emptyList(),

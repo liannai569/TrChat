@@ -2,8 +2,8 @@ General:
   Command-Controller:
     Enabled: true
     List:
-      - 'arasple{exact: true}{condition: perm *trchat.admin}'
-      - 'ver(sion)?(s)?{condition: perm *trchat.admin}'
+      - 'arasple{exact: true}{condition: perm "trchat.admin"}'
+      - 'ver(sion)?(s)?{condition: perm "trchat.admin"}'
       - 'help(s)?{condition: perm *trchat.admin}'
       - 'shout{cooldown: 3}'
   Mention:
@@ -31,7 +31,6 @@ General:
     Cooldown: '30s'
     Origin-Name: false
     Compatible: false
-    Type: TRANSLATABLE
     Keys:
       - "%i%"
       - "%i"

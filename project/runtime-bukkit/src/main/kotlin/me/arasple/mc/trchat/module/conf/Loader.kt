@@ -117,11 +117,12 @@ object Loader {
                 Range(Range.Type.valueOf(it[0]), distance)
             }
             val proxy = section.getBoolean("Proxy", false)
+            val forceProxy = section.getBoolean("Force-Proxy", false)
             val doubleTransfer = section.getBoolean("Double-Transfer", true)
             val ports = section.getString("Ports")?.split(";")?.map { it.toInt() } ?: emptyList()
             val disabledFunctions = section.getStringList("Disabled-Functions")
             val filterBeforeSending = section.getBoolean("Filter-Before-Sending", false)
-            ChannelSettings(joinPermission, speakCondition, autoJoin, isPrivate, range, proxy, doubleTransfer, ports, disabledFunctions, filterBeforeSending)
+            ChannelSettings(joinPermission, speakCondition, autoJoin, isPrivate, range, proxy, forceProxy, doubleTransfer, ports, disabledFunctions, filterBeforeSending)
         }
 
         val bindings = conf.getConfigurationSection("Bindings")?.let {

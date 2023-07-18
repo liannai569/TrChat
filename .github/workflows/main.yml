@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: TrChat Artifacts
-          path: build/libs/
+          path: plugin/build/libs/
 #      - name: automatic releases
 #        uses: marvinpinto/action-automatic-releases@v1.2.1
 #        with:

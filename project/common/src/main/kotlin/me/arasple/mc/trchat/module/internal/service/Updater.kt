@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.module.internal.service
 import me.arasple.mc.trchat.util.parseJson
 import taboolib.common.LifeCycle
 import taboolib.common.env.IO
+import taboolib.common.platform.ProxyPlayer
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.SkipTo
 import taboolib.common.platform.function.console
@@ -41,13 +42,22 @@ object Updater {
                     val latestVersion = json["tag_name"].asString.removePrefix("v")
                     latest_Version = Version(latestVersion)
                     information = json["body"].asString
-                    notifyVersion()
+                    notifyConsole()
                 }
             }
         }
     }
 
-    private fun notifyVersion() {
+    fun notifyPlayer(player: ProxyPlayer) {
+        if (player.hasPermission("trchat.admin") && latest_Version > current_version && player.uniqueId !in notified) {
+            player.sendLang("Plugin-Updater-Header", current_version, latest_Version)
+            player.sendMessage(information)
+            player.sendLang("Plugin-Updater-Footer")
+            notified.add(player.uniqueId)
+        }
+    }
+
+    private fun notifyConsole() {
         if (latest_Version > current_version) {
             console().sendLang("Plugin-Updater-Header", current_version, latest_Version)
             console().sendMessage(information)

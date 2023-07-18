@@ -29,7 +29,7 @@ object ListenerQuit {
         disconnect(e.player)
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onKick(e: PlayerKickEvent) {
         disconnect(e.player)
     }

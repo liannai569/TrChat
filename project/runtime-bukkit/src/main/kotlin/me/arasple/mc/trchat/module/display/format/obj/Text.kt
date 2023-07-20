@@ -21,13 +21,13 @@ class Text(val content: String, val condition: Condition?) {
     val dynamic = papiRegex.containsMatchIn(content)
 
     fun process(sender: CommandSender, vararg vars: String): ComponentText {
-        var text = KetherHandler.parseInline(content, sender).replaceWithOrder(*vars)
+        var text = KetherHandler.parseInline(content, sender)
         if (sender is Player) {
             if (dynamic) {
                 text = text.setPlaceholders(sender)
             }
             text = HookPlugin.getItemsAdder().replaceFontImages(text, sender as? Player)
         }
-        return Components.text(text.colorify())
+        return Components.text(text.replaceWithOrder(*vars).colorify())
     }
 }

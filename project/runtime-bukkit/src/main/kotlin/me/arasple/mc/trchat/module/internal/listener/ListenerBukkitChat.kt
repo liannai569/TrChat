@@ -5,6 +5,7 @@ package me.arasple.mc.trchat.module.internal.listener
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.Function
+import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.util.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -23,7 +24,7 @@ import taboolib.platform.util.sendLang
 object ListenerBukkitChat {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onChat(e: AsyncPlayerChatEvent) {
+    fun onBukkitChat(e: AsyncPlayerChatEvent) {
         if (e.isCancelled) return
         e.recipients.clear()
         val player = e.player
@@ -35,17 +36,15 @@ object ListenerBukkitChat {
         if (!checkLimits(player, e.message)) {
             return
         }
-
         Channel.channels.values.forEach { channel ->
             channel.bindings.prefix?.forEach {
                 if (e.message.startsWith(it, ignoreCase = true)) {
-                    channel.execute(player, e.message.substring(it.length), false)
+                    channel.execute(player, e.message.substring(it.length), TrChatBukkit.isPaperEnv)
                     return
                 }
             }
         }
-
-        session.getChannel()?.execute(player, e.message, false)
+        session.getChannel()?.execute(player, e.message, TrChatBukkit.isPaperEnv)
     }
 
     private fun checkLimits(player: Player, message: String): Boolean {
@@ -59,7 +58,7 @@ object ListenerBukkitChat {
             }
         }
         if (!player.hasPermission("trchat.bypass.repeat")) {
-            val lastMessage = player.session.lastMessage
+            val lastMessage = player.session.lastPublicMessage
             if (Strings.similarDegree(lastMessage, message) > Settings.chatSimilarity) {
                 player.sendLang("General-Too-Similar")
                 return false

@@ -4,7 +4,6 @@ import me.arasple.mc.trchat.util.parseJson
 import taboolib.common.LifeCycle
 import taboolib.common.env.IO
 import taboolib.common.platform.ProxyPlayer
-import taboolib.common.platform.Schedule
 import taboolib.common.platform.SkipTo
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
@@ -29,7 +28,6 @@ object Updater {
     var latest_Version = Version("0.0")
     var information = ""
 
-    @Schedule(delay = 20, period = (15 * 60 * 20).toLong(), async = true)
     fun grabInfo() {
         if (latest_Version.version[0] > 0) {
             return
@@ -50,8 +48,10 @@ object Updater {
 
     fun notifyPlayer(player: ProxyPlayer) {
         if (player.hasPermission("trchat.admin") && latest_Version > current_version && player.uniqueId !in notified) {
-            player.sendLang("Plugin-Updater-Header", current_version, latest_Version)
-            player.sendMessage(information)
+            player.sendLang("Plugin-Updater-Header", current_version.source, latest_Version.source)
+            information.lines().forEach {
+                player.sendMessage(it)
+            }
             player.sendLang("Plugin-Updater-Footer")
             notified.add(player.uniqueId)
         }
@@ -59,7 +59,7 @@ object Updater {
 
     private fun notifyConsole() {
         if (latest_Version > current_version) {
-            console().sendLang("Plugin-Updater-Header", current_version, latest_Version)
+            console().sendLang("Plugin-Updater-Header", current_version.source, latest_Version.source)
             console().sendMessage(information)
             console().sendLang("Plugin-Updater-Footer")
         } else {

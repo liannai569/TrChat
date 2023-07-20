@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.platform.compat.PlaceholderExpansion
 
@@ -34,7 +35,8 @@ object HookPlaceholderAPI : PlaceholderExpansion {
 //                "js" -> if (params.size > 1) JavaScriptAgent.eval(player, args.substringAfter('_')).get() else ""
                 "channel" -> session.channel
                 "toplayer" -> session.lastPrivateTo
-                "lastmessage" -> session.lastMessage
+                "lastpublicmessage", "lastmessage" -> session.lastPublicMessage
+                "lastprivatemessage" -> session.lastPrivateMessage
                 "spy" -> data.isSpying
                 "filter" -> data.isFilterEnabled
                 "mute" -> data.isMuted
@@ -64,7 +66,7 @@ object HookPlaceholderAPI : PlaceholderExpansion {
         return "ERROR"
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onChat(e: TrChatEvent) {
         if (e.forward && !Vars.checkExpansions(e.session.player)) {
             e.isCancelled = true

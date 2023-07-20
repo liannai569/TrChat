@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.command.main.CommandMute
 import me.arasple.mc.trchat.module.internal.data.PlayerData
 import me.arasple.mc.trchat.module.internal.script.Condition
+import me.arasple.mc.trchat.module.internal.script.kether.KetherHandler
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -16,11 +17,12 @@ import taboolib.expansion.DataContainer
 import taboolib.expansion.playerDataContainer
 import taboolib.expansion.playerDatabase
 import taboolib.module.chat.ComponentText
+import taboolib.module.nms.MinecraftVersion
 import taboolib.module.ui.MenuHolder
 import taboolib.module.ui.type.Basic
 import taboolib.platform.util.sendLang
 
-val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") }
+val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") && MinecraftVersion.major < 8  }
 private val noClickBasic = object : Basic() {
     init {
         rows(6)
@@ -60,6 +62,10 @@ fun String.setPlaceholders(sender: CommandSender): String {
         t.print("Error occurred when parsing placeholder!This is not a bug of TrChat")
         this
     }
+}
+
+fun String.parseInline(sender: CommandSender, vars: Map<String, Any> = emptyMap()): String {
+    return KetherHandler.parseInline(this, sender, vars)
 }
 
 inline val Player.session get() = ChatSession.getSession(this)

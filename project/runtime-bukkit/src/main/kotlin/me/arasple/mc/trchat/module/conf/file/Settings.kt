@@ -1,7 +1,11 @@
 package me.arasple.mc.trchat.module.conf.file
 
+import me.arasple.mc.trchat.module.internal.service.Updater
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.function.submitAsync
 import taboolib.common5.util.parseMillis
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigNode
@@ -30,5 +34,17 @@ object Settings {
 
     @ConfigNode("Chat.Length-Limit", "settings.yml")
     var chatLengthLimit = 100
+
+    @ConfigNode("Options.Component-Max-Length", "settings.yml")
+    var componentMaxLength = 32766
+
+    @Awake(LifeCycle.ENABLE)
+    fun init() {
+        if (conf.getBoolean("Options.Check-Update", true)) {
+            submitAsync(delay = 20, period = 15 * 60 * 20) {
+                Updater.grabInfo()
+            }
+        }
+    }
 
 }

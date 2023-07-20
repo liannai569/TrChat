@@ -127,6 +127,7 @@ open class Channel(
             return null
         }
         val msg = events.process(player, event.message)?.replace("{{", "\\{{") ?: return null
+        player.session.lastPublicMessage = msg
 
         val component = Components.empty()
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
@@ -138,8 +139,6 @@ open class Channel(
                 .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { suffix -> component.append(suffix) }
         } ?: return null
-
-        player.session.lastMessage = msg
         ChatLogs.logNormal(player.name, msg)
         Metrics.increase(0)
 

@@ -42,7 +42,6 @@ class CustomFunction(
         fun String.replaceRegex(regex: Regex, replaceRegex: Regex?, replacement: (String) -> String): String {
             return replace(regex) {
                 val str = it.value
-                if (str.contains('%')) return@replace str
                 val result = replaceRegex?.find(str)?.value ?: str
                 replacement(result)
             }

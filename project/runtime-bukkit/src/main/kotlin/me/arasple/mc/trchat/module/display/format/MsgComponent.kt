@@ -53,7 +53,7 @@ class MsgComponent(val defaultColor: List<Pair<CustomColor, Condition?>>, style:
         val message = vars[0]
         val component = Components.text(message)
         style.forEach {
-            it.applyTo(component, sender, *vars, message = component.toPlainText())
+            it.applyTo(component, sender, *vars)
         }
         return component
     }

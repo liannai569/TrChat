@@ -1,10 +1,11 @@
 Options:
+  Check-Update: true
+  Proxy: AUTO
   Log-Normal: '[{0}] {1}: {2}'
   Log-Private: '[{0}] {1} -> {2}: {3}'
   Depend-Expansions: ['player', 'server']
   Prevent-Tab-Complete: false
-  # AUTO, NONE, BUNGEE, VELOCITY
-  Proxy: AUTO
+  Component-Max-Length: 32766
 
 Channel:
   Default: 'Normal'

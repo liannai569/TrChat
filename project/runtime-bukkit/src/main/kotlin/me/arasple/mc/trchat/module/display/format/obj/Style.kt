@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.display.format.obj
 
 import me.arasple.mc.trchat.module.internal.script.Condition
 import me.arasple.mc.trchat.util.color.colorify
+import me.arasple.mc.trchat.util.parseInline
 import me.arasple.mc.trchat.util.pass
 import me.arasple.mc.trchat.util.setPlaceholders
 import org.bukkit.command.CommandSender
@@ -82,18 +83,18 @@ sealed interface Style {
 
     companion object {
 
-        fun Style.applyTo(component: ComponentText, sender: CommandSender, vararg vars: String, message: String = "") {
+        fun Style.applyTo(component: ComponentText, sender: CommandSender, vararg vars: String) {
             val content = when (this) {
                 is Font -> {
                     contents.firstOrNull { it.second.pass(sender) }?.first
                 }
                 is Hover.Text -> {
                     contents.filter { it.second.pass(sender) }.joinToString("\n") { it.first }
-                        .replace("\$message", message).replaceWithOrder(*vars).setPlaceholders(sender).colorify()
+                        .parseInline(sender).setPlaceholders(sender).replaceWithOrder(*vars).colorify()
                 }
                 else -> {
                     contents.firstOrNull { it.second.pass(sender) }?.first
-                        ?.replace("\$message", message)?.replaceWithOrder(*vars)?.setPlaceholders(sender)
+                        ?.parseInline(sender)?.setPlaceholders(sender)?.replaceWithOrder(*vars)
                 }
             }
             if (content != null) {

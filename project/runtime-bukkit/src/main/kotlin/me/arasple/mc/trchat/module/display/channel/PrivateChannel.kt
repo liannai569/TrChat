@@ -96,6 +96,7 @@ class PrivateChannel(
             return null
         }
         val msg = events.process(player, event.message)?.replace("{{", "\\{{") ?: return null
+        player.session.lastPrivateMessage = msg
 
         val send = Components.empty()
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->
@@ -123,7 +124,6 @@ class PrivateChannel(
         if (!events.send(player, session.lastPrivateTo, msg)) {
             return null
         }
-
         player.sendComponent(player, send)
 
         PlayerData.data.filterValues { it.isSpying }.entries.forEach { (_, v) ->

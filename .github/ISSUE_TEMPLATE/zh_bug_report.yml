@@ -1,6 +1,6 @@
 name: 错误报告
 description: '注意: 未正确根据提示进行反馈错误会被关闭.'
-title: "[问题]: "
+title: "[问题] "
 labels: ['Bug | 漏洞']
 body:
   - type: checkboxes
@@ -16,7 +16,7 @@ body:
     id: wikis
     attributes:
       label: '是否已查阅 Wiki'
-      description: '往往很多问题都是因为没有详细查阅 Wiki, 或是Wiki已经有解决方案, 你是否已阅读 [Wiki](https://trchat.plugindoc.cn/wen-ti/known)?'
+      description: '往往很多问题都是因为没有详细查阅 Wiki, 或是Wiki已经有解决方案, 你是否已阅读 [Wiki](https://trchat.trixey.cc/guide/known-issues)?'
       options:
         - label: '我已查阅 Wiki 对于该问题的相关内容, 并确定该问题是存在的.'
           required: true

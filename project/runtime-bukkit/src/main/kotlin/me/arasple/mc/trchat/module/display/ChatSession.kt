@@ -22,10 +22,9 @@ class ChatSession(
     var channel: String?
 ) {
 
-    var lastMessage = ""
-
+    var lastPublicMessage = ""
+    var lastPrivateMessage = ""
     var lastPrivateTo = ""
-
     val receivedMessages = mutableListOf<ChatMessage>()
 
     fun getColor(default: CustomColor?): CustomColor {

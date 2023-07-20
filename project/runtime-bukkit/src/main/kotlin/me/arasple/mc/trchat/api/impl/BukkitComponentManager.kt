@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.api.impl
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.ComponentManager
 import me.arasple.mc.trchat.api.nms.NMS
+import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.toUUID
 import net.md_5.bungee.api.chat.BaseComponent
@@ -56,9 +57,9 @@ object BukkitComponentManager : ComponentManager {
             return
         }
         val newComponent = if (isFilterEnabled && commandSender is Player && commandSender.data.isFilterEnabled) {
-            filterComponent(component, 32000)
+            filterComponent(component, Settings.componentMaxLength)
         } else {
-            validateComponent(component, 32000)
+            validateComponent(component, Settings.componentMaxLength)
         }
 
         if (commandSender is Player) {

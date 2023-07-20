@@ -1,6 +1,6 @@
 name: Error Report
 description: 'Warning: Failure to properly follow the prompts for feedback errors will be closed.'
-title: "[issue]: "
+title: "[issue] "
 labels: ['Bug | 漏洞']
 body:
   - type: checkboxes
@@ -16,7 +16,7 @@ body:
     id: wikis
     attributes:
       label: 'Have you checked the Wiki'
-      description: 'Often many problems are caused by not checking the wiki in detail, or the wiki already has a solution, have you read [Wiki](https://trchat.plugindoc.cn/wen-ti/known)?'
+      description: 'Often many problems are caused by not checking the wiki in detail, or the wiki already has a solution, have you read [Wiki](https://trchat.trixey.cc/guide/known-issues)?'
       options:
         - label: 'I have checked the Wiki for this problem and determined that the problem exists.'
           required: true

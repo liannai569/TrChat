@@ -14,6 +14,7 @@ import me.arasple.mc.trchat.module.internal.service.Metrics
 import me.arasple.mc.trchat.util.*
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.command.command
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
@@ -51,8 +52,14 @@ open class Channel(
                 join(it, id, hint = false)
             }
         }
-        if (bindings.command?.isNotEmpty() == true) {
-            command(bindings.command[0], subList(bindings.command, 1), "Channel $id", permission = settings.joinPermission) {
+        if (!bindings.command.isNullOrEmpty()) {
+            command(
+                name = bindings.command[0],
+                aliases = subList(bindings.command, 1),
+                description = "TrChat channel $id",
+                permission = settings.joinPermission,
+                permissionDefault = if (settings.joinPermission.isEmpty()) PermissionDefault.TRUE else PermissionDefault.OP
+            ) {
                 execute<Player> { sender, _, _ ->
                     if (sender.session.channel == this@Channel.id) {
                         quit(sender)
@@ -122,12 +129,15 @@ open class Channel(
             player.sendLang("Channel-Bad-Language")
             return null
         }
-        val event = TrChatEvent(this, player.session, message)
+        val session = player.session
+        session.lastPublicMessage = message
+        val event = TrChatEvent(this, session, message)
         if (!event.call()) {
             return null
         }
         val msg = events.process(player, event.message)?.replace("{{", "\\{{") ?: return null
-        player.session.lastPublicMessage = msg
+        ChatLogs.logNormal(player.name, msg)
+        Metrics.increase(0)
 
         val component = Components.empty()
         formats.firstOrNull { it.condition.pass(player) }?.let { format ->
@@ -139,9 +149,6 @@ open class Channel(
                 .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { suffix -> component.append(suffix) }
         } ?: return null
-        ChatLogs.logNormal(player.name, msg)
-        Metrics.increase(0)
-
         // TODO: 跨服事件传递
         // Proxy
         if (settings.proxy) {

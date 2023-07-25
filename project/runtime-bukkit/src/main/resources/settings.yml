@@ -3,9 +3,11 @@ Options:
   Proxy: AUTO
   Log-Normal: '[{0}] {1}: {2}'
   Log-Private: '[{0}] {1} -> {2}: {3}'
+  Log-Delete-Time: 0
   Depend-Expansions: ['player', 'server']
   Prevent-Tab-Complete: false
   Component-Max-Length: 32766
+  Kether-Allow-Tolerance-Parser: true
 
 Channel:
   Default: 'Normal'

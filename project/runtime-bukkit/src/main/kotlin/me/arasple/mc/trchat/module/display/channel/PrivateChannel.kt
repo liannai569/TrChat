@@ -16,6 +16,7 @@ import me.arasple.mc.trchat.util.pass
 import me.arasple.mc.trchat.util.sendComponent
 import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
+import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.suggest
 import taboolib.common.platform.function.console
@@ -44,8 +45,14 @@ class PrivateChannel(
         onlinePlayers.filter { it.session.channel == id }.forEach {
             join(it, id, hint = false)
         }
-        if (bindings.command?.isNotEmpty() == true) {
-            command(bindings.command[0], subList(bindings.command, 1), "Channel $id", permission = settings.joinPermission) {
+        if (!bindings.command.isNullOrEmpty()) {
+            command(
+                name = bindings.command[0],
+                aliases = subList(bindings.command, 1),
+                description = "TrChat channel $id",
+                permission = settings.joinPermission,
+                permissionDefault = if (settings.joinPermission.isEmpty()) PermissionDefault.TRUE else PermissionDefault.OP
+            ) {
                 execute<Player> { sender, _, _ ->
                     if (sender.session.channel == this@PrivateChannel.id) {
                         quit(sender)
@@ -91,12 +98,12 @@ class PrivateChannel(
             return null
         }
         val session = player.session
+        session.lastPrivateMessage = message
         val event = TrChatEvent(this, session, message)
         if (!event.call()) {
             return null
         }
         val msg = events.process(player, event.message)?.replace("{{", "\\{{") ?: return null
-        player.session.lastPrivateMessage = msg
 
         val send = Components.empty()
         sender.firstOrNull { it.condition.pass(player) }?.let { format ->

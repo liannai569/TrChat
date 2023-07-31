@@ -3,13 +3,11 @@ package me.arasple.mc.trchat.module.internal.script.kether
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
+import me.arasple.mc.trchat.util.session
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
-import taboolib.module.kether.KetherParser
-import taboolib.module.kether.ScriptFrame
-import taboolib.module.kether.combinationParser
-import taboolib.module.kether.script
+import taboolib.module.kether.*
 
 @PlatformSide([Platform.BUKKIT])
 internal object KetherActions {
@@ -48,6 +46,14 @@ internal object KetherActions {
                     else -> error("Unknown filter action: $action")
                 }
             }
+        }
+    }
+
+    @KetherParser(["cancel"], namespace = "trchat")
+    internal fun actionCancel() = scriptParser {
+        actionNow {
+            player().session.cancelChat = true
+            null
         }
     }
 

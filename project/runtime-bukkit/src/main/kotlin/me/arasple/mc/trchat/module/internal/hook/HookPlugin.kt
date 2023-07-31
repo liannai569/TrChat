@@ -3,10 +3,14 @@ package me.arasple.mc.trchat.module.internal.hook
 import me.arasple.mc.trchat.module.internal.hook.impl.HookEcoEnchants
 import me.arasple.mc.trchat.module.internal.hook.impl.HookItemsAdder
 import me.arasple.mc.trchat.module.internal.hook.impl.HookNova
+import me.arasple.mc.trchat.module.internal.hook.type.HookDisplayItem
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.function.console
 import taboolib.module.lang.sendLang
+import java.util.function.BiFunction
 
 /**
  * @author Arasple
@@ -30,6 +34,17 @@ object HookPlugin {
     fun addHook(element: HookAbstract) {
         registry.add(element)
         console().sendLang("Plugin-Dependency-Hooked", element.name)
+    }
+
+    fun registerDisplayItemHook(name: String, func: BiFunction<ItemStack, Player, ItemStack>) {
+        addHook(object : HookDisplayItem() {
+            override fun getPluginName(): String {
+                return name
+            }
+            override fun displayItem(item: ItemStack, player: Player): ItemStack {
+                return func.apply(item, player)
+            }
+        })
     }
 
     fun getEcoEnchants(): HookEcoEnchants {

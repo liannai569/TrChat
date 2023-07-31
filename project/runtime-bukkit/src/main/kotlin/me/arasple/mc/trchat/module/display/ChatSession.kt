@@ -22,10 +22,11 @@ class ChatSession(
     var channel: String?
 ) {
 
+    val receivedMessages = mutableListOf<ChatMessage>()
     var lastPublicMessage = ""
     var lastPrivateMessage = ""
     var lastPrivateTo = ""
-    val receivedMessages = mutableListOf<ChatMessage>()
+    var cancelChat = false
 
     fun getColor(default: CustomColor?): CustomColor {
         val forces = MessageColors.getForceColors(player)

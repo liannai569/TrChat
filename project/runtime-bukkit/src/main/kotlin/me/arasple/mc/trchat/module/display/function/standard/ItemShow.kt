@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.module.display.function.standard
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import me.arasple.mc.trchat.api.impl.BukkitProxyManager
 import me.arasple.mc.trchat.module.adventure.toNative
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.display.function.Function
@@ -12,13 +13,17 @@ import me.arasple.mc.trchat.module.internal.script.Reaction
 import me.arasple.mc.trchat.util.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import taboolib.common.io.digest
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.util.asList
 import taboolib.common.util.replaceWithOrder
 import taboolib.common.util.resettableLazy
+import taboolib.common5.util.encodeBase64
 import taboolib.common5.util.parseMillis
+import taboolib.library.xseries.XMaterial
 import taboolib.module.chat.ComponentText
 import taboolib.module.chat.Components
 import taboolib.module.chat.impl.DefaultComponent
@@ -27,8 +32,12 @@ import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.getI18nName
 import taboolib.module.nms.getInternalName
+import taboolib.module.ui.buildMenu
+import taboolib.module.ui.type.Hopper
+import taboolib.platform.util.asLangText
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.sendLang
+import taboolib.platform.util.serializeToByteArray
 
 /**
  * @author ItsFlicker
@@ -62,7 +71,10 @@ object ItemShow : Function("ITEM") {
     @ConfigNode("General.Item-Show.Keys", "function.yml")
     var keys = emptyList<String>()
 
-    private val cache: Cache<ItemStack, ComponentText> = CacheBuilder.newBuilder()
+    private val cacheComponent: Cache<ItemStack, ComponentText> = CacheBuilder.newBuilder()
+        .maximumSize(50)
+        .build()
+    val cacheHopper: Cache<String, Inventory> = CacheBuilder.newBuilder()
         .maximumSize(50)
         .build()
 
@@ -94,15 +106,25 @@ object ItemShow : Function("ITEM") {
                 newItem
             }
         }
-        return cache.get(item) {
+        val sha1 = computeAndCache(sender, item).let {
+            BukkitProxyManager.sendMessage(sender, arrayOf(
+                "ItemShow",
+                MinecraftVersion.minecraftVersion,
+                sender.name,
+                it.first,
+                it.second)
+            )
+            it.first
+        }
+        return cacheComponent.get(item) {
             sender
-                .getComponentFromLang("Function-Item-Show-Format-New", item.amount) { type, i, part, proxySender ->
+                .getComponentFromLang("Function-Item-Show-Format-With-Hopper", item.amount, sha1) { type, i, part, proxySender ->
                     val component = if (part.isVariable && part.text == "item") {
                         item.getNameComponent(sender)
                     } else {
-                        Components.text(part.text.translate(proxySender).replaceWithOrder(item.amount))
+                        Components.text(part.text.translate(proxySender).replaceWithOrder(item.amount, sha1))
                     }
-                    component.applyStyle(type, part, i, proxySender, item.amount).hoverItemFixed(item)
+                    component.applyStyle(type, part, i, proxySender, item.amount, sha1).hoverItemFixed(item)
                 }
         }
     }
@@ -122,6 +144,22 @@ object ItemShow : Function("ITEM") {
             }
         }
         return true
+    }
+
+    fun computeAndCache(sender: Player, item: ItemStack): Pair<String, String> {
+        val sha1 = item.serializeToByteArray().encodeBase64().digest("sha-1")
+        if (cacheHopper.getIfPresent(sha1) != null) {
+            return sha1 to cacheHopper.getIfPresent(sha1)!!.serializeToByteArray().encodeBase64()
+        }
+        val menu = buildMenu<Hopper>(sender.asLangText("Function-Item-Show-Title", sender.name)) {
+            rows(1)
+            map("xxixx")
+            set('x', XMaterial.BLACK_STAINED_GLASS_PANE) { name = "§r" }
+            set('i', item)
+            onClick(lock = true)
+        }
+        cacheHopper.put(sha1, menu)
+        return sha1 to menu.serializeToByteArray().encodeBase64()
     }
 
     @Suppress("Deprecation")

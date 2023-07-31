@@ -6,6 +6,7 @@ import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.module.display.function.standard.EnderChestShow
 import me.arasple.mc.trchat.module.display.function.standard.InventoryShow
+import me.arasple.mc.trchat.module.display.function.standard.ItemShow
 import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.proxy.redis.RedisManager
 import me.arasple.mc.trchat.module.internal.proxy.redis.TrRedisMessage
@@ -16,11 +17,13 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageRecipient
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.subList
 import taboolib.common5.util.decodeBase64
 import taboolib.module.chat.Components
+import taboolib.module.lang.asLangText
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.util.bukkitPlugin
@@ -110,12 +113,22 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                 }
                 BukkitProxyManager.sendMessage(onlinePlayers.firstOrNull(), arrayOf("LoadedProxyChannel", id))
             }
+            "ItemShow" -> {
+                if (data[1] == MinecraftVersion.minecraftVersion) {
+                    val name = data[2]
+                    val sha1 = data[3]
+                    if (ItemShow.cacheHopper.getIfPresent(sha1) == null) {
+                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickHopper(console().asLangText("Function-Item-Show-Title", name)))
+                        ItemShow.cacheHopper.put(sha1, inventory)
+                    }
+                }
+            }
             "InventoryShow" -> {
                 if (data[1] == MinecraftVersion.minecraftVersion) {
                     val name = data[2]
                     val sha1 = data[3]
                     if (InventoryShow.cache.getIfPresent(sha1) == null) {
-                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickInventory(54, "$name's Inventory"))
+                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickChest(6, console().asLangText("Function-Inventory-Show-Title", name)))
                         InventoryShow.cache.put(sha1, inventory)
                     }
                 }
@@ -125,7 +138,7 @@ sealed interface BukkitProxyProcessor : PluginMessageListener {
                     val name = data[2]
                     val sha1 = data[3]
                     if (EnderChestShow.cache.getIfPresent(sha1) == null) {
-                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickInventory(27, "$name's Ender Chest"))
+                        val inventory = data[4].decodeBase64().deserializeToInventory(createNoClickChest(3, console().asLangText("Function-EnderChest-Show-Title", name)))
                         EnderChestShow.cache.put(sha1, inventory)
                     }
                 }

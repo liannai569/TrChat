@@ -3,6 +3,7 @@ package me.arasple.mc.trchat.module.internal.command.main
 import me.arasple.mc.trchat.module.display.function.standard.EnderChestShow
 import me.arasple.mc.trchat.module.display.function.standard.ImageShow
 import me.arasple.mc.trchat.module.display.function.standard.InventoryShow
+import me.arasple.mc.trchat.module.display.function.standard.ItemShow
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
@@ -24,6 +25,23 @@ object CommandViews {
 
     @Awake(LifeCycle.ENABLE)
     fun c() {
+        command("view-item", permissionDefault = PermissionDefault.TRUE) {
+            dynamic("item") {
+                execute<Player> { sender, _, argument ->
+                    ItemShow.cacheHopper.getIfPresent(argument)?.let {
+                        sender.openInventory(it)
+                    } ?: kotlin.run {
+                        sender.sendLang("Function-Inventory-Show-Unavailable")
+                    }
+                }
+            }
+            incorrectSender { sender, _ ->
+                sender.sendLang("Command-Not-Player")
+            }
+            incorrectCommand { _, _, _, _ ->
+                createHelper()
+            }
+        }
         command("view-inventory", permissionDefault = PermissionDefault.TRUE) {
             dynamic("inventory") {
                 execute<Player> { sender, _, argument ->

@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.api.nms
 
 import me.arasple.mc.trchat.util.reportOnce
 import net.minecraft.network.protocol.game.ClientboundCustomChatCompletionsPacket
-import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.server.v1_12_R1.ChatMessageType
 import net.minecraft.server.v1_12_R1.IChatBaseComponent
 import net.minecraft.server.v1_12_R1.PacketPlayOutChat
@@ -16,6 +15,7 @@ import taboolib.module.nms.sendPacket
 import taboolib.platform.util.isNotAir
 import java.util.*
 
+private typealias CraftPlayer19 = org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
 private typealias CraftItemStack19 = org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
 private typealias CraftChatMessage19 = org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
 private typealias NMSNBTTagCompound = net.minecraft.nbt.NBTTagCompound
@@ -54,16 +54,9 @@ class NMSImpl : NMS() {
     }
 
     override fun sendMessage(receiver: Player, component: ComponentText, sender: UUID?) {
-        if (majorLegacy >= 11901) {
-            receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
-                craftChatMessageFromComponent(component),
-                false
-            ))
-        } else if (majorLegacy == 11900) {
-            receiver.sendPacket(ClientboundSystemChatPacket::class.java.invokeConstructor(
-                craftChatMessageFromComponent(component),
-                0
-            ))
+        if (majorLegacy >= 11900) {
+            val player = (receiver as CraftPlayer19).handle
+            player.sendSystemMessage(craftChatMessageFromComponent(component) as NMSIChatBaseComponent)
         } else if (majorLegacy >= 11600) {
             receiver.sendPacket(PacketPlayOutChat::class.java.invokeConstructor(
                 craftChatMessageFromComponent(component),

@@ -12,6 +12,7 @@ import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 import taboolib.common.util.unsafeLazy
 import taboolib.expansion.DataContainer
 import taboolib.expansion.playerDataContainer
@@ -20,19 +21,27 @@ import taboolib.module.chat.ComponentText
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.ui.MenuHolder
 import taboolib.module.ui.type.Basic
+import taboolib.module.ui.type.Hopper
 import taboolib.platform.util.sendLang
 
 val isDragonCoreHooked by unsafeLazy { Bukkit.getPluginManager().isPluginEnabled("DragonCore") && MinecraftVersion.major < 8  }
-private val noClickBasic = object : Basic() {
-    init {
-        rows(6)
-        onClick(lock = true)
-    }
-}
+
+fun createNoClickChest(rows: Int, title: String) =
+    MenuHolder(object : Basic(title) {
+        init {
+            rows(rows)
+            onClick(lock = true)
+        }
+    }).inventory
 
 @Suppress("Deprecation")
-fun createNoClickInventory(size: Int, title: String) =
-    Bukkit.createInventory(MenuHolder(noClickBasic), size, title)
+fun createNoClickHopper(title: String) =
+    Bukkit.createInventory(MenuHolder(object : Hopper(title) {
+        init {
+            rows(1)
+            onClick(lock = true)
+        }
+    }), InventoryType.HOPPER, title)
 
 fun String?.toCondition() = if (this == null) Condition.EMPTY else Condition(this)
 

@@ -1,11 +1,11 @@
 package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.api.impl.BungeeChannelManager
+import me.arasple.mc.trchat.api.impl.BungeeComponentManager
 import me.arasple.mc.trchat.api.impl.BungeeProxyManager
 import me.arasple.mc.trchat.module.internal.TrChatBungee
 import me.arasple.mc.trchat.util.print
 import me.arasple.mc.trchat.util.proxy.common.MessageReader
-import me.arasple.mc.trchat.util.toUUID
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.connection.Connection
 import net.md_5.bungee.api.event.PluginMessageEvent
@@ -66,7 +66,7 @@ object ListenerBungeeTransfer {
                 val raw = data[2]
                 val player = getProxyPlayer(to) ?: return
 
-                Components.parseRaw(raw).sendTo(player)
+                BungeeComponentManager.sendComponent(player, Components.parseRaw(raw))
             }
             "BroadcastRaw" -> {
                 val uuid = data[1]
@@ -84,7 +84,7 @@ object ListenerBungeeTransfer {
                     server<ProxyServer>().servers.forEach { (_, v) ->
                         if (ports == null || v.address.port in ports) {
                             v.players.filter { perm == "" || it.hasPermission(perm) }.forEach {
-                                it.sendMessage(uuid.toUUID(), message.toSpigotObject())
+                                BungeeComponentManager.sendComponent(it, message, uuid)
                             }
                         }
                     }
@@ -94,6 +94,9 @@ object ListenerBungeeTransfer {
             "UpdateNames" -> {
                 val names = data[1].split(",").map { it.split("-", limit = 2) }
                 BungeeProxyManager.allNames[connection.address.port] = names.associate { it[0] to it[1].takeIf { dn -> dn != "null" } }
+            }
+            "ItemShow" -> {
+                BungeeProxyManager.sendMessageToAll("ItemShow", data[1], data[2], data[3], data[4])
             }
             "InventoryShow" -> {
                 BungeeProxyManager.sendMessageToAll("InventoryShow", data[1], data[2], data[3], data[4])

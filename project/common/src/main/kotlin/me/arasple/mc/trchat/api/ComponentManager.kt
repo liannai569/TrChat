@@ -26,4 +26,6 @@ interface ComponentManager {
      */
     fun filterComponent(component: ComponentText, maxLength: Int = -1): ComponentText
 
+    fun validateComponent(component: ComponentText, maxLength: Int = -1): ComponentText
+
 }

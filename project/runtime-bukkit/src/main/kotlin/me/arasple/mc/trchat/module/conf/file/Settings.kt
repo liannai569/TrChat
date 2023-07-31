@@ -11,6 +11,7 @@ import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.configuration.Configuration
+import taboolib.module.kether.Kether
 
 /**
  * @author ItsFlicker
@@ -40,6 +41,9 @@ object Settings {
 
     @Awake(LifeCycle.ENABLE)
     fun init() {
+        conf.onReload {
+            Kether.isAllowToleranceParser = conf.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
+        }
         if (conf.getBoolean("Options.Check-Update", true)) {
             submitAsync(delay = 20, period = 15 * 60 * 20) {
                 Updater.grabInfo()

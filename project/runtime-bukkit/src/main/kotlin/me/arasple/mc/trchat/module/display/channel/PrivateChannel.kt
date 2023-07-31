@@ -127,6 +127,10 @@ class PrivateChannel(
                 .forEach { suffix -> receive.append(suffix) }
         } ?: return null
 
+        if (session.cancelChat) {
+            session.cancelChat = false
+            return null
+        }
         // Channel event
         if (!events.send(player, session.lastPrivateTo, msg)) {
             return null

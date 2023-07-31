@@ -91,6 +91,9 @@ object ListenerVelocityTransfer {
                 val names = data[1].split(",").map { it.split("-", limit = 2) }
                 VelocityProxyManager.allNames[connection.serverInfo.address.port] = names.associate { it[0] to it[1].takeIf { dn -> dn != "null" } }
             }
+            "ItemShow" -> {
+                VelocityProxyManager.sendMessageToAll("ItemShow", data[1], data[2], data[3], data[4])
+            }
             "InventoryShow" -> {
                 VelocityProxyManager.sendMessageToAll("InventoryShow", data[1], data[2], data[3], data[4])
             }

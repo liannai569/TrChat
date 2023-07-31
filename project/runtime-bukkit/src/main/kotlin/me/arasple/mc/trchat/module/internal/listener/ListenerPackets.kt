@@ -22,6 +22,7 @@ object ListenerPackets {
         if (majorLegacy >= 11902) {
             when (e.packet.name) {
                 "ClientboundServerDataPacket" -> e.packet.write("enforcesSecureChat", true)
+                "ClientboundPlayerChatHeaderPacket" -> e.isCancelled = true
             }
         }
     }

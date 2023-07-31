@@ -7,6 +7,7 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.function.console
 import taboolib.common.util.ResettableLazy
 import taboolib.common5.Baffle
 import taboolib.module.configuration.Config
@@ -29,7 +30,7 @@ object Functions {
     @Awake(LifeCycle.LOAD)
     fun init() {
         conf.onReload {
-            Loader.loadFunctions()
+            Loader.loadFunctions(console())
             ResettableLazy.reset("functions")
         }
     }

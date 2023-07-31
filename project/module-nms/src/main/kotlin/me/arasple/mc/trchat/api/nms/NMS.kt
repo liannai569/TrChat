@@ -18,7 +18,7 @@ abstract class NMS {
     abstract fun craftChatMessageFromComponent(component: ComponentText): Any
 
     /**
-     * IChatBaseComponent -> RawMessage
+     * IChatBaseComponent -> raw string
      */
     abstract fun rawMessageFromCraftChatMessage(component: Any): String
 
@@ -55,11 +55,7 @@ abstract class NMS {
             // 特殊药水
             "CustomPotionEffects",
             // 隐藏标签
-            "HideFlags",
-            // 方块标签
-            "BlockEntityTag",
-            // Bukkit 自定义标签
-            "PublicBukkitValues"
+            "HideFlags"
         )
     }
 }

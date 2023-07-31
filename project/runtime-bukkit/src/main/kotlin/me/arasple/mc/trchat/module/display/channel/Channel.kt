@@ -149,6 +149,10 @@ open class Channel(
                 .mapNotNull { suffix -> suffix.value.firstOrNull { it.condition.pass(player) }?.content?.toTextComponent(player) }
                 .forEach { suffix -> component.append(suffix) }
         } ?: return null
+        if (session.cancelChat) {
+            session.cancelChat = false
+            return null
+        }
         // TODO: 跨服事件传递
         // Proxy
         if (settings.proxy) {

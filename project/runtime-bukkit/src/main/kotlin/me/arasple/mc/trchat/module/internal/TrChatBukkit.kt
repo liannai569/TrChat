@@ -2,7 +2,6 @@ package me.arasple.mc.trchat.module.internal
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.impl.BukkitProxyManager
-import me.arasple.mc.trchat.module.conf.Loader
 import me.arasple.mc.trchat.module.conf.file.Filters
 import me.arasple.mc.trchat.module.conf.file.Functions
 import me.arasple.mc.trchat.module.conf.file.Settings
@@ -15,7 +14,6 @@ import org.bukkit.Bukkit
 import taboolib.common.platform.*
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
-import taboolib.module.kether.Kether
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.MinecraftVersion.majorLegacy
 
@@ -63,9 +61,7 @@ object TrChatBukkit : Plugin() {
         Settings.conf.reload()
         Functions.conf.reload()
         Filters.conf.reload()
-        Kether.isAllowToleranceParser = Settings.conf.getBoolean("Options.Kether-Allow-Tolerance-Parser", true)
         TrChat.api().getChannelManager().loadChannels(notify)
-        Loader.loadFunctions(notify)
     }
 
 }

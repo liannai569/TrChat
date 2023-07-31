@@ -34,10 +34,6 @@ object BukkitComponentManager : ComponentManager {
         PlatformFactory.registerAPI<ComponentManager>(this)
     }
 
-    override fun filterComponent(component: ComponentText, maxLength: Int): ComponentText {
-        return validateComponent(DefaultComponent(listOf(filterComponent(component.toSpigotObject()))), maxLength)
-    }
-
     override fun sendComponent(receiver: Any, component: ComponentText, sender: Any?) {
         val commandSender = when (receiver) {
             is ProxyCommandSender -> receiver.cast()
@@ -58,8 +54,10 @@ object BukkitComponentManager : ComponentManager {
         }
         val newComponent = if (isFilterEnabled && commandSender is Player && commandSender.data.isFilterEnabled) {
             filterComponent(component, Settings.componentMaxLength)
-        } else {
+        } else if (commandSender is Player) {
             validateComponent(component, Settings.componentMaxLength)
+        } else {
+            component
         }
 
         if (commandSender is Player) {
@@ -69,10 +67,14 @@ object BukkitComponentManager : ComponentManager {
         }
     }
 
-    private fun validateComponent(component: ComponentText, maxLength: Int): ComponentText {
+    override fun filterComponent(component: ComponentText, maxLength: Int): ComponentText {
+        return validateComponent(DefaultComponent(listOf(filterComponent(component.toSpigotObject()))), maxLength)
+    }
+
+    override fun validateComponent(component: ComponentText, maxLength: Int): ComponentText {
         if (maxLength <= 0) return component
         return if (component.toRawMessage().length > maxLength) {
-            Components.text("This chat component is too big to show (> $maxLength).")
+            Components.text("This chat component is too big to show ( > $maxLength ).")
         } else {
             component
         }

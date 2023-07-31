@@ -128,10 +128,14 @@ Function-Mention-All-Format:
   - type: json
     text: ' [&a@&2所有人] '
     args: [ ]
-Function-Item-Show-Format-New:
+Function-Item-Show-Format-With-Hopper:
   - type: json
     text: '&8\[[item] &bx{0}&8\]'
-    args: [ ]
+    args:
+      - hover: '&7点击查看此物品'
+        command: '/view-item {1}'
+Function-Item-Show-Unavailable: '&c&l该物品已过期或不存在...'
+Function-Item-Show-Title: '{0}的物品'
 Function-Inventory-Show-Format:
   - type: json
     text: '[&8\[&3{0}的背包&8\]]'

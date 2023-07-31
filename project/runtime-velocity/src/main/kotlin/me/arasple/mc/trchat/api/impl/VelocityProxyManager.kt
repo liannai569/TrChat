@@ -57,10 +57,20 @@ object VelocityProxyManager : ProxyMessageManager {
         }
     }
 
-    fun sendMessageToAll(vararg args: String, predicate: (RegisteredServer) -> Boolean = { true }) {
-        plugin.server.allServers.filter { v -> predicate(v) }.forEach { v ->
-            sendMessage(v, *args)
+    fun sendMessageToAll(vararg args: String, predicate: (RegisteredServer) -> Boolean = { true }): Future<*> {
+        val recipients = plugin.server.allServers.filter { v -> v.playersConnected.isNotEmpty() && predicate(v) }
+        return executor.submit {
+            try {
+                for (bytes in buildMessage(*args)) {
+                    recipients.forEach { v ->
+                        v.sendPluginMessage(outgoing, bytes)
+                    }
+                }
+            } catch (e: IOException) {
+                e.print("Failed to send proxy trchat message!")
+            }
         }
+
     }
 
     @Schedule(async = true, period = 200L)

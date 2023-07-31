@@ -12,7 +12,6 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.suggest
-import taboolib.common5.Demand
 import taboolib.common5.util.parseMillis
 import taboolib.expansion.createHelper
 import taboolib.platform.util.sendLang
@@ -32,13 +31,13 @@ object CommandMute {
 
     @Awake(LifeCycle.ENABLE)
     fun c() {
-        command("mute", description = "Mute", permission = "trchat.command.mute") {
+        command("mute", description = "Mute player", permission = "trchat.command.mute", newParser = true) {
             dynamic("player") {
                 suggest {
                     BukkitProxyManager.getPlayerNames().keys.toList()
                 }
-                execute<CommandSender> { sender, _, argument ->
-                    val player = Bukkit.getOfflinePlayer(argument)
+                execute<CommandSender> { sender, ctx, _ ->
+                    val player = Bukkit.getOfflinePlayer(ctx["player"])
                     if (!player.hasPlayedBefore()) {
                         return@execute sender.sendLang("Command-Player-Not-Exist")
                     }
@@ -49,26 +48,25 @@ object CommandMute {
                 }
                 dynamic("options", optional = true) {
                     suggestion<CommandSender>(uncheck = true) { _, _ ->
-                        listOf("-t 1h", "-t 2d", "-t 15m", "-r 原因", "--cancel")
+                        listOf("-t=15m", "-t=1h", "-t=3d", "-r=Reason", "-cancel")
                     }
-                    execute<CommandSender> { sender, ctx, argument ->
+                    execute<CommandSender> { sender, ctx, _ ->
                         val player = Bukkit.getOfflinePlayer(ctx["player"])
                         if (!player.hasPlayedBefore()) {
                             return@execute sender.sendLang("Command-Player-Not-Exist")
                         }
                         val data = player.data
-                        val de = Demand("mute $argument")
-                        if (de.tags.contains("cancel")) {
+                        if (ctx.hasOption("cancel")) {
                             data.updateMuteTime(0)
                             sender.sendLang("Mute-Cancel-Muted-Player", player.name!!)
-                            (player as? Player)?.sendLang("General-Cancel-Muted")
+                            player.player?.sendLang("General-Cancel-Muted")
                         } else {
-                            val time = de.get("t") ?: "999d"
-                            val reason = de.get("r") ?: "null"
+                            val time = ctx.option("time", "t") ?: "999d"
+                            val reason = ctx.option("reason", "r") ?: "null"
                             data.updateMuteTime(time.parseMillis())
                             data.setMuteReason(reason)
                             sender.sendLang("Mute-Muted-Player", player.name!!, time, reason)
-                            (player as? Player)?.sendLang("General-Muted", muteDateFormat.format(data.muteTime), data.muteReason)
+                            player.player?.sendLang("General-Muted", muteDateFormat.format(data.muteTime), data.muteReason)
                         }
                     }
                 }

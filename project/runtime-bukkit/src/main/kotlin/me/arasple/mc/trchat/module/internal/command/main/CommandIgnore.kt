@@ -9,6 +9,7 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
+import taboolib.common.platform.command.bool
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.suggest
 import taboolib.expansion.createHelper
@@ -29,8 +30,8 @@ object CommandIgnore {
                 suggest {
                     BukkitProxyManager.getPlayerNames().keys.filter { it !in PlayerData.vanishing }
                 }
-                execute<Player> { sender, _, argument ->
-                    val player = Bukkit.getOfflinePlayer(argument)
+                execute<Player> { sender, ctx, _ ->
+                    val player = Bukkit.getOfflinePlayer(ctx["player"])
                     if (!player.hasPlayedBefore()) {
                         return@execute sender.sendLang("Command-Player-Not-Exist")
                     }
@@ -38,6 +39,21 @@ object CommandIgnore {
                         sender.sendLang("Ignore-Ignored-Player", player.name!!)
                     } else {
                         sender.sendLang("Ignore-Cancel-Player", player.name!!)
+                    }
+                }
+                bool(optional = true) {
+                    execute<Player> { sender, ctx, _ ->
+                        val player = Bukkit.getOfflinePlayer(ctx["player"])
+                        if (!player.hasPlayedBefore()) {
+                            return@execute sender.sendLang("Command-Player-Not-Exist")
+                        }
+                        if (ctx.bool("boolean")) {
+                            sender.data.addIgnored(player.uniqueId)
+                            sender.sendLang("Ignore-Ignored-Player", player.name!!)
+                        } else {
+                            sender.data.removeIgnored(player.uniqueId)
+                            sender.sendLang("Ignore-Cancel-Player", player.name!!)
+                        }
                     }
                 }
             }

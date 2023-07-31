@@ -53,9 +53,18 @@ object BungeeProxyManager : ProxyMessageManager {
         }
     }
 
-    fun sendMessageToAll(vararg args: String, predicate: (ServerInfo) -> Boolean = { true }) {
-        server<ProxyServer>().servers.filter { (_, v) -> predicate(v) }.forEach { (_, v) ->
-            sendMessage(v, *args)
+    fun sendMessageToAll(vararg args: String, predicate: (ServerInfo) -> Boolean = { true }): Future<*> {
+        val recipients = server<ProxyServer>().servers.filter { (_, v) -> v.players.isNotEmpty() && predicate(v) }
+        return executor.submit {
+            try {
+                for (bytes in buildMessage(*args)) {
+                    recipients.forEach { (_, v) ->
+                        v.sendData(TrChatBungee.TRCHAT_CHANNEL, bytes)
+                    }
+                }
+            } catch (e: IOException) {
+                e.print("Failed to send proxy trchat message!")
+            }
         }
     }
 

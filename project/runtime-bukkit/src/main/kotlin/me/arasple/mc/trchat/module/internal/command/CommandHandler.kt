@@ -5,14 +5,13 @@ import me.arasple.mc.trchat.module.internal.TrChatBukkit
 import me.arasple.mc.trchat.module.internal.command.sub.CommandColor
 import me.arasple.mc.trchat.module.internal.command.sub.CommandRecallMessage
 import me.arasple.mc.trchat.util.data
+import me.arasple.mc.trchat.util.parseSimple
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
 import taboolib.common.platform.ProxyCommandSender
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.mainCommand
-import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.command.*
 import taboolib.expansion.createHelper
 import taboolib.module.lang.sendLang
 import taboolib.platform.util.sendLang
@@ -28,17 +27,43 @@ import taboolib.platform.util.sendLang
 @CommandHeader("trchat", ["trc"], "TrChat main command", permission = "trchat.access")
 object CommandHandler {
 
-    @CommandBody(permission = "trchat.command.reload", optional = true)
-    val reload = subCommand {
-        execute<ProxyCommandSender> { sender, _, _ ->
-            TrChatBukkit.reload(sender)
-        }
-    }
+    @CommandBody(permission = "trchat.command.color", optional = true)
+    val color = CommandColor.command
+
+    @CommandBody(permission = "trchat.command.recallmessage", optional = true)
+    val recallMessage = CommandRecallMessage.command
 
     @CommandBody(permission = "trchat.command.chatfilter", optional = true)
     val chatFilter = subCommand {
         execute { sender, _, _ ->
             MenuFilterControl.displayFor(sender)
+        }
+    }
+
+    @CommandBody(permission = "trchat.command.clear", optional = true)
+    val clear = subCommand {
+        player(suggest = listOf("*")) {
+            execute<CommandSender> { _, ctx, _ ->
+                ctx.players("player").forEach {
+                    repeat(80) { _ ->
+                        it.sendMessage("")
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody(permission = "trchat.command.tellsimple", optional = true)
+    val tellsimple = subCommand {
+        player(suggest = listOf("*")) {
+            dynamic("message") {
+                execute<CommandSender> { _, ctx, argument ->
+                    val component = argument.parseSimple()
+                    ctx.players("player").forEach {
+                        component.sendTo(it)
+                    }
+                }
+            }
         }
     }
 
@@ -57,11 +82,12 @@ object CommandHandler {
         }
     }
 
-    @CommandBody(permission = "trchat.command.recallmessage", optional = true)
-    val recallMessage = CommandRecallMessage.command
-
-    @CommandBody(permission = "trchat.command.color", optional = true)
-    val color = CommandColor.command
+    @CommandBody(permission = "trchat.command.reload", optional = true)
+    val reload = subCommand {
+        execute<ProxyCommandSender> { sender, _, _ ->
+            TrChatBukkit.reload(sender)
+        }
+    }
 
     @CommandBody
     val help = subCommand {

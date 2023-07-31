@@ -114,10 +114,14 @@ Function-Mention-Notify:
     sound: 'BLOCK_ANVIL_LAND'
     volume: 1
     pitch: 2
-Function-Item-Show-Format-New:
+Function-Item-Show-Format-With-Hopper:
   - type: json
     text: '&8\[[item] &bx{0}&8\]'
-    args: [ ]
+    args:
+      - hover: '&7Click to view this item'
+        command: '/view-item {1}'
+Function-Item-Show-Unavailable: '&c&This item has been expired or does not exist...'
+Function-Item-Show-Title: '{0}''s Item'
 Function-Inventory-Show-Format:
   - type: json
     text: '[&8\[&3Inventory of {0}&8\]]'

@@ -23,6 +23,7 @@ class ChatSession(
 ) {
 
     val receivedMessages = mutableListOf<ChatMessage>()
+    var lastChannel: Channel? = null
     var lastPublicMessage = ""
     var lastPrivateMessage = ""
     var lastPrivateTo = ""

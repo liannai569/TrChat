@@ -1,5 +1,6 @@
 package me.arasple.mc.trchat.module.internal.hook
 
+import me.arasple.mc.trchat.module.internal.hook.impl.HookDiscordSRV
 import me.arasple.mc.trchat.module.internal.hook.impl.HookEcoEnchants
 import me.arasple.mc.trchat.module.internal.hook.impl.HookItemsAdder
 import me.arasple.mc.trchat.module.internal.hook.impl.HookNova
@@ -20,6 +21,7 @@ import java.util.function.BiFunction
 object HookPlugin {
 
     val registry = arrayListOf(
+        HookDiscordSRV(),
         HookEcoEnchants(),
         HookItemsAdder(),
         HookNova()
@@ -27,6 +29,7 @@ object HookPlugin {
 
     fun printInfo() {
         registry.filter { it.isHooked }.forEach {
+            it.init()
             console().sendLang("Plugin-Dependency-Hooked", it.name)
         }
     }
@@ -47,16 +50,20 @@ object HookPlugin {
         })
     }
 
+    fun getDiscordSRV(): HookDiscordSRV {
+        return registry[0] as HookDiscordSRV
+    }
+
     fun getEcoEnchants(): HookEcoEnchants {
-        return registry[0] as HookEcoEnchants
+        return registry[1] as HookEcoEnchants
     }
 
     fun getItemsAdder(): HookItemsAdder {
-        return registry[1] as HookItemsAdder
+        return registry[2] as HookItemsAdder
     }
 
     fun getNova(): HookNova {
-        return registry[2] as HookNova
+        return registry[3] as HookNova
     }
 
 }

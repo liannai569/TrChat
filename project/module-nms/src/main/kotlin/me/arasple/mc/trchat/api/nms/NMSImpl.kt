@@ -107,26 +107,35 @@ class NMSImpl : NMS() {
     }
 
     override fun addCustomChatCompletions(player: Player, entries: List<String>) {
-        if (majorLegacy < 11903) return
-        player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
-            ClientboundCustomChatCompletionsPacket.Action.ADD,
-            entries
-        ))
+        if (majorLegacy < 11901) return
+        try {
+            player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
+                ClientboundCustomChatCompletionsPacket.Action.ADD,
+                entries
+            ))
+        } catch (_: NoClassDefFoundError) {
+        }
     }
 
     override fun removeCustomChatCompletions(player: Player, entries: List<String>) {
-        if (majorLegacy < 11903) return
-        player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
-            ClientboundCustomChatCompletionsPacket.Action.REMOVE,
-            entries
-        ))
+        if (majorLegacy < 11901) return
+        try {
+            player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
+                ClientboundCustomChatCompletionsPacket.Action.REMOVE,
+                entries
+            ))
+        } catch (_: NoClassDefFoundError) {
+        }
     }
 
     override fun setCustomChatCompletions(player: Player, entries: List<String>) {
-        if (majorLegacy < 11903) return
-        player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
-            ClientboundCustomChatCompletionsPacket.Action.SET,
-            entries
-        ))
+        if (majorLegacy < 11901) return
+        try {
+            player.sendPacket(ClientboundCustomChatCompletionsPacket::class.java.invokeConstructor(
+                ClientboundCustomChatCompletionsPacket.Action.SET,
+                entries
+            ))
+        } catch (_: NoClassDefFoundError) {
+        }
     }
 }

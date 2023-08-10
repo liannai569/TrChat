@@ -49,7 +49,7 @@ internal object KetherActions {
         }
     }
 
-    @KetherParser(["cancel"], namespace = "trchat")
+    @KetherParser(["cancel"], namespace = "trchat", shared = false)
     internal fun actionCancel() = scriptParser {
         actionNow {
             player().session.cancelChat = true

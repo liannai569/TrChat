@@ -39,12 +39,16 @@ object ListenerBukkitChat {
         Channel.channels.values.forEach { channel ->
             channel.bindings.prefix?.forEach {
                 if (e.message.startsWith(it, ignoreCase = true)) {
+                    if (channel.settings.isPrivate) e.isCancelled = true
                     channel.execute(player, e.message.substring(it.length), TrChatBukkit.isPaperEnv)
                     return
                 }
             }
         }
-        session.getChannel()?.execute(player, e.message, TrChatBukkit.isPaperEnv)
+        session.getChannel()?.let {
+            if (it.settings.isPrivate) e.isCancelled = true
+            it.execute(player, e.message, TrChatBukkit.isPaperEnv)
+        }
     }
 
     private fun checkLimits(player: Player, message: String): Boolean {

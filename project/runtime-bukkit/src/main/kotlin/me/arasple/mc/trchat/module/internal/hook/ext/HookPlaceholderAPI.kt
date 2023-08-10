@@ -1,9 +1,11 @@
 package me.arasple.mc.trchat.module.internal.hook.ext
 
 import me.arasple.mc.trchat.api.event.TrChatEvent
+import me.arasple.mc.trchat.module.internal.command.main.CommandMute
 import me.arasple.mc.trchat.util.Vars
 import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.session
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import taboolib.common.platform.Platform
@@ -31,11 +33,9 @@ object HookPlaceholderAPI : PlaceholderExpansion {
             val params = args.split('_')
             val session = player.session
             val data = player.data
-
             return when (params[0].lowercase()) {
 //                "js" -> if (params.size > 1) JavaScriptAgent.eval(player, args.substringAfter('_')).get() else ""
                 "channel" -> session.channel
-                "toplayer" -> session.lastPrivateTo
                 "lastpublicmessage", "lastmessage" -> {
                     if (params.getOrNull(1) == "uncolored") session.lastPublicMessage.uncolored()
                     else session.lastPublicMessage
@@ -44,10 +44,14 @@ object HookPlaceholderAPI : PlaceholderExpansion {
                     if (params.getOrNull(1) == "uncolored") session.lastPrivateMessage.uncolored()
                     else session.lastPrivateMessage
                 }
+                "toplayer" -> session.lastPrivateTo
                 "spy" -> data.isSpying
                 "filter" -> data.isFilterEnabled
                 "mute" -> data.isMuted
+                "mutetime" -> CommandMute.muteDateFormat.format(data.muteTime)
+                "mutereason" -> data.muteReason
                 "vanish" -> data.isVanishing
+                "ignore" -> data.hasIgnored(Bukkit.getOfflinePlayer(params[1]).uniqueId)
                 else -> "out of case"
             }.toString()
         }
@@ -61,7 +65,6 @@ object HookPlaceholderAPI : PlaceholderExpansion {
             }
             val params = args.split('_')
             val data = player.data
-
             return when (params[0].lowercase()) {
                 "spy" -> data.isSpying
                 "filter" -> data.isFilterEnabled

@@ -24,4 +24,6 @@ abstract class HookAbstract {
         return javaClass.simpleName.substring(4)
     }
 
+    open fun init() = Unit
+
 }

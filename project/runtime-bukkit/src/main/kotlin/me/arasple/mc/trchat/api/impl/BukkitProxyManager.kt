@@ -57,7 +57,7 @@ object BukkitProxyManager : ClientMessageManager {
 
     override val executor: ExecutorService by unsafeLazy {
         val factory = ThreadFactoryBuilder().setNameFormat("TrChat PluginMessage Processing Thread #%d").build()
-        Executors.newFixedThreadPool(2, factory)
+        Executors.newFixedThreadPool(4, factory)
     }
 
     override val mode: ProxyMode by unsafeLazy {

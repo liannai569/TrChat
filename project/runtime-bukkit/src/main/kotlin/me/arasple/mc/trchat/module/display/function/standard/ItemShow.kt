@@ -95,7 +95,8 @@ object ItemShow : Function("ITEM") {
     }
 
     override fun parseVariable(sender: Player, arg: String): ComponentText? {
-        val item = (sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)).let {
+        val item = sender.inventory.getItem(arg.toInt() - 1) ?: ItemStack(Material.AIR)
+        val newItem = (item).let {
             if (compatible) {
                 buildItem(it) { material = Material.STONE }
             } else {
@@ -116,15 +117,15 @@ object ItemShow : Function("ITEM") {
             )
             it.first
         }
-        return cacheComponent.get(item) {
+        return cacheComponent.get(newItem) {
             sender
-                .getComponentFromLang("Function-Item-Show-Format-With-Hopper", item.amount, sha1) { type, i, part, proxySender ->
+                .getComponentFromLang("Function-Item-Show-Format-With-Hopper", newItem.amount, sha1) { type, i, part, proxySender ->
                     val component = if (part.isVariable && part.text == "item") {
-                        item.getNameComponent(sender)
+                        newItem.getNameComponent(sender)
                     } else {
-                        Components.text(part.text.translate(proxySender).replaceWithOrder(item.amount, sha1))
+                        Components.text(part.text.translate(proxySender).replaceWithOrder(newItem.amount, sha1))
                     }
-                    component.applyStyle(type, part, i, proxySender, item.amount, sha1).hoverItemFixed(item)
+                    component.applyStyle(type, part, i, proxySender, newItem.amount, sha1).hoverItemFixed(newItem)
                 }
         }
     }
@@ -147,7 +148,7 @@ object ItemShow : Function("ITEM") {
     }
 
     fun computeAndCache(sender: Player, item: ItemStack): Pair<String, String> {
-        val sha1 = item.serializeToByteArray().encodeBase64().digest("sha-1")
+        val sha1 = item.serializeToByteArray(zipped = false).encodeBase64().digest("sha-1")
         if (cacheHopper.getIfPresent(sha1) != null) {
             return sha1 to cacheHopper.getIfPresent(sha1)!!.serializeToByteArray().encodeBase64()
         }

@@ -122,7 +122,13 @@ object Loader {
             val ports = section.getString("Ports")?.split(";")?.map { it.toInt() } ?: emptyList()
             val disabledFunctions = section.getStringList("Disabled-Functions")
             val filterBeforeSending = section.getBoolean("Filter-Before-Sending", false)
-            ChannelSettings(joinPermission, speakCondition, autoJoin, isPrivate, range, proxy, forceProxy, doubleTransfer, ports, disabledFunctions, filterBeforeSending)
+            val sendToDiscord = section.getBoolean("Send-To-Discord", !isPrivate)
+            val receiveFromDiscord = section.getBoolean("Receive-From-Discord", true)
+            ChannelSettings(
+                joinPermission, speakCondition, autoJoin, isPrivate,
+                range, proxy, forceProxy, doubleTransfer, ports, disabledFunctions, filterBeforeSending,
+                sendToDiscord, receiveFromDiscord
+            )
         }
 
         val bindings = conf.getConfigurationSection("Bindings")?.let {

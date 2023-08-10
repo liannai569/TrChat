@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.internal.script.js
 
 import com.google.common.collect.Maps
+import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.session
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -50,11 +51,11 @@ object JavaScriptAgent {
 
     fun eval(player: Player, script: String, vararg additions: Pair<String, Any>, cacheScript: Boolean = true): CompletableFuture<Any?> {
         return try {
-            val session = player.session
             val context = SimpleScriptContext()
 
             context.setBindings(SimpleBindings(bindings).also {
-                it["session"] = session
+                it["session"] = player.session
+                it["data"] = player.data
                 it["player"] = player
                 it["sender"] = player
                 for (addition in additions) {

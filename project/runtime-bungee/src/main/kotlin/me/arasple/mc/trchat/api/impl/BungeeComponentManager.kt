@@ -31,7 +31,7 @@ object BungeeComponentManager : ComponentManager {
             is UUID -> sender
             else -> null
         }
-        commandSender.sendMessage(uuid, validateComponent(component, 32766).toSpigotObject())
+        commandSender.sendMessage(uuid, validateComponent(component, 32700).toSpigotObject())
     }
 
     override fun filterComponent(component: ComponentText, maxLength: Int): ComponentText {

@@ -6,7 +6,7 @@ Options:
   Log-Delete-Time: 0
   Depend-Expansions: ['player', 'server']
   Prevent-Tab-Complete: false
-  Component-Max-Length: 32766
+  Component-Max-Length: 32700
   Kether-Allow-Tolerance-Parser: true
 
 Channel:

@@ -130,6 +130,7 @@ open class Channel(
             return null
         }
         val session = player.session
+        session.lastChannel = this
         session.lastPublicMessage = message
         val event = TrChatEvent(this, session, message)
         if (!event.call()) {
@@ -196,7 +197,7 @@ open class Channel(
                 }
             }
         }
-        if (toConsole) {
+        if (toConsole || settings.isPrivate) {
             console().sendComponent(player, component)
         }
         return component to null

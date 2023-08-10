@@ -1,6 +1,7 @@
 package me.arasple.mc.trchat.module.internal.data
 
 import me.arasple.mc.trchat.util.getDataContainer
+import me.arasple.mc.trchat.util.parseString
 import me.arasple.mc.trchat.util.toUUID
 import org.bukkit.OfflinePlayer
 import taboolib.common5.cbool
@@ -28,8 +29,7 @@ class PlayerData(val player: OfflinePlayer) {
 
     val isMuted get() = muteTime > System.currentTimeMillis()
 
-    val muteReason
-        get() = player.getDataContainer()["mute_reason"] ?: "null"
+    val muteReason get() = player.getDataContainer()["mute_reason"] ?: "null"
 
     val isVanishing get() = player.getDataContainer()["vanish"].cbool
 
@@ -64,13 +64,17 @@ class PlayerData(val player: OfflinePlayer) {
     }
 
     fun addIgnored(uuid: UUID) {
-        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) + uuid.toString()
+        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) + uuid.parseString()
         player.getDataContainer()["ignored"] = new
     }
 
     fun removeIgnored(uuid: UUID) {
-        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) - uuid.toString()
+        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) - uuid.parseString()
         player.getDataContainer()["ignored"] = new
+    }
+
+    fun hasIgnored(uuid: UUID): Boolean {
+        return uuid.parseString() in (player.getDataContainer()["ignored"]?.split(",") ?: return false)
     }
 
     fun switchIgnored(uuid: UUID): Boolean {

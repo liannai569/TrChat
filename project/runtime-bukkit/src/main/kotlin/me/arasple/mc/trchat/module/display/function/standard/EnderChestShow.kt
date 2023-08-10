@@ -107,7 +107,7 @@ object EnderChestShow : Function("ENDERCHEST") {
 
     fun computeAndCache(sender: Player): Pair<String, String> {
         val inventory = sender.enderChest
-        val sha1 = inventory.serializeToByteArray().encodeBase64().digest("sha-1")
+        val sha1 = inventory.serializeToByteArray(zipped = false).encodeBase64().digest("sha-1")
         if (cache.getIfPresent(sha1) != null) {
             return sha1 to cache.getIfPresent(sha1)!!.serializeToByteArray().encodeBase64()
         }

@@ -37,7 +37,7 @@ object Settings {
     var chatLengthLimit = 100
 
     @ConfigNode("Options.Component-Max-Length", "settings.yml")
-    var componentMaxLength = 32766
+    var componentMaxLength = 32700
 
     @Awake(LifeCycle.ENABLE)
     fun init() {

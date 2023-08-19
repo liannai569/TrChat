@@ -29,7 +29,7 @@ object CommandReply {
 
     @Awake(LifeCycle.ENABLE)
     fun c() {
-        command("reply", listOf("r"), "Reply", permission = "trchat.private") {
+        command("reply", listOf("trreply", "r"), "Reply", permission = "trchat.private") {
             dynamic("message") {
                 execute<Player> { sender, _, argument ->
                     val session = sender.session

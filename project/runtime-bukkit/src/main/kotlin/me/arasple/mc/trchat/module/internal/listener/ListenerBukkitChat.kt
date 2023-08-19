@@ -63,7 +63,7 @@ object ListenerBukkitChat {
         }
         if (!player.hasPermission("trchat.bypass.repeat")) {
             val lastMessage = player.session.lastPublicMessage
-            if (Strings.similarDegree(lastMessage, message) > Settings.chatSimilarity) {
+            if (Settings.chatSimilarity > 0 && Strings.similarDegree(lastMessage, message) > Settings.chatSimilarity) {
                 player.sendLang("General-Too-Similar")
                 return false
             }

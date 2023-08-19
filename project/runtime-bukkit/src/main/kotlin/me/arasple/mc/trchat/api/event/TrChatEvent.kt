@@ -16,4 +16,7 @@ class TrChatEvent(
     val session: ChatSession,
     var message: String,
     val forward: Boolean = true
-) : BukkitProxyEvent()
+) : BukkitProxyEvent() {
+
+    val player = session.player
+}

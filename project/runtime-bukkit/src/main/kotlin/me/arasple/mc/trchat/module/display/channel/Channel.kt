@@ -221,7 +221,7 @@ open class Channel(
                 player.sendLang("General-No-Permission")
                 return false
             }
-            player.session.channel = channel.id
+            player.session.setChannel(channel)
             channel.listeners.add(player.name)
             channel.events.join(player)
 
@@ -240,7 +240,7 @@ open class Channel(
                 player.sendLang("Channel-Quit", it.id)
             }
             if (!join(player, Settings.defaultChannel)) {
-                player.session.channel = null
+                player.session.setChannel(null)
             }
         }
     }

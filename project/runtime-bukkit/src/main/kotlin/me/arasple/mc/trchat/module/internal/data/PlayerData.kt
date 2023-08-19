@@ -1,5 +1,6 @@
 package me.arasple.mc.trchat.module.internal.data
 
+import me.arasple.mc.trchat.module.display.channel.Channel
 import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.parseString
 import me.arasple.mc.trchat.util.toUUID
@@ -21,6 +22,8 @@ class PlayerData(val player: OfflinePlayer) {
         }
     }
 
+    val channel get() = player.getDataContainer()["channel"]
+
     val isSpying get() = player.getDataContainer()["spying"].cbool
 
     val isFilterEnabled get() = player.getDataContainer()["filter"]?.cbool ?: true
@@ -34,6 +37,10 @@ class PlayerData(val player: OfflinePlayer) {
     val isVanishing get() = player.getDataContainer()["vanish"].cbool
 
     val ignored get() = player.getDataContainer()["ignored"]?.split(",")?.map { it.toUUID() } ?: emptyList()
+
+    fun setChannel(channel: Channel) {
+        player.getDataContainer()["channel"] = channel.id
+    }
 
     fun selectColor(color: String) {
         player.getDataContainer()["color"] = color
@@ -64,13 +71,15 @@ class PlayerData(val player: OfflinePlayer) {
     }
 
     fun addIgnored(uuid: UUID) {
-        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) + uuid.parseString()
-        player.getDataContainer()["ignored"] = new
+        val list = player.getDataContainer()["ignored"]?.split(",") ?: listOf()
+        val new = list + uuid.parseString()
+        player.getDataContainer()["ignored"] = new.joinToString(",")
     }
 
     fun removeIgnored(uuid: UUID) {
-        val new = (player.getDataContainer()["ignored"]?.split(",") ?: return) - uuid.parseString()
-        player.getDataContainer()["ignored"] = new
+        val list = player.getDataContainer()["ignored"]?.split(",") ?: return
+        val new = list - uuid.parseString()
+        player.getDataContainer()["ignored"] = new.joinToString(",")
     }
 
     fun hasIgnored(uuid: UUID): Boolean {

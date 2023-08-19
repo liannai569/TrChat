@@ -3,8 +3,10 @@ package me.arasple.mc.trchat.module.display
 import me.arasple.mc.trchat.module.adventure.getComponent
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.module.display.channel.Channel
+import me.arasple.mc.trchat.module.display.channel.PrivateChannel
 import me.arasple.mc.trchat.util.color.CustomColor
 import me.arasple.mc.trchat.util.color.MessageColors
+import me.arasple.mc.trchat.util.data
 import me.arasple.mc.trchat.util.getDataContainer
 import me.arasple.mc.trchat.util.reportOnce
 import org.bukkit.entity.Player
@@ -17,10 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author ItsFlicker
  * @since 2021/12/11 22:44
  */
-class ChatSession(
-    val player: Player,
-    var channel: String?
-) {
+class ChatSession(val player: Player) {
 
     val receivedMessages = mutableListOf<ChatMessage>()
     var lastChannel: Channel? = null
@@ -28,6 +27,17 @@ class ChatSession(
     var lastPrivateMessage = ""
     var lastPrivateTo = ""
     var cancelChat = false
+    var channel: String?
+        private set
+
+    init {
+        val data = player.data
+        channel = if (data.channel != null && Channel.channels[data.channel] != null) {
+            data.channel
+        } else {
+            Settings.defaultChannel
+        }
+    }
 
     fun getColor(default: CustomColor?): CustomColor {
         val forces = MessageColors.getForceColors(player)
@@ -46,6 +56,13 @@ class ChatSession(
     fun getChannel(): Channel? {
         channel ?: return null
         return Channel.channels[channel]
+    }
+
+    fun setChannel(channel: Channel?) {
+        this.channel = channel?.id
+        if (channel != null && channel !is PrivateChannel) {
+            player.data.setChannel(channel)
+        }
     }
 
     fun addMessage(packet: Packet) {
@@ -79,9 +96,7 @@ class ChatSession(
         val sessions = ConcurrentHashMap<UUID, ChatSession>()
 
         fun getSession(player: Player): ChatSession {
-            return sessions.computeIfAbsent(player.uniqueId) {
-                ChatSession(player, Settings.defaultChannel)
-            }
+            return sessions.computeIfAbsent(player.uniqueId) { ChatSession(player) }
         }
 
         fun removeSession(player: Player) {

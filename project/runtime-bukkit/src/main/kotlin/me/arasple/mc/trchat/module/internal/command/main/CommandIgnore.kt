@@ -25,7 +25,7 @@ object CommandIgnore {
 
     @Awake(LifeCycle.ENABLE)
     fun ignore() {
-        command("ignore", permission = "trchat.command.ignore") {
+        command("ignore", listOf("trignore"), permission = "trchat.command.ignore") {
             dynamic("player") {
                 suggest {
                     BukkitProxyManager.getPlayerNames().keys.filter { it !in PlayerData.vanishing }

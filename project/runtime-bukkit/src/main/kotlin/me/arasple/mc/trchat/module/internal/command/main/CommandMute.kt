@@ -33,13 +33,13 @@ object CommandMute {
 
     @Awake(LifeCycle.ENABLE)
     fun c() {
-        command("mute", description = "Mute a player", permission = "trchat.command.mute") {
+        command("mute", listOf("trmute"), description = "Mute a player", permission = "trchat.command.mute") {
             dynamic("player") {
                 suggest {
                     BukkitProxyManager.getPlayerNames().keys.toList()
                 }
-                execute<CommandSender> { sender, _, argument ->
-                    val player = Bukkit.getOfflinePlayer(argument)
+                execute<CommandSender> { sender, ctx, _ ->
+                    val player = Bukkit.getOfflinePlayer(ctx["player"])
                     if (!player.hasPlayedBefore()) {
                         return@execute sender.sendLang("Command-Player-Not-Exist")
                     }
@@ -78,7 +78,7 @@ object CommandMute {
                 createHelper()
             }
         }
-        command("unmute", description = "Unmute a player", permission = "trchat.command.unmute") {
+        command("unmute", listOf("trunmute"), description = "Unmute a player", permission = "trchat.command.unmute") {
             dynamic("player") {
                 suggest {
                     BukkitProxyManager.getPlayerNames().keys.toList()

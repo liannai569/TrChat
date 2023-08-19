@@ -26,18 +26,22 @@ object Settings {
 
     @ConfigNode("Channel.Default", "settings.yml")
     var defaultChannel = "Normal"
+        private set
 
     @ConfigNode("Chat.Cooldown", "settings.yml")
     val chatCooldown = ConfigNodeTransfer<String, Long> { parseMillis() }
 
     @ConfigNode("Chat.Anti-Repeat", "settings.yml")
     var chatSimilarity = 0.85
+        private set
 
     @ConfigNode("Chat.Length-Limit", "settings.yml")
     var chatLengthLimit = 100
+        private set
 
     @ConfigNode("Options.Component-Max-Length", "settings.yml")
     var componentMaxLength = 32700
+        private set
 
     @Awake(LifeCycle.ENABLE)
     fun init() {

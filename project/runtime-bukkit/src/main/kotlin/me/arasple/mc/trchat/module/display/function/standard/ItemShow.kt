@@ -31,7 +31,7 @@ import taboolib.module.configuration.ConfigNode
 import taboolib.module.configuration.ConfigNodeTransfer
 import taboolib.module.nms.MinecraftVersion
 import taboolib.module.nms.getI18nName
-import taboolib.module.nms.getInternalName
+import taboolib.module.nms.getLocaleKey
 import taboolib.module.ui.buildMenu
 import taboolib.module.ui.type.Hopper
 import taboolib.platform.util.asLangText
@@ -167,7 +167,7 @@ object ItemShow : Function("ITEM") {
     private fun ItemStack.getNameComponent(player: Player): ComponentText {
         return if (originName || itemMeta?.hasDisplayName() != true) {
             if (MinecraftVersion.major >= 7) {
-                Components.empty().appendTranslation(getInternalName())
+                Components.empty().appendTranslation(getLocaleKey().path)
             } else {
                 Components.text(getI18nName(player))
             }

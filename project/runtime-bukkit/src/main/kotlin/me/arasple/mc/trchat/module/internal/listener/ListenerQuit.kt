@@ -2,8 +2,6 @@ package me.arasple.mc.trchat.module.internal.listener
 
 import me.arasple.mc.trchat.module.display.ChatSession
 import me.arasple.mc.trchat.module.display.channel.Channel
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerKickEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Platform
 import taboolib.common.platform.PlatformSide
@@ -18,19 +16,12 @@ import taboolib.expansion.releaseDataContainer
 @PlatformSide([Platform.BUKKIT])
 object ListenerQuit {
 
-    private fun disconnect(player: Player) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onQuit(e: PlayerQuitEvent) {
+        val player = e.player
         Channel.channels.values.forEach { it.listeners -= player.name }
         ChatSession.removeSession(player)
         player.releaseDataContainer()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onQuit(e: PlayerQuitEvent) {
-        disconnect(e.player)
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onKick(e: PlayerKickEvent) {
-        disconnect(e.player)
-    }
 }

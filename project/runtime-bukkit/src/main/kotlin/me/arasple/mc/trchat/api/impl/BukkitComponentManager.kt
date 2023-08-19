@@ -2,6 +2,7 @@ package me.arasple.mc.trchat.api.impl
 
 import me.arasple.mc.trchat.TrChat
 import me.arasple.mc.trchat.api.ComponentManager
+import me.arasple.mc.trchat.api.event.TrChatReceiveEvent
 import me.arasple.mc.trchat.api.nms.NMS
 import me.arasple.mc.trchat.module.conf.file.Settings
 import me.arasple.mc.trchat.util.data
@@ -48,20 +49,22 @@ object BukkitComponentManager : ComponentManager {
             is UUID -> sender
             else -> null
         }
-
         if (commandSender is Player && uuid in commandSender.data.ignored) {
             return
         }
-        val newComponent = if (isFilterEnabled && commandSender is Player && commandSender.data.isFilterEnabled) {
-            filterComponent(component, Settings.componentMaxLength)
-        } else if (commandSender is Player) {
-            validateComponent(component, Settings.componentMaxLength)
-        } else {
-            component
+        val event = TrChatReceiveEvent(commandSender, uuid, component)
+        if (!event.call()) {
+            return
         }
-
+        val newComponent = if (isFilterEnabled && commandSender is Player && commandSender.data.isFilterEnabled) {
+            filterComponent(event.message, Settings.componentMaxLength)
+        } else if (commandSender is Player) {
+            validateComponent(event.message, Settings.componentMaxLength)
+        } else {
+            event.message
+        }
         if (commandSender is Player) {
-            NMS.instance.sendMessage(commandSender, newComponent, uuid)
+            NMS.instance.sendMessage(commandSender, newComponent, event.sender)
         } else {
             newComponent.sendTo(adaptCommandSender(commandSender))
         }

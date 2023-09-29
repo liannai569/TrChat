@@ -19,6 +19,7 @@ import org.bukkit.entity.Player
 import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.suggest
+import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.util.subList
@@ -93,7 +94,7 @@ class PrivateChannel(
             player.sendLang("Channel-No-Speak-Permission")
             return null
         }
-        if (settings.filterBeforeSending && TrChat.api().getFilterManager().filter(message).sensitiveWords > 0) {
+        if (settings.filterBeforeSending && TrChat.api().getFilterManager().filter(message, adaptPlayer(player)).sensitiveWords > 0) {
             player.sendLang("Channel-Bad-Language")
             return null
         }

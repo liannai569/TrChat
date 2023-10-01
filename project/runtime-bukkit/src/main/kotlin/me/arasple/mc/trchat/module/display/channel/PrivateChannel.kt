@@ -15,6 +15,7 @@ import me.arasple.mc.trchat.util.checkMute
 import me.arasple.mc.trchat.util.pass
 import me.arasple.mc.trchat.util.sendComponent
 import me.arasple.mc.trchat.util.session
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.command.command
@@ -142,8 +143,8 @@ class PrivateChannel(
         }
         player.sendComponent(player, send)
 
-        PlayerData.data.filterValues { it.isSpying }.entries.forEach { (_, v) ->
-            v.player.player
+        PlayerData.spying.forEach {
+            Bukkit.getPlayer(it)
                 ?.sendLang("Private-Message-Spy-Format", player.name, to, msgComponent!!.toLegacyText())
         }
         console().sendLang("Private-Message-Spy-Format", player.name, to, msgComponent!!.toLegacyText())

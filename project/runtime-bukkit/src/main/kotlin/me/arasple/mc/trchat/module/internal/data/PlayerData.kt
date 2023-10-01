@@ -17,9 +17,8 @@ import java.util.concurrent.ConcurrentHashMap
 class PlayerData(val player: Player) {
 
     init {
-        if (isVanishing) {
-            vanishing += player.name
-        }
+        if (isVanishing) vanishing += player.name
+        if (isSpying) spying += player.name
     }
 
     val channel get() = player.getDataContainer()["channel"]
@@ -64,7 +63,9 @@ class PlayerData(val player: Player) {
 
     fun switchSpy(): Boolean {
         player.getDataContainer()["spying"] = !isSpying
-        return isSpying
+        return isSpying.also {
+            if (it) spying += player.name else spying -= player.name
+        }
     }
 
     fun switchVanish(): Boolean {
@@ -106,12 +107,17 @@ class PlayerData(val player: Player) {
         @JvmField
         val data = ConcurrentHashMap<UUID, PlayerData>()
 
+        val spying = mutableSetOf<String>()
         val vanishing = mutableSetOf<String>()
 
         fun getData(player: Player): PlayerData {
             return data.computeIfAbsent(player.uniqueId) {
                 PlayerData(player)
             }
+        }
+
+        fun removeData(player: Player) {
+            data -= player.uniqueId
         }
 
     }

@@ -171,7 +171,8 @@ object ItemShow : Function("ITEM") {
         val menu = buildMenu<Hopper>(sender.asLangText("Function-Item-Show-Title", sender.name)) {
             rows(1)
             map("xxixx")
-            set('x', XMaterial.BLACK_STAINED_GLASS_PANE) { name = "§r" }
+            //移除不需要的物品,方便自定义Gui
+            // set('x', XMaterial.BLACK_STAINED_GLASS_PANE) { name = "§r" }
             set('i', item)
             onClick(lock = true)
         }
